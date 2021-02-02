@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "author": "Hektor Misplon",
+  "license": "MIT",
+  "scripts": {
+    "start": "snowpack dev"
+  },
+  "devDependencies": {
+    "@snowpack/plugin-svelte": "^3.5.2",
+    "snowpack": "^3.0.1"
+  },
+  "dependencies": {
+    "svelte": "^3.32.1"
+  }
+}
