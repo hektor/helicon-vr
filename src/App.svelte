@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from "svelte";
   import {
     Color,
     Fog,
@@ -24,8 +25,9 @@
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
   let target;
-  const { width = innerWidth, height = innerHeight } = window;
-  const aspectRatio = width / height;
+
+  $: width = 0;
+  $: height = 0;
 
   const settings = {
     fov: 45,
@@ -51,7 +53,7 @@
   });
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(45, aspectRatio, near, far / 2);
+  const camera = new PerspectiveCamera(45, width / height, near, far / 2);
   const renderer = new WebGLRenderer();
   const material = new LineBasicMaterial({ color: 0x0000ff });
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -87,19 +89,32 @@
   controls.update();
 
   renderer.xr.enabled = true;
-  renderer.setSize(width, height);
 
   $: target && target.appendChild(renderer.domElement);
   $: target && target.appendChild(VRButton.createButton(renderer));
   $: target && target.appendChild(stats.dom);
+
+  const resize = () => {
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  };
 
   renderer.setAnimationLoop(() => {
     stats.begin();
     renderer.render(scene, camera);
     stats.end();
   });
+
+  onMount(() => {
+    resize();
+  });
 </script>
 
+<svelte:window
+  on:resize={resize}
+  bind:innerWidth={width}
+  bind:innerHeight={height} />
 <div bind:this={target}>
   <slot />
 </div>
