@@ -57,9 +57,6 @@
   const geometry = new BufferGeometry().setFromPoints(points);
   const line = new Line(geometry, material);
 
-  /* Create surface plane */
-  const surface = new Mesh(new PlaneGeometry(16, 16, 16, 16));
-
   /* Add fog */
   scene.fog = new Fog(0x111111, near, far);
   scene.background = new Color(0x0c0c0c);
@@ -73,7 +70,6 @@
   scene.add(light);
 
   /* Add geometry to scene */
-  scene.add(surface);
   scene.add(line);
 
   camera.position.set(0, 0, 100);
