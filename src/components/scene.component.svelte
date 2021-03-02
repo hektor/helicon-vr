@@ -4,6 +4,7 @@
     Color,
     Fog,
     Scene,
+    Clock,
     PerspectiveCamera,
     WebGLRenderer,
     BufferGeometry,
@@ -15,8 +16,10 @@
     PlaneGeometry,
     Vector3,
     AmbientLight,
+    PointLight,
     DirectionalLight,
     SpotLight,
+    SphereGeometry,
   } from "three";
 
   import Stats from "three/examples/jsm/libs/stats.module.js";
@@ -35,22 +38,7 @@
     far: 500,
   };
 
-  const { fov, near, far } = settings;
-
-  /* Initialize GUI controls */
-  const gui = new GUI();
-  gui.add(settings, "fov", 0, 90).onChange((value) => {
-    camera.fov = value;
-    camera.updateProjectionMatrix();
-  });
-  gui.add(settings, "near", 0, 1000).onChange((value) => {
-    camera.near = value;
-    camera.updateProjectionMatrix();
-  });
-  gui.add(settings, "far", 0, 1000).onChange((value) => {
-    camera.far = value;
-    camera.updateProjectionMatrix();
-  });
+  const clock = new Clock();
 
   const scene = new Scene();
   const camera = new PerspectiveCamera(45, width / height, near, far / 2);
@@ -73,11 +61,16 @@
   const surface = new Mesh(new PlaneGeometry(16, 16, 16, 16));
 
   /* Add fog */
-  scene.fog = new Fog(0xffffff, near, far);
-  scene.background = new Color(0xcccccc);
+  scene.fog = new Fog(0x111111, near, far);
+  scene.background = new Color(0x0c0c0c);
 
-  /* Lay surface flat */
-  surface.rotation.x = -Math.PI / 2;
+  const sphere = new SphereGeometry(0.25, 16, 16);
+
+  sphere.translate(0, 8, 0);
+
+  const light = new PointLight(0xffffff, 1, 16);
+  light.add(new Mesh(sphere, new MeshBasicMaterial({ color: 0xffffff })));
+  scene.add(light);
 
   /* Add geometry to scene */
   scene.add(surface);
@@ -103,6 +96,12 @@
   renderer.setAnimationLoop(() => {
     stats.begin();
     renderer.render(scene, camera);
+
+    const time = Date.now() * 0.0005;
+    const delta = clock.getDelta();
+
+    light.position.x = Math.sin(time * 8) * 8;
+    light.position.z = Math.cos(time * 8) * 8;
     stats.end();
   });
 
