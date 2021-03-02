@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
   import {
     Color,
     Fog,
@@ -106,6 +106,13 @@
   onMount(() => {
     resize();
   });
+
+  export const ctx = {
+    scene,
+    camera,
+  };
+
+  setContext("scene", ctx);
 </script>
 
 <svelte:window
