@@ -24,21 +24,20 @@
   } from "three";
 
   import Stats from "three/examples/jsm/libs/stats.module.js";
-  import { GUI } from "three/examples/jsm/libs/dat.gui.module.js";
   import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+  import { settings } from "../stores/camera-settings.store";
+
+  import GUI from "./gui.component.svelte";
   import Terrain from "./terrain.component.svelte";
+
   let target;
 
   $: width = 0;
   $: height = 0;
 
-  const settings = {
-    fov: 45,
-    near: 1,
-    far: 500,
-  };
+  const { fov, near, far } = $settings;
 
   const clock = new Clock();
 
@@ -120,5 +119,6 @@
   bind:innerWidth={width}
   bind:innerHeight={height} />
 <div bind:this={target}>
+  <GUI />
   <Terrain />
 </div>
