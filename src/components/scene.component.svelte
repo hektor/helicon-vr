@@ -10,6 +10,7 @@
     BufferGeometry,
     LineBasicMaterial,
     MeshPhongMaterial,
+    MeshBasicMaterial,
     Line,
     Mesh,
     Plane,
@@ -27,6 +28,7 @@
   import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+  import Terrain from "./terrain.component.svelte";
   let target;
 
   $: width = 0;
@@ -111,5 +113,5 @@
   bind:innerWidth={width}
   bind:innerHeight={height} />
 <div bind:this={target}>
-  <slot />
+  <Terrain />
 </div>
