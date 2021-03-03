@@ -21,12 +21,11 @@
 
   import Stats from "three/examples/jsm/libs/stats.module.js";
   import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
-  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-
   import { settings } from "../stores/camera-settings.store";
 
   import GUI from "./gui.component.svelte";
   import Terrain from "./terrain.component.svelte";
+  import Controls from "./orbit-controls.component.svelte";
 
   let target;
 
@@ -108,12 +107,12 @@
     resize();
   });
 
-  export const ctx = {
+  setContext("scene", {
+    composer,
+    renderer,
     scene,
     camera,
-  };
-
-  setContext("scene", ctx);
+  });
 </script>
 
 <svelte:window
@@ -121,6 +120,7 @@
   bind:innerWidth={width}
   bind:innerHeight={height} />
 <div bind:this={target}>
+  <Controls />
   <GUI />
   <Terrain />
 </div>
