@@ -21,10 +21,12 @@
 
   import Stats from "three/examples/jsm/libs/stats.module.js";
   import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
+  import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
   import { settings } from "../stores/camera-settings.store";
 
   import GUI from "./gui.component.svelte";
   import Terrain from "./terrain.component.svelte";
+  import Bloom from "./bloom.component.svelte";
   import Controls from "./orbit-controls.component.svelte";
 
   let target;
@@ -86,16 +88,18 @@
   $: target && target.appendChild(VRButton.createButton(renderer));
   $: target && target.appendChild(stats.dom);
 
+  const composer = new EffectComposer(renderer);
+
   const resize = () => {
     renderer.setSize(width, height);
+    composer.setSize(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   };
 
   renderer.setAnimationLoop(() => {
     stats.begin();
-    renderer.render(scene, camera);
-
+    composer.render(scene, camera);
     const time = clock.getElapsedTime();
 
     light.position.x = Math.sin(time * 8) * 8;
@@ -123,4 +127,5 @@
   <Controls />
   <GUI />
   <Terrain />
+  <Bloom />
 </div>
