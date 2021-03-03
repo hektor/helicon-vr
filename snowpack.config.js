@@ -7,7 +7,9 @@ module.exports = {
   plugins: ['@snowpack/plugin-svelte'],
   routes: [],
   optimize: {},
-  packageOptions: {},
   devOptions: {},
   buildOptions: {},
+  packageOptions: {
+    source: 'remote',
+  },
 }
