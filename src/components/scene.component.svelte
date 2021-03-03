@@ -9,17 +9,11 @@
     WebGLRenderer,
     BufferGeometry,
     LineBasicMaterial,
-    MeshPhongMaterial,
     MeshBasicMaterial,
     Line,
     Mesh,
-    Plane,
-    PlaneGeometry,
     Vector3,
-    AmbientLight,
     PointLight,
-    DirectionalLight,
-    SpotLight,
     SphereGeometry,
   } from "three";
 
