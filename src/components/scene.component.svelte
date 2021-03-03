@@ -1,10 +1,10 @@
 <script>
   import { onMount, setContext } from "svelte";
   import {
+    Clock,
     Color,
     Fog,
     Scene,
-    Clock,
     PerspectiveCamera,
     WebGLRenderer,
     BufferGeometry,
@@ -94,8 +94,7 @@
     stats.begin();
     renderer.render(scene, camera);
 
-    const time = Date.now() * 0.0005;
-    const delta = clock.getDelta();
+    const time = clock.getElapsedTime();
 
     light.position.x = Math.sin(time * 8) * 8;
     light.position.z = Math.cos(time * 8) * 8;
