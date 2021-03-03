@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+blender terrain.blend --background --python export.py
