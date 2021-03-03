@@ -14,6 +14,8 @@
     Mesh,
     Vector3,
     PointLight,
+    ReinhardToneMapping,
+    sRGBEncoding,
     SphereGeometry,
   } from "three";
 
@@ -34,12 +36,10 @@
   const { fov, near, far } = $settings;
 
   const clock = new Clock();
-
   const scene = new Scene();
-  const camera = new PerspectiveCamera(45, width / height, near, far / 2);
-  const renderer = new WebGLRenderer();
+  const camera = new PerspectiveCamera(fov, width / height, near, far / 2);
+  const renderer = new WebGLRenderer({ antialias: true });
   const material = new LineBasicMaterial({ color: 0x0000ff });
-  const controls = new OrbitControls(camera, renderer.domElement);
   const stats = new Stats();
 
   /* Create rectangle*/
@@ -67,12 +67,21 @@
   /* Add geometry to scene */
   scene.add(line);
 
-  camera.position.set(0, 0, 100);
+  camera.position.set(0, 32, 0);
   camera.lookAt(0, 0, 0);
 
-  controls.update();
-
+  /*
+   * Configure renderer
+   */
   renderer.xr.enabled = true;
+  renderer.toneMapping = ReinhardToneMapping;
+  renderer.shadowMap.enabled = true;
+  // renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.physicallyCorrectLights;
+  // color accuracy
+  renderer.gammaFactor = 2.2;
+  renderer.outputEncoding = sRGBEncoding;
 
   $: target && target.appendChild(renderer.domElement);
   $: target && target.appendChild(VRButton.createButton(renderer));
