@@ -7,12 +7,8 @@
     Scene,
     PerspectiveCamera,
     WebGLRenderer,
-    BufferGeometry,
-    LineBasicMaterial,
     MeshBasicMaterial,
-    Line,
     Mesh,
-    Vector3,
     PointLight,
     ReinhardToneMapping,
     sRGBEncoding,
@@ -36,22 +32,22 @@
 
   const { fov, near, far } = $settings;
 
-  const clock = new Clock(); // Makes use of performance.now()
   const scene = new Scene();
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2);
+  const light = new PointLight(0xffffff, 1, 16);
   const renderer = new WebGLRenderer({ antialias: true });
-  const material = new LineBasicMaterial({ color: 0x0000ff });
+  const composer = new EffectComposer(renderer);
+  const clock = new Clock(); // Makes use of performance.now()
   const stats = new Stats();
 
-  /* Create rectangle*/
-  const points = [];
-  points.push(new Vector3(-8, 0, 0));
-  points.push(new Vector3(8, 0, 0));
-  points.push(new Vector3(8, 8, 0));
-  points.push(new Vector3(-8, 8, 0));
-  points.push(new Vector3(-8, 0, 0));
-  const geometry = new BufferGeometry().setFromPoints(points);
-  const line = new Line(geometry, material);
+  const sphere = new SphereGeometry(0.25, 16, 16);
+
+  const resize = () => {
+    renderer.setSize(width, height);
+    composer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  };
 
   /*
    * Add fog to scene (fade distant objects)
@@ -59,17 +55,17 @@
   scene.fog = new Fog(0x111111, near, far);
   scene.background = new Color(0x0c0c0c);
 
-  const sphere = new SphereGeometry(0.25, 16, 16);
-
-  sphere.translate(0, 8, 0);
-
-  const light = new PointLight(0xffffff, 1, 16);
+  /*
+   * Add lights to scene
+   */
   light.add(new Mesh(sphere, new MeshBasicMaterial({ color: 0xffffff })));
   scene.add(light);
 
-  /* Add geometry to scene */
-  scene.add(line);
+  sphere.translate(0, 8, 0);
 
+  /*
+   * Configure camera
+   */
   camera.position.set(0, 32, 0);
   camera.lookAt(0, 0, 0);
 
@@ -85,19 +81,6 @@
   // color accuracy
   renderer.gammaFactor = 2.2;
   renderer.outputEncoding = sRGBEncoding;
-
-  $: target && target.appendChild(renderer.domElement);
-  $: target && target.appendChild(VRButton.createButton(renderer));
-  $: target && target.appendChild(stats.dom);
-
-  const composer = new EffectComposer(renderer);
-
-  const resize = () => {
-    renderer.setSize(width, height);
-    composer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-  };
 
   /*
    * Use setAnimationLoop for WebXR (requestAnimationFrame equiv)
@@ -120,6 +103,12 @@
     resize();
   });
 
+  // Attach elements to DOM
+  $: target && target.appendChild(renderer.domElement);
+  $: target && target.appendChild(VRButton.createButton(renderer));
+  $: target && target.appendChild(stats.dom);
+
+  //Expose scene objects
   setContext("scene", {
     composer,
     renderer,
