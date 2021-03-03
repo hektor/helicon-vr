@@ -1,5 +1,6 @@
 <script>
-  import Scene from "./components/scene.component.svelte";
+  import Router from "svelte-spa-router";
+  import { routes } from "./routes";
 </script>
 
 <style>
@@ -29,4 +30,4 @@
   }
 </style>
 
-<Scene />
+<Router {routes} />
