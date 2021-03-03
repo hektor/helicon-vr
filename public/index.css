@@ -1,4 +1,44 @@
-/* Add CSS styles here! */
+@import url('https://rsms.me/inter/inter.css');
+
+/*
+ * Variables
+ */
+
+:root {
+  /* Color variables */
+  --color-bg: #eee;
+  --color-1: #aaa;
+  --color-2: #999;
+  --color-3: #888;
+  --color-4: #777;
+  --color-5: #666;
+  --color-primary: #333;
+}
+
+/*
+ * Reset
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Base
+ */
+
+html {
+  font-size: 62.5%;
+}
+
 body {
-  font-family: sans-serif;
+  display: flex;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-family: var(--font-family);
+  font-size: 1.6rem;
+  min-height: 100vh;
 }
