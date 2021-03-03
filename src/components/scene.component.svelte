@@ -36,7 +36,7 @@
 
   const { fov, near, far } = $settings;
 
-  const clock = new Clock();
+  const clock = new Clock(); // Makes use of performance.now()
   const scene = new Scene();
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2);
   const renderer = new WebGLRenderer({ antialias: true });
@@ -53,7 +53,9 @@
   const geometry = new BufferGeometry().setFromPoints(points);
   const line = new Line(geometry, material);
 
-  /* Add fog */
+  /*
+   * Add fog to scene (fade distant objects)
+   */
   scene.fog = new Fog(0x111111, near, far);
   scene.background = new Color(0x0c0c0c);
 
@@ -97,13 +99,20 @@
     camera.updateProjectionMatrix();
   };
 
+  /*
+   * Use setAnimationLoop for WebXR (requestAnimationFrame equiv)
+   */
   renderer.setAnimationLoop(() => {
+    // Monitor performance of enclosed code (begin to end)
     stats.begin();
-    composer.render(scene, camera);
-    const time = clock.getElapsedTime();
-
-    light.position.x = Math.sin(time * 8) * 8;
-    light.position.z = Math.cos(time * 8) * 8;
+    {
+      // Render scene
+      composer.render(scene, camera);
+      // Circling lights
+      const time = clock.getElapsedTime();
+      light.position.x = Math.sin(time * 8) * 8;
+      light.position.z = Math.cos(time * 8) * 8;
+    }
     stats.end();
   });
 
