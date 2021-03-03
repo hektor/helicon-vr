@@ -35,7 +35,10 @@
   const scene = new Scene();
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2);
   const light = new PointLight(0xffffff, 1, 16);
-  const renderer = new WebGLRenderer({ antialias: true });
+  const renderer = new WebGLRenderer({
+    antialias: true,
+    powerPreference: "high-performance",
+  });
   const composer = new EffectComposer(renderer);
   const clock = new Clock(); // Makes use of performance.now()
   const stats = new Stats();
