@@ -4,8 +4,9 @@
   // Pages
   import Home from "./pages/home.page.svelte";
   import About from "./pages/about.page.svelte";
+  import Devices from "./pages/devices.page.svelte";
 
-  const routes = { "/": Home, "/about": About };
+  const routes = { "/": Home, "/about": About, "/devices": Devices };
 </script>
 
 <style>
