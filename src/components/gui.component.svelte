@@ -4,7 +4,7 @@
   import tweakpane from "https://cdn.skypack.dev/tweakpane";
   import { getContext } from "svelte";
   const { camera } = getContext("scene");
-  import { settings } from "../stores/camera-settings.store";
+  import { settings } from "../stores/camera";
   const { setFov, setNear, setFar, reset } = settings;
 
   /*

@@ -18,7 +18,7 @@
   import Stats from "three/examples/jsm/libs/stats.module.js";
   import { VRButton } from "three/examples/jsm/webxr/VRButton.js";
   import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-  import { settings } from "../stores/camera-settings.store";
+  import { settings } from "../stores/camera";
 
   import GUI from "./gui.component.svelte";
   import Terrain from "./terrain.component.svelte";
