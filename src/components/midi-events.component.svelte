@@ -2,6 +2,7 @@
   import { BehaviorSubject, fromEvent } from "rxjs";
   import { skip, filter, tap, pluck } from "rxjs/operators";
   import { inputs$ } from "../stores/devices.js";
+  import { notes$, controls$ } from "../stores/midi.js";
 
   /*
    * Channel voice messages (0x80 - 0xEF)
@@ -50,11 +51,7 @@
   const noteNum = (note) => note[1];
   const noteVel = (note) => note[2];
 
-  noteMessages$.subscribe((note) => {
-    console.log("Note:");
-    console.log(noteNum(note));
-    console.log(noteVel(note));
-  });
+  noteMessages$.pipe(skip(1)).subscribe((note) => notes$.next(note));
 
   /*
    * Control stream
@@ -66,9 +63,5 @@
   const controlNum = (controller) => controller[1];
   const controlVal = (controller) => controller[2];
 
-  controlMessages$.subscribe((control) => {
-    console.log("Control:");
-    console.log(controlNum(control));
-    console.log(controlVal(control));
-  });
+  controlMessages$.pipe(skip(1)).subscribe((cc) => controls$.next(cc));
 </script>
