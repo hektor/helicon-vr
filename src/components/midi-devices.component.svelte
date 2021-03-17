@@ -33,7 +33,7 @@
 </script>
 
 <div>
-  <button on:click={init}><Renew />Scan for MIDI devices</button>
+  <button on:click={init}><Renew />Refresh MIDI devices</button>
   <pre>{JSON.stringify($inputNames$, 0, 2)}</pre>
   <pre>{JSON.stringify($outputNames$, 0, 2)}</pre>
 </div>
