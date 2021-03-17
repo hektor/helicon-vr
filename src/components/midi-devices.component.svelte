@@ -8,6 +8,8 @@
     outputNames$,
   } from "../stores/devices";
 
+  import Renew from "carbon-icons-svelte/lib/Renew16";
+
   const doesMIDI = !!navigator.requestMIDIAccess;
 
   const allow = async (midi) => {
@@ -31,6 +33,7 @@
 </script>
 
 <div>
+  <button on:click={init}><Renew />Scan for MIDI devices</button>
   <pre>{JSON.stringify($inputNames$, 0, 2)}</pre>
   <pre>{JSON.stringify($outputNames$, 0, 2)}</pre>
 </div>
