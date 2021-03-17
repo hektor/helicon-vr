@@ -5,7 +5,7 @@ module.exports = {
     src: '/dist',
   },
   plugins: ['@snowpack/plugin-svelte'],
-  routes: [],
+  routes: [{ match: 'routes', src: '.*', dest: '/index.html' }],
   optimize: {},
   devOptions: {},
   buildOptions: {},
