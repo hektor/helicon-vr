@@ -18,7 +18,7 @@
     inputNames$.next([...inputs.values()].map(({ name }) => name));
     outputNames$.next([...outputs.values()].map(({ name }) => name));
 
-    fromEvent(midi, "statechange").subscribe(init);
+    fromEvent(midi, "statechange").subscribe(console.log);
   };
 
   const reject = (e) => console.error("No MIDI access", e);
