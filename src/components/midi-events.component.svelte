@@ -48,9 +48,6 @@
   const isNoteToggle = (msg) => isNoteOn(msg) || isNoteOff(msg);
   const noteMessages$ = channelMessages$.pipe(filter(isNoteToggle));
 
-  const noteNum = (note) => note[1];
-  const noteVel = (note) => note[2];
-
   noteMessages$.pipe(skip(1)).subscribe((note) => notes$.next(note));
 
   /*
@@ -59,9 +56,6 @@
 
   const isControlChange = (msg) => statusByte(msg) == CONTROL_CHANGE;
   const controlMessages$ = channelMessages$.pipe(filter(isControlChange));
-
-  const controlNum = (controller) => controller[1];
-  const controlVal = (controller) => controller[2];
 
   controlMessages$.pipe(skip(1)).subscribe((cc) => controls$.next(cc));
 </script>
