@@ -1,7 +1,6 @@
 import { BehaviorSubject } from 'rxjs'
 
-export const notes$ = new BehaviorSubject()
-export const controls$ = new BehaviorSubject()
+export const notes$ = new BehaviorSubject(null)
+export const controls$ = new BehaviorSubject(null)
 
-notes$.subscribe(note => console.log('Note', note))
 controls$.subscribe(control => console.log('Control', control))
