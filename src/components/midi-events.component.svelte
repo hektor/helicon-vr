@@ -3,6 +3,18 @@
   import { skip, filter, tap, pluck } from "rxjs/operators";
   import { inputs$ } from "../stores/devices.js";
 
+  /*
+   * Channel voice messages (0x80 - 0xEF)
+   */
+
+  const NOTE_OFF = 0x80;
+  const NOTE_ON = 0x90;
+  const CONTROL_CHANGE = 0xb0;
+
+  /*
+   * Initialize MIDI message observable
+   */
+
   const messages$ = new BehaviorSubject();
 
   inputs$
@@ -14,10 +26,8 @@
     )
     .subscribe();
 
-  // messages$.pipe(skip(1), tap(console.log)).subscribe();
-
   /*
-   * Stream channel messages (0x80 - 0xEF)
+   * Channel message stream
    */
 
   const channelMessages$ = messages$.pipe(
@@ -26,11 +36,39 @@
     filter((message) => message[0] < 240)
   );
 
-  channelMessages$.subscribe();
-
   const statusByte = (msg) => msg[0];
-  const isNoteOn = (msg) => statusByte(msg) == 0x90;
-  const isNoteOff = (msg) => statusByte(msg) == 0x80;
+
+  /*
+   * Notes stream
+   */
+
+  const isNoteOn = (msg) => statusByte(msg) == NOTE_ON;
+  const isNoteOff = (msg) => statusByte(msg) == NOTE_OFF;
   const isNoteToggle = (msg) => isNoteOn(msg) || isNoteOff(msg);
-  channelMessages$.pipe(filter(isNoteToggle)).subscribe(console.log);
+  const noteMessages$ = channelMessages$.pipe(filter(isNoteToggle));
+
+  const noteNum = (note) => note[1];
+  const noteVel = (note) => note[2];
+
+  noteMessages$.subscribe((note) => {
+    console.log("Note:");
+    console.log(noteNum(note));
+    console.log(noteVel(note));
+  });
+
+  /*
+   * Control stream
+   */
+
+  const isControlChange = (msg) => statusByte(msg) == CONTROL_CHANGE;
+  const controlMessages$ = channelMessages$.pipe(filter(isControlChange));
+
+  const controlNum = (controller) => controller[1];
+  const controlVal = (controller) => controller[2];
+
+  controlMessages$.subscribe((control) => {
+    console.log("Control:");
+    console.log(controlNum(control));
+    console.log(controlVal(control));
+  });
 </script>
