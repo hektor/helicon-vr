@@ -1,13 +1,15 @@
 <script>
-  import Router from "svelte-spa-router";
+  import Router from 'svelte-spa-router'
 
   // Pages
-  import Home from "./pages/home.page.svelte";
-  import About from "./pages/about.page.svelte";
-  import MIDI from "./pages/midi.page.svelte";
+  import Home from './pages/home.page.svelte'
+  import About from './pages/about.page.svelte'
+  import MIDI from './pages/midi.page.svelte'
 
-  const routes = { "/": Home, "/about": About, "/midi": MIDI };
+  const routes = { '/': Home, '/about': About, '/midi': MIDI }
 </script>
+
+<Router {routes} />
 
 <style>
   :global(:root) {
@@ -35,5 +37,3 @@
     --tp-separator-color: hsla(0, 0%, 7%, 1);
   }
 </style>
-
-<Router {routes} />

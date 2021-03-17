@@ -1,35 +1,29 @@
 <script>
-  import { onMount } from "svelte";
-  import { fromEvent } from "rxjs";
-  import {
-    inputs$,
-    outputs$,
-    inputNames$,
-    outputNames$,
-  } from "../stores/devices";
+  import { onMount } from 'svelte'
+  import { fromEvent } from 'rxjs'
+  import { inputs$, outputs$, inputNames$, outputNames$ } from '../stores/devices'
 
-  import Renew from "carbon-icons-svelte/lib/Renew16";
+  import Renew from 'carbon-icons-svelte/lib/Renew16'
 
-  const doesMIDI = !!navigator.requestMIDIAccess;
+  const doesMIDI = !!navigator.requestMIDIAccess
 
-  const allow = async (midi) => {
-    const { inputs, outputs } = midi;
+  const allow = async midi => {
+    const { inputs, outputs } = midi
 
-    inputs$.next([...inputs.values()]);
-    outputs$.next([...outputs.values()]);
-    inputNames$.next([...inputs.values()].map(({ name }) => name));
-    outputNames$.next([...outputs.values()].map(({ name }) => name));
+    inputs$.next([...inputs.values()])
+    outputs$.next([...outputs.values()])
+    inputNames$.next([...inputs.values()].map(({ name }) => name))
+    outputNames$.next([...outputs.values()].map(({ name }) => name))
 
-    fromEvent(midi, "statechange").subscribe(console.log);
-  };
+    fromEvent(midi, 'statechange').subscribe(console.log)
+  }
 
-  const reject = (e) => console.error("No MIDI access", e);
+  const reject = e => console.error('No MIDI access', e)
 
   const init = async () =>
-    doesMIDI &&
-    (await navigator.requestMIDIAccess({ sysex: true }).then(allow, reject));
+    doesMIDI && (await navigator.requestMIDIAccess({ sysex: true }).then(allow, reject))
 
-  onMount(init);
+  onMount(init)
 </script>
 
 <div>

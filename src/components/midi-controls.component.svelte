@@ -1,16 +1,15 @@
 <script>
-  import { skip, tap } from "rxjs/operators";
-  import { controls$ } from "../stores/midi.js";
+  import { skip, tap } from 'rxjs/operators'
+  import { controls$ } from '../stores/midi.js'
 
-  const controlNum = (control) => control[1];
-  const controlVal = (control) => control[2];
+  const controlNum = control => control[1]
+  const controlVal = control => control[2]
 
   controls$
     .pipe(
-      skip(1)
-      //
+      skip(1), //
     )
-    .subscribe();
+    .subscribe()
 </script>
 
 <pre>
