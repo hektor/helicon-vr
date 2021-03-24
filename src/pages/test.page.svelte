@@ -1,5 +1,6 @@
 <script>
   import TransportControls from '../components/transport-controls.svelte'
+  import VolumeSlider from '../components/volume-slider.component.svelte'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
   import { Transport } from 'tone'
@@ -58,6 +59,7 @@
 <div class="container">
   <h1>Test page</h1>
   <TransportControls />
+  <VolumeSlider />
   <select bind:value={oscType}>
     <option value="sine">Sine</option>
     <option value="square">Square</option>
