@@ -6,8 +6,15 @@
   import World from './pages/world.page.svelte'
   import About from './pages/about.page.svelte'
   import MIDI from './pages/midi.page.svelte'
+  import Requirements from './pages/requirements.page.svelte'
 
-  const routes = { '/': Home, '/world': World, '/about': About, '/midi': MIDI }
+  const routes = {
+    '/': Home,
+    '/world': World,
+    '/about': About,
+    '/requirements': Requirements,
+    '/midi': MIDI,
+  }
 </script>
 
 <Router {routes} />
