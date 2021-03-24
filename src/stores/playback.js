@@ -1,13 +1,8 @@
-import { BehaviorSubject } from 'rxjs'
+import { writable$ } from './utils/observable-store'
 
-export const playing$ = new BehaviorSubject(false)
-export const bpm$ = new BehaviorSubject(localStorage.getItem('bpm') || 120)
-export const vol$ = new BehaviorSubject(localStorage.getItem('vol') || 100)
-
-/*
- * Support "binding"
- */
-bpm$.set = bpm$.next
+export const playing$ = writable$(false)
+export const bpm$ = writable$(localStorage.getItem('bpm') || 120)
+export const vol$ = writable$(localStorage.getItem('vol') || 100)
 
 /*
  * Persist playback settings
