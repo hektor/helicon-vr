@@ -64,7 +64,7 @@
 <div class="container">
   <TransportControls />
   <ToggleTheme />
-  <VolumeSlider label="Master" value={$vol$} />
+  <VolumeSlider label="Master" bind:value={$vol$} />
   <select bind:value={oscType}>
     <option value="sine">Sine</option>
     <option value="square">Square</option>
