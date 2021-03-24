@@ -74,8 +74,8 @@
   }
 
   .col-left {
-    color: #ccc;
-    background: #555;
+    color: var(--color-primary);
+    background: var(--color-1);
     max-width: 48rem;
   }
 
@@ -91,7 +91,7 @@
   .supports-group-header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--color-1);
     padding: 1.6rem;
   }
 
@@ -108,7 +108,7 @@
     display: flex;
     align-items: center;
     padding: 1.6rem;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--color-1);
   }
 
   .supports > div {
