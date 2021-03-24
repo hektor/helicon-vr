@@ -4,6 +4,7 @@
   import { inputs$, outputs$, inputNames$, outputNames$ } from '../stores/devices'
 
   import Renew from 'carbon-icons-svelte/lib/Renew16'
+  import MidiPort from './icons/midi-port-icon.component.svelte'
 
   const doesMIDI = !!navigator.requestMIDIAccess
 
@@ -27,6 +28,7 @@
 </script>
 
 <div>
+  <MidiPort />
   <button on:click={init}><Renew />Refresh MIDI devices</button>
   <pre>{JSON.stringify($inputNames$, 0, 2)}</pre>
   <pre>{JSON.stringify($outputNames$, 0, 2)}</pre>
