@@ -1,6 +1,7 @@
 <script>
   import TransportControls from '../components/transport-controls.svelte'
   import VolumeSlider from '../components/volume-slider.component.svelte'
+  import ToggleTheme from '../components/toggle-theme.component.svelte'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
   import { Transport } from 'tone'
@@ -62,6 +63,7 @@
 
 <div class="container">
   <TransportControls />
+  <ToggleTheme />
   <VolumeSlider label="Master" value={$vol$} />
   <select bind:value={oscType}>
     <option value="sine">Sine</option>
