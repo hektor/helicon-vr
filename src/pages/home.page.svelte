@@ -15,6 +15,7 @@
     <div class="nav-group">
       <nav>
         <a href="/#/world">Discover</a>
+        <a href="/#/test">Test</a>
       </nav>
       <nav>
         <a href="/#/about">About</a>
