@@ -3,10 +3,11 @@
 
   // Pages
   import Home from './pages/home.page.svelte'
+  import World from './pages/world.page.svelte'
   import About from './pages/about.page.svelte'
   import MIDI from './pages/midi.page.svelte'
 
-  const routes = { '/': Home, '/about': About, '/midi': MIDI }
+  const routes = { '/': Home, '/world': World, '/about': About, '/midi': MIDI }
 </script>
 
 <Router {routes} />
