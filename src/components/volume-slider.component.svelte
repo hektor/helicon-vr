@@ -1,16 +1,34 @@
 <script>
-  import { vol$ } from '../stores/playback'
-  const max = 100
-  const min = 0
+  export let min = 0
+  export let max = 100
+  export let label
+  export let value
 </script>
 
-<div>
-  <input type="range" bind:value={$vol$} {min} {max} steps={max} />
+<div class="slider-container">
+  <label for="master">{label || ''}</label>
+  <div class="slider">
+    <input name="master" type="range" bind:value {min} {max} steps={max} />
+  </div>
+  <span>{value}</span>
 </div>
 
 <style>
-  div {
-    --height: 8rem;
+  label {
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .slider-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 8rem;
+    align-items: center;
+  }
+
+  .slider {
+    --height: 9.6rem;
     --width: 2.4rem;
     display: inline-block;
     width: var(--width);
@@ -18,11 +36,33 @@
     padding: 0;
   }
 
-  div {
+  input {
     width: var(--height);
     height: var(--width);
     margin: 0;
     transform-origin: calc(var(--height) / 2) calc(var(--height) / 2);
     transform: rotate(-90deg);
+  }
+
+  input[type='range']::-webkit-slider-runnable-track {
+    cursor: pointer;
+    background: #ccc;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    cursor: pointer;
+    background: #111;
+  }
+
+  input[type='range'] {
+    -webkit-appearance: none;
+  }
+
+  input[type='range']::-webkit-slider-thumb {
+    height: var(--width);
+    width: 0.4rem;
+    background: #555;
+    cursor: pointer;
+    -webkit-appearance: none;
   }
 </style>

@@ -5,6 +5,7 @@
   import * as Tone from 'tone'
   import { Transport } from 'tone'
   import { playing$, bpm$ } from '../stores/playback'
+  import { vol$ } from '../stores/playback'
 
   const gain = new Tone.Gain(0.1).toDestination()
   const synth = new Tone.Synth({ envelope: { attack: 0.25 } }).connect(gain)
@@ -60,9 +61,8 @@
 </script>
 
 <div class="container">
-  <h1>Test page</h1>
   <TransportControls />
-  <VolumeSlider />
+  <VolumeSlider label="Master" value={$vol$} />
   <select bind:value={oscType}>
     <option value="sine">Sine</option>
     <option value="square">Square</option>
