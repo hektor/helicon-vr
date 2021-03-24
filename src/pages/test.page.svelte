@@ -50,10 +50,13 @@
   Tone.Transport.bpm.value = 80
   Tone.Transport.scheduleRepeat(loop, '8n')
 
-  $: $playing$ ? Transport.start() : Transport.stop()
+  /*
+   * Tone.start() prevents suspended AudioContext
+   */
+  $: $playing$ ? Tone.start() && Transport.start() : Transport.stop()
   $: Transport.bpm.value = $bpm$
 
-  onDestroy(() => Tone.Transport.stop())
+  onDestroy(() => Transport.stop())
 </script>
 
 <div class="container">
