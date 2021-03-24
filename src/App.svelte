@@ -1,5 +1,6 @@
 <script>
   import Router from 'svelte-spa-router'
+  import { theme } from './stores/theme'
 
   // Pages
   import Home from './pages/home.page.svelte'
@@ -17,6 +18,8 @@
     '/midi': MIDI,
     '/test': Test,
   }
+
+  theme.subscribe(mode => document.documentElement.setAttribute('data-theme', mode))
 </script>
 
 <Router {routes} />
