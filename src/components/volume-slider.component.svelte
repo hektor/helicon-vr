@@ -17,8 +17,7 @@
 <style>
   label {
     padding: 0.8rem;
-    margin-bottom: 0.8rem;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--color-1);
   }
 
   .slider-container {
@@ -34,6 +33,7 @@
     display: inline-block;
     width: var(--width);
     height: var(--height);
+    margin: 0.8rem;
     padding: 0;
   }
 
@@ -47,12 +47,7 @@
 
   input[type='range']::-webkit-slider-runnable-track {
     cursor: pointer;
-    background: #ccc;
-  }
-
-  input[type='range']::-webkit-slider-thumb {
-    cursor: pointer;
-    background: #111;
+    background: var(--color-1);
   }
 
   input[type='range'] {
@@ -62,7 +57,7 @@
   input[type='range']::-webkit-slider-thumb {
     height: var(--width);
     width: 0.4rem;
-    background: #555;
+    background: var(--color-primary);
     cursor: pointer;
     -webkit-appearance: none;
   }
