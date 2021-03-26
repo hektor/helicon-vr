@@ -7,9 +7,9 @@
 </script>
 
 <div class="slider-container" style="--mute: {mute ? 0.5 : 1}">
-  <label for="master">{label || ''}</label>
+  <label for="slider">{label || ''}</label>
   <div class="slider">
-    <input name="master" type="range" bind:value {min} {max} steps={max} list="zero-snap" />
+    <input name="slider" type="range" bind:value {min} {max} steps={max} list="zero-snap" />
     <datalist id="zero-snap"><option value="0" /></datalist>
   </div>
   <span>{value}dB</span>
