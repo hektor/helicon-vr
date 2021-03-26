@@ -11,5 +11,6 @@ export const mute$ = writable$(JSON.parse(localStorage.getItem('mute')) || false
  * Persist playback settings (rate-limited)
  */
 
-vol$.pipe(debounce(() => interval(500))).subscribe(vol => localStorage.setItem('vol', vol))
 bpm$.pipe(debounce(() => interval(500))).subscribe(bpm => localStorage.setItem('bpm', bpm))
+vol$.pipe(debounce(() => interval(500))).subscribe(vol => localStorage.setItem('vol', vol))
+mute$.subscribe(mute => localStorage.setItem('mute', mute))
