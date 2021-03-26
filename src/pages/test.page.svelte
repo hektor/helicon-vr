@@ -6,7 +6,7 @@
   import * as Tone from 'tone'
   import { Transport } from 'tone'
   import { playing$, bpm$ } from '../stores/playback'
-  import { vol$ } from '../stores/playback'
+  import { vol$, mute$ } from '../stores/playback'
 
   const master = new Tone.Channel({
     volume: -Infinity,
@@ -15,10 +15,15 @@
   const synth = new Tone.Synth({ envelope: { attack: 0.25 } }).connect(master)
 
   /*
-   * Update master volume
+   * Playback store updates
    */
 
-  $: master.set({ volume: $vol$ })
+  $: {
+    master.set({ volume: $vol$, mute: $mute$ })
+    // Calling Tone.start() prevents suspended AudioContext
+    $playing$ ? Tone.start() && Transport.start() : Transport.stop()
+    Transport.bpm.value = $bpm$
+  }
 
   let oscType = 'square'
 
@@ -56,33 +61,71 @@
     index++
   }
 
-  $: synth.oscillator.type = oscType
-
-  Tone.Transport.bpm.value = 80
   Tone.Transport.scheduleRepeat(loop, '8n')
 
-  /*
-   * Tone.start() prevents suspended AudioContext
-   */
-  $: $playing$ ? Tone.start() && Transport.start() : Transport.stop()
-  $: Transport.bpm.value = $bpm$
+  $: synth.oscillator.type = oscType
 
   onDestroy(() => Transport.stop())
 </script>
 
 <div class="container">
-  <TransportControls />
+  <header>
+    <TransportControls />
+  </header>
   <ToggleTheme />
-  <VolumeSlider label="Master" bind:value={$vol$} />
   <select bind:value={oscType}>
     <option value="sine">Sine</option>
     <option value="square">Square</option>
     <option value="triangle">Triangle</option>
   </select>
+  <div class="channel-strips">
+    <div class="channel-strip">
+      <VolumeSlider label="Track 1" />
+      <button class="channel-mute">M</button>
+    </div>
+    <div class="channel-strip master">
+      <VolumeSlider label="Master" bind:value={$vol$} mute={$mute$} />
+      <button class="channel-mute" class:mute={$mute$} on:click={() => mute$.next(!$mute$)}>
+        M
+      </button>
+    </div>
+  </div>
 </div>
 
 <style>
   .container {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .channel-strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .channel-strips {
+    margin-top: auto;
+    display: flex;
+    padding: 1.6rem 6.4rem;
+  }
+
+  .master {
+    margin-left: auto;
+  }
+
+  .channel-mute {
+    margin: 1rem;
+    padding: 1rem;
+    color: var(--color-3);
+    border: 1px solid var(--color-1);
+    background: var(--color-bg);
+  }
+
+  .mute {
+    color: var(--color-bg);
+    border: 1px solid var(--color-bg);
+    background: var(--color-primary);
   }
 </style>
