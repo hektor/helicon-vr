@@ -1,16 +1,21 @@
 <script>
+  import { onDestroy } from 'svelte'
+  import * as Tone from 'tone'
+  import { Transport, Channel, Synth } from 'tone'
+
+  import { playing$, bpm$, vol$, mute$ } from '../stores/playback'
+  import { tracks$ } from '../stores/mixer'
+
   import TransportControls from '../components/transport-controls.svelte'
   import ToggleTheme from '../components/toggle-theme.component.svelte'
   import ChannelStrip from '../components/channel-strip.component.svelte'
-  import AddFilled24 from 'carbon-icons-svelte/lib/AddFilled24'
-  import { onDestroy } from 'svelte'
-  import * as Tone from 'tone'
-  import { Transport } from 'tone'
-  import { playing$, bpm$ } from '../stores/playback'
-  import { vol$, mute$ } from '../stores/playback'
-  import { tracks$ } from '../stores/mixer'
+  import AddTrack from '../components/add-track.component.svelte'
 
-  const newTrack = () =>
+  /*
+   * Add a track
+   */
+
+  const addTrack = () =>
     tracks$.next([
       ...$tracks$,
       { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: -60, mute: false },
@@ -59,11 +64,6 @@
   /*
    * Configure synths
    */
-
-  const sequencer = new Tone.Loop(time => {
-    synth.triggerAttackRelease('C3', 1, time)
-    synth.triggerAttackRelease('G3', 2, '+1n')
-  }, '1m')
 
   const cMaj = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', null, null]
   const cycle = [
@@ -168,17 +168,6 @@
     display: flex;
     padding: 1.6rem 1.6rem;
     padding-right: 4rem;
-  }
-
-  .channel-strip-add {
-    min-width: 9.6rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1.6rem;
-    border-left: 1px solid var(--color-1);
   }
 
   .tracks::-webkit-scrollbar {
