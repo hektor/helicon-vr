@@ -16,6 +16,27 @@
       { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: -60, mute: false },
     ])
 
+  /*
+   * Remove track from its context menu,
+   * other tracks are reindexed and relabeled
+   */
+
+  const removeTrack = () => {
+    tracks$.next(
+      $tracks$
+        // remove
+        .filter(({ id }) => id !== trackMenu)
+        // reindex
+        .map((track, i) => ({
+          ...track,
+          id: i + 1,
+          label: `Track ${i + 1}`,
+        })),
+    )
+    // reset menu id
+    trackMenu = null
+  }
+
   const master = new Tone.Channel({
     volume: -Infinity,
   }).toDestination()
@@ -73,6 +94,21 @@
 
   $: synth.oscillator.type = oscType
 
+  let position = { x: 0, y: 0 }
+  let shown = false
+  let trackMenu = null
+
+  const showMenu = (e, id) => {
+    const { clientX: x, clientY: y } = e
+    trackMenu = id
+    shown = true
+    position = { x, y }
+  }
+
+  const hideMenu = () => {
+    shown = false
+  }
+
   onDestroy(() => Transport.stop())
 </script>
 
@@ -88,23 +124,34 @@
   </select>
   <div class="channel-strips">
     <div class="tracks">
-      {#each $tracks$ as { label, volume, mute }}
-        <ChannelStrip {label} bind:volume bind:mute />
+      {#each $tracks$ as { id, label, volume, mute }}
+        <ChannelStrip
+          {label}
+          bind:volume
+          bind:mute
+          on:contextmenu={e => {
+            showMenu(e, id)
+          }}
+        />
       {/each}
     </div>
-    <button class="channel-strip-add" on:click={newTrack}>
-      <AddFilled24 style="fill: var(--color-2)" />
-      <small> New track </small>
-    </button>
-    <ChannelStrip
-      label="Master"
-      mute={$mute$}
-      bind:volume={$vol$}
-      on:mute={() => mute$.next(!$mute$)}
-      master
-    />
+    <AddTrack on:click={addTrack} />
+    <ChannelStrip label="Master" bind:volume={$vol$} bind:mute={$mute$} master />
   </div>
 </div>
+
+{#if trackMenu}
+  <div
+    id="context"
+    style="--display: {shown ? 'block' : 'none'}; --top: {position.y}px; --left: {position.x}px"
+  >
+    <span>Remove track {trackMenu}?</span>
+    <ul>
+      <li on:click={removeTrack}>Remove?</li>
+    </ul>
+  </div>
+{/if}
+<svelte:body on:click={hideMenu} on:contextmenu|preventDefault />
 
 <style>
   .container {
@@ -151,15 +198,32 @@
     overflow-x: scroll;
   }
 
-  .channel-strip-add > small {
-    padding: 0.8rem 0;
-    color: var(--color-2);
-  }
-
   :global(.master) {
     flex: 1;
     margin-left: auto;
     padding-left: 3.2rem;
     border-left: 1px solid var(--color-1);
+  }
+  #context {
+    display: var(--display);
+    border: 1px solid var(--color-3);
+    background: var(--color-1);
+    position: absolute;
+    top: var(--top);
+    left: var(--left);
+  }
+
+  #context ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  #context li {
+    padding: 0.8rem;
+  }
+
+  #context li:hover {
+    background: var(--color-3);
   }
 </style>
