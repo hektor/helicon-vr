@@ -59,7 +59,7 @@
   .transport-controls {
     flex: 1;
     display: flex;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--color-1);
   }
 
   button:disabled.playing {
