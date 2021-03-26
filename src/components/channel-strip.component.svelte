@@ -1,15 +1,13 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
-  const dispatch = createEventDispatcher()
-
   import VolumeSlider from '../components/volume-slider.component.svelte'
+
   export let label
   export let volume
   export let mute
   export let master
 </script>
 
-<div class="channel-strip" class:master>
+<div class="channel-strip" class:master on:contextmenu>
   <VolumeSlider {label} {mute} bind:value={volume} />
   <input type="checkbox" class="channel-mute" class:mute bind:checked={mute} />
   <button
