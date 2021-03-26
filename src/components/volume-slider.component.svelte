@@ -1,6 +1,6 @@
 <script>
-  export let min = 0
-  export let max = 100
+  export let min = -60
+  export let max = 6
   export let label
   export let value
 </script>
@@ -8,9 +8,10 @@
 <div class="slider-container">
   <label for="master">{label || ''}</label>
   <div class="slider">
-    <input name="master" type="range" bind:value {min} {max} steps={max} />
+    <input name="master" type="range" bind:value {min} {max} steps={max} list="zero-snap" />
+    <datalist id="zero-snap"><option value="0" /></datalist>
   </div>
-  <span>{value}</span>
+  <span>{value}dB</span>
 </div>
 
 <style>

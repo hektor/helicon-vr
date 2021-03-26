@@ -8,8 +8,17 @@
   import { playing$, bpm$ } from '../stores/playback'
   import { vol$ } from '../stores/playback'
 
-  const gain = new Tone.Gain(0.1).toDestination()
-  const synth = new Tone.Synth({ envelope: { attack: 0.25 } }).connect(gain)
+  const master = new Tone.Channel({
+    volume: -Infinity,
+  }).toDestination()
+
+  const synth = new Tone.Synth({ envelope: { attack: 0.25 } }).connect(master)
+
+  /*
+   * Update master volume
+   */
+
+  $: master.set({ volume: $vol$ })
 
   let oscType = 'square'
 
