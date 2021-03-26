@@ -19,6 +19,10 @@
   label {
     padding: 0.8rem;
     border-bottom: 1px solid var(--color-1);
+    overflow: hidden;
+    max-width: 9.6rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .slider-container {
@@ -36,7 +40,6 @@
     width: var(--width);
     height: var(--height);
     margin: 0.8rem;
-    padding: 0;
   }
 
   input {
