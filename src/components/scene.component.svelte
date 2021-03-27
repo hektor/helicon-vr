@@ -115,10 +115,22 @@
   })
 </script>
 
-<svelte:window on:resize={resize} bind:innerWidth={width} bind:innerHeight={height} />
-<div bind:this={target}>
-  <Controls />
-  <GUI />
+<svelte:window on:resize={resize} />
+<div bind:this={target} on:resize={resize} bind:clientWidth={width} bind:clientHeight={height}>
   <Terrain />
+  <Controls />
+  <!--
   <Bloom />
+  <GUI />
+  -->
 </div>
+
+<style>
+  div {
+    flex: 1;
+    display: flex;
+    max-height: 100vh;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+</style>
