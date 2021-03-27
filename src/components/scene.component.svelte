@@ -7,12 +7,9 @@
     Scene,
     PerspectiveCamera,
     WebGLRenderer,
-    MeshBasicMaterial,
-    Mesh,
     PointLight,
     ReinhardToneMapping,
     sRGBEncoding,
-    SphereGeometry,
   } from 'three'
 
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -45,8 +42,6 @@
   const clock = new Clock() // Makes use of performance.now()
   const stats = new Stats()
 
-  const sphere = new SphereGeometry(0.25, 16, 16)
-
   const resize = () => {
     renderer.setSize(width, height)
     composer.setSize(width, height)
@@ -59,14 +54,6 @@
    */
   scene.fog = new Fog(0x111111, near, far)
   scene.background = new Color(0x0c0c0c)
-
-  /*
-   * Add lights to scene
-   */
-  light.add(new Mesh(sphere, new MeshBasicMaterial({ color: 0xffffff })))
-  scene.add(light)
-
-  sphere.translate(0, 8, 0)
 
   /*
    * Configure camera
