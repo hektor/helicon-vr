@@ -12,4 +12,4 @@ const createSettings = init => {
   }
 }
 
-export const settings = createSettings({ fov: 45, near: 1, far: 100 })
+export const settings = createSettings({ fov: 45, near: 0.1, far: 200 })
