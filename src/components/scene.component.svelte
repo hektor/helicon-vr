@@ -15,6 +15,8 @@
     SphereGeometry,
   } from 'three'
 
+  import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+
   import Stats from 'three/examples/jsm/libs/stats.module.js'
   import { VRButton } from 'three/examples/jsm/webxr/VRButton.js'
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
@@ -22,7 +24,7 @@
 
   import GUI from './gui.component.svelte'
   import Terrain from './terrain.component.svelte'
-  import Bloom from './bloom.component.svelte'
+  /* import Bloom from './bloom.component.svelte' */
   import Controls from './orbit-controls.component.svelte'
 
   let target
@@ -118,6 +120,9 @@
     scene,
     camera,
   })
+
+  composer.addPass(new RenderPass(scene, camera))
+
 </script>
 
 <svelte:window on:resize={resize} bind:innerWidth={width} bind:innerHeight={height} />
