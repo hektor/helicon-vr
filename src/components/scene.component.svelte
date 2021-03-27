@@ -1,5 +1,5 @@
 <script>
-  import { onMount, setContext } from 'svelte'
+  import { onMount, onDestroy, setContext } from 'svelte'
   import {
     Clock,
     Color,
@@ -106,12 +106,12 @@
 
   onMount(() => {
     resize()
-  })
 
-  // Attach elements to DOM
-  $: target && target.appendChild(renderer.domElement)
-  $: target && target.appendChild(VRButton.createButton(renderer))
-  $: target && target.appendChild(stats.dom)
+    // Attach elements to DOM
+    target && target.appendChild(renderer.domElement)
+    target && target.appendChild(VRButton.createButton(renderer))
+    target && target.appendChild(stats.dom)
+  })
 
   //Expose scene objects
   setContext('scene', {
@@ -123,6 +123,9 @@
 
   composer.addPass(new RenderPass(scene, camera))
 
+  onDestroy(() => {
+    scene.remove.apply(scene, scene.children)
+  })
 </script>
 
 <svelte:window on:resize={resize} bind:innerWidth={width} bind:innerHeight={height} />
