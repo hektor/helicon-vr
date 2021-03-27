@@ -36,7 +36,6 @@
   .slider {
     --height: 9.6rem;
     --width: 2.4rem;
-    display: inline-block;
     width: var(--width);
     height: var(--height);
     margin: 0.8rem;
@@ -45,7 +44,6 @@
   input {
     width: var(--height);
     height: var(--width);
-    margin: 0;
     transform-origin: calc(var(--height) / 2) calc(var(--height) / 2);
     transform: rotate(-90deg);
   }
