@@ -1,4 +1,5 @@
 <script>
+  import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
@@ -145,9 +146,11 @@
     id="context"
     style="--display: {shown ? 'block' : 'none'}; --top: {position.y}px; --left: {position.x}px"
   >
-    <span>Remove track {trackMenu}?</span>
     <ul>
-      <li on:click={removeTrack}>Remove?</li>
+      <li>
+        <span>Track {trackMenu}</span>
+      </li>
+      <li class="option" on:click={removeTrack}><TrashCan24 />Remove</li>
     </ul>
   </div>
 {/if}
@@ -193,6 +196,7 @@
     padding-left: 3.2rem;
     border-left: 1px solid var(--color-1);
   }
+
   #context {
     display: var(--display);
     border: 1px solid var(--color-3);
@@ -202,6 +206,11 @@
     left: var(--left);
   }
 
+  #context span {
+    font-weight: 500;
+    background: var(--color-1);
+  }
+
   #context ul {
     padding: 0;
     margin: 0;
@@ -209,10 +218,14 @@
   }
 
   #context li {
-    padding: 0.8rem;
+    display: flex;
+    align-items: center;
+    padding: 1.6rem;
   }
 
-  #context li:hover {
-    background: var(--color-3);
+  #context .option:hover {
+    cursor: pointer;
+    color: var(--color-1);
+    background: var(--color-4);
   }
 </style>
