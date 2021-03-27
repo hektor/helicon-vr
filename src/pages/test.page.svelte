@@ -43,11 +43,11 @@
     trackMenu = null
   }
 
-  const master = new Tone.Channel({
+  const master = new Channel({
     volume: -Infinity,
   }).toDestination()
 
-  const synth = new Tone.Synth({ envelope: { attack: 0.25 } }).connect(master)
+  const synth = new Synth({ envelope: { attack: 0.25 } }).connect(master)
 
   /*
    * Playback store updates
