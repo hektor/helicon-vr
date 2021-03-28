@@ -39,8 +39,8 @@
 
   const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000)
   const matStdFloor = new THREE.MeshStandardMaterial({
-    color: 0x808080,
-    roughness: 0.1,
+    color: 0xffffff,
+    roughness: 0.2,
     metalness: 0,
   })
 
@@ -54,23 +54,16 @@
   meshKnot.position.set(Math.random(5), 5, 0)
   scene.add(meshKnot)
 
-  /* const loader = new GLTFLoader().setPath('/') */
-  /* loader.load('terrain.glb', function (gltf) { */
-  /*   gltf.scene.matrixAutoUpdate = false */
-  /*   scene.add(gltf.scene) */
-  /* }) */
+  const ambientLight = new THREE.AmbientLight(0xeeeeee, 1)
+  scene.add(ambientLight)
 
   theme.subscribe(mode => {
     if (mode === 'dark') {
-      matStdFloor.color.setHex(0x808080)
-      /* rectLight1.intensity = 1 */
-      /* rectLight2.intensity = 1 */
-      /* rectLight3.intensity = 1 */
+      scene.background.setHex(0x111111)
+      ambientLight.visible = false
     } else {
-      matStdFloor.color.setHex(0xffffff)
-      /* rectLight1.intensity = 10 */
-      /* rectLight2.intensity = 10 */
-      /* rectLight3.intensity = 10 */
+      scene.background.setHex(0xeeeeee)
+      ambientLight.visible = true
     }
   })
 </script>
