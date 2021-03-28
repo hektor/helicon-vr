@@ -69,15 +69,11 @@
    * Configure renderer
    */
   renderer.xr.enabled = true
-  renderer.toneMapping = ReinhardToneMapping
-  renderer.shadowMap.enabled = true
-  // renderer.shadowMap.type = PCFSoftShadowMap;
   $: renderer.setPixelRatio(window.devicePixelRatio * $resolution)
-  renderer.physicallyCorrectLights
   // color accuracy
+  renderer.physicallyCorrectLights
   renderer.gammaFactor = 2.2
   renderer.outputEncoding = sRGBEncoding
-
   /*
    * Use setAnimationLoop for WebXR (requestAnimationFrame equiv)
    */
