@@ -59,8 +59,11 @@
   /*
    * Configure camera
    */
-  camera.position.set(0, 32, 0)
-  camera.lookAt(0, 0, 0)
+
+  camera.position.set(...$cameraPosition)
+  cameraPosition.subscribe(() => {
+    camera.position.set(...$cameraPosition)
+  })
 
   /*
    * Configure renderer
@@ -119,6 +122,10 @@
 </script>
 
 <svelte:window on:resize={resize} />
+<button on:click={() => console.log(camera.getWorldPosition())}>Camera position?</button>
+<button on:click={() => console.log(camera.getWorldDirection())}>Camera lookat?</button>
+<button on:click={() => cameraPosition.top()}>Top</button>
+<button on:click={() => cameraPosition.front()}>front</button>
 <div bind:this={target} on:resize={resize} bind:clientWidth={width} bind:clientHeight={height}>
   <Terrain />
   <Controls bind:controls />

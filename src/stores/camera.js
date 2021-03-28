@@ -8,8 +8,19 @@ const createSettings = init => {
     setFov: fov => update(state => ({ ...state, fov })),
     setNear: near => update(state => ({ ...state, near })),
     setFar: far => update(state => ({ ...state, far })),
-    reset: () => set({ fov: 45, near: 1, far: 100 }),
+    reset: () => set({ fov: 45, near: 1, far: 256 }),
   }
 }
 
-export const settings = createSettings({ fov: 45, near: 0.1, far: 200 })
+const createPosition = init => {
+  const { subscribe, set } = writable(init)
+
+  return {
+    subscribe,
+    top: () => set([0, 64, 32]),
+    front: () => set([0, 0.5, -64]),
+  }
+}
+
+export const settings = createSettings({ fov: 45, near: 0.1, far: 256 })
+export const position = createPosition([0, 0, -64])
