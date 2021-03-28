@@ -5,6 +5,7 @@
  */
 
 :root {
+  --font-family: 'Inter', sans serif
   /* Color variables */
   --color-bg: #eee;
   --color-1: #aaa;
