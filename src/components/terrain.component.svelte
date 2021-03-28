@@ -21,9 +21,15 @@
     return light
   })
 
-  $: $tracks$.forEach(({ volume }, i) => {
+  $: $tracks$.forEach(({ volume, mute }, i) => {
     const normalizedVolume = (volume - -60) / (6 - -60)
     lights[i].height = normalizedVolume * 8
+    if (mute) {
+      lights[i].color.setHex(0x0c0c0c)
+    } else {
+      lights[i].color.setHex(0xffffff)
+    }
+    if (volume > 0) lights[i].color.setHex(0xff4400)
   })
 
   /*   const normalizedVolume = (volume - -60) / (6 - -60) */
