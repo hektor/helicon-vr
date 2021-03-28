@@ -14,7 +14,7 @@
 
   const lights = $tracks$.map(({ volume }, i) => {
     const normalizedVolume = (volume - -60) / (6 - -60)
-    const light = new THREE.RectAreaLight(0xffffff, 4, 2, normalizedVolume * 8)
+    const light = new THREE.RectAreaLight(0xffffff, 2, 2, normalizedVolume * 8)
     const spacing = 4
     light.position.set(-i * spacing + $tracks$.length + spacing / 2, 0)
     scene.add(light)
@@ -39,7 +39,7 @@
 
   const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000)
   const matStdFloor = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+    color: 0xcccccc,
     roughness: 0.2,
     metalness: 0,
   })
