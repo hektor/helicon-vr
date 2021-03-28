@@ -13,11 +13,11 @@
   } from 'three'
 
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
-
   import Stats from 'three/examples/jsm/libs/stats.module.js'
   import { VRButton } from 'three/examples/jsm/webxr/VRButton.js'
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
-  import { settings } from '../stores/camera'
+  import { settings as cameraSettings, position as cameraPosition } from '../stores/camera'
+  import { resolution } from '../stores/vr'
 
   import GUI from './gui.component.svelte'
   import Terrain from './terrain.component.svelte'
@@ -29,7 +29,7 @@
   $: width = 0
   $: height = 0
 
-  const { fov, near, far } = $settings
+  const { fov, near, far } = $cameraSettings
 
   const scene = new Scene()
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2)
@@ -68,7 +68,7 @@
   renderer.toneMapping = ReinhardToneMapping
   renderer.shadowMap.enabled = true
   // renderer.shadowMap.type = PCFSoftShadowMap;
-  renderer.setPixelRatio(window.devicePixelRatio)
+  $: renderer.setPixelRatio(window.devicePixelRatio * $resolution)
   renderer.physicallyCorrectLights
   // color accuracy
   renderer.gammaFactor = 2.2
@@ -121,8 +121,13 @@
   <Controls />
   <!--
   <Bloom />
-  <GUI />
+  <select bind:value={$resolution} name="resolution">
+    <option selected={$resolution === 1} value={1}>Full</option>
+    <option selected={$resolution === 0.5} value={0.5}>Half</option>
+    <option selected={$resolution === 0.25} value={0.25}>Quarter</option>
+  </select>
   -->
+  <GUI />
 </div>
 
 <style>
