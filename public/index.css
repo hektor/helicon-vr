@@ -8,12 +8,22 @@
   --font-family: 'Inter', sans serif
   /* Color variables */
   --color-bg: #eee;
-  --color-1: #aaa;
+  --color-1: #ccc;
   --color-2: #999;
   --color-3: #888;
   --color-4: #777;
   --color-5: #666;
   --color-primary: #333;
+}
+
+[data-theme='dark'] {
+  --color-bg: #0f0f0f;
+  --color-1: #222;
+  --color-2: #333;
+  --color-3: #444;
+  --color-4: #555;
+  --color-5: #666;
+  --color-primary: #eee;
 }
 
 /*
