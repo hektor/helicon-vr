@@ -35,7 +35,7 @@
       setFar(value)
       updateCamera('far')
     })
-    pane.addButton({ title: 'Default settings' }).on('click', e => {
+    pane.addButton({ title: 'Default settings' }).on('click', () => {
       // Set camera settings to initial settings
       reset()
       updateCamera('fov')
