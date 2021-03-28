@@ -53,3 +53,50 @@ body {
   font-size: 1.6rem;
   min-height: 100vh;
 }
+
+/*
+ * Typography
+ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  margin: 0;
+}
+
+p {
+  margin: 0.8rem 0;
+}
+
+a,
+button {
+  background-color: inherit;
+  color: inherit;
+}
+
+a[href^="https://"]::after
+{
+  content: '↗';
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input {
+  margin: 0;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+select {
+  font-size: inherit;
+}
