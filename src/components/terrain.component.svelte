@@ -47,11 +47,11 @@
   const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor)
   scene.add(mshStdFloor)
 
-  const geoKnot = new THREE.TorusKnotGeometry(1.5, 0.5, 200, 16)
-  const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0, metalness: 0 })
+  const geoKnot = new THREE.TorusKnotGeometry(8, 0.25, 128, 8)
+  const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 1 })
   const meshKnot = new THREE.Mesh(geoKnot, matKnot)
   meshKnot.name = 'meshKnot'
-  meshKnot.position.set(Math.random(5), 5, 0)
+  meshKnot.position.set(0, 12, -8)
   scene.add(meshKnot)
 
   const ambientLight = new THREE.AmbientLight(0xeeeeee, 1)
