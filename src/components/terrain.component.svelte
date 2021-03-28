@@ -15,10 +15,15 @@
   const lights = $tracks$.map(({ volume }, i) => {
     const normalizedVolume = (volume - -60) / (6 - -60)
     const light = new THREE.RectAreaLight(0xffffff, 4, 2, normalizedVolume * 8)
-    light.position.set(-i * 4 + $tracks$.length * 2, 0)
+    const spacing = 4
+    light.position.set(-i * spacing + $tracks$.length + spacing / 2, 0)
     scene.add(light)
-    scene.add(new RectAreaLightHelper(light))
     return light
+  })
+
+  lights.forEach(light => {
+    const helper = new RectAreaLightHelper(light)
+    scene.add(helper)
   })
 
   $: $tracks$.forEach(({ volume, mute }, i) => {
@@ -31,30 +36,6 @@
     }
     if (volume > 0) lights[i].color.setHex(0xff4400)
   })
-
-  /*   const normalizedVolume = (volume - -60) / (6 - -60) */
-  /*   const light = new THREE.RectAreaLight(0xffffff, 4, 2, normalizedVolume * 8) */
-  /*   light.position.set(-i * 4 + $tracks$.length * 2, 0) */
-  /*   scene.add(light) */
-  /*   scene.add(new RectAreaLightHelper(light)) */
-  /* }) */
-
-  /* const rectLight1 = new THREE.RectAreaLight(0xffffff, 4, 4, 8) */
-  /* rectLight1.position.set(-8, 2, 4) */
-
-  /* const rectLight2 = new THREE.RectAreaLight(0xffffff, 4, 4, 8) */
-  /* rectLight2.position.set(0, 4, 4) */
-
-  /* const rectLight3 = new THREE.RectAreaLight(0xffffff, 4, 4, 8) */
-  /* rectLight3.position.set(8, 2, 4) */
-
-  /* scene.add(rectLight1) */
-  /* scene.add(rectLight2) */
-  /* scene.add(rectLight3) */
-
-  /* scene.add(new RectAreaLightHelper(rectLight1)) */
-  /* scene.add(new RectAreaLightHelper(rectLight2)) */
-  /* scene.add(new RectAreaLightHelper(rectLight3)) */
 
   const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000)
   const matStdFloor = new THREE.MeshStandardMaterial({
