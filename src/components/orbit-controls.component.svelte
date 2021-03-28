@@ -3,7 +3,7 @@
   import { getContext } from 'svelte'
   const { camera, renderer } = getContext('scene')
 
-  const controls = new OrbitControls(camera, renderer.domElement)
+  export const controls = new OrbitControls(camera, renderer.domElement)
 
   /*
    * Configure orbit controls

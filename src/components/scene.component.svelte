@@ -25,6 +25,7 @@
   import Controls from './orbit-controls.component.svelte'
 
   let target
+  let controls
 
   $: width = 0
   $: height = 0
@@ -87,7 +88,9 @@
       const time = clock.getElapsedTime()
       light.position.x = Math.sin(time * 8) * 8
       light.position.z = Math.cos(time * 8) * 8
+      controls.update()
     }
+
     stats.end()
   })
 
@@ -118,7 +121,7 @@
 <svelte:window on:resize={resize} />
 <div bind:this={target} on:resize={resize} bind:clientWidth={width} bind:clientHeight={height}>
   <Terrain />
-  <Controls />
+  <Controls bind:controls />
   <!--
   <Bloom />
   <select bind:value={$resolution} name="resolution">
