@@ -48,7 +48,43 @@
     volume: -Infinity,
   }).toDestination()
 
-  const synth = new Synth({ envelope: { attack: 0.25 } }).connect(master)
+  let channels = $tracks$.map(({ volume, mute, id }) =>
+    new Channel({ volume, mute, id }).connect(master),
+  )
+
+  const indexChannels = () =>
+    channels.map((channel, i) => {
+      channel.name = $tracks$[i].id
+    })
+
+  indexChannels()
+
+  $: {
+    if ($tracks$.length > channels.length) {
+      const channel = new Channel({ volume: 0, mute: false }).connect(master)
+      channel.name = $tracks$.length
+      channels = [...channels, channel]
+    }
+    if ($tracks$.length < channels.length) {
+      const trackIds = $tracks$.map(({ id }) => id)
+      const channelIds = channels.map(({ name }) => name)
+      const diff = channelIds.filter(x => !trackIds.includes(x))
+      channels.filter(channel => {
+        if (diff.includes(channel.name)) {
+          channel.dispose()
+        }
+      })
+
+      channels = channels.filter(channel => !diff.includes(channel.name))
+    }
+
+    $tracks$.forEach(({ volume, mute }, i) => {
+      channels[i].volume.value = volume
+      channels[i].mute = mute
+    })
+  }
+
+  const synth = new Synth({ envelope: { attack: 0.25 } }).connect(channels[0])
 
   /*
    * Playback store updates
