@@ -23,7 +23,7 @@
    * Create and return initial array for lights and helpers
    */
 
-  let lights = $tracks$.map(({ volume: v }) => new RectAreaLight(0xffffff, 2, width, heightFrom(v)))
+  let lights = $tracks$.map(() => new RectAreaLight(0xffffff, 2, width))
   let helpers = lights.map(light => new RectAreaLightHelper(light))
 
   const addLights = () => lights.forEach(light => scene.add(light))
