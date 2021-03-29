@@ -17,7 +17,7 @@
 
   const spacing = 1
   const width = 2
-  const offset = ($tracks$.length * width + $tracks$.length * spacing) / 2
+  const getOffset = () => ($tracks$.length * width + $tracks$.length * spacing) / 2
 
   /*
    * Create and return initial array for lights and helpers
@@ -34,7 +34,9 @@
    */
 
   const updateLightPositions = () =>
-    lights.forEach(({ position: p }, i) => p.set(-i * width - spacing * i - width / 2 + offset, 0))
+    lights.forEach(({ position: p }, i) =>
+      p.set(-i * width - spacing * i - width / 2 + getOffset(), 0),
+    )
 
   updateLightPositions()
   addLights()
