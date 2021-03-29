@@ -1,6 +1,11 @@
 <script>
   import CheckmarkFilled32 from 'carbon-icons-svelte/lib/CheckmarkFilled32'
+  import LogoGithub32 from 'carbon-icons-svelte/lib/LogoGithub32'
   import Misuse32 from 'carbon-icons-svelte/lib/Misuse32'
+
+  import Typewriter from '../components/typewriter.component.svelte'
+
+  import { resolution } from '../stores/vr'
 
   const supportsMIDI = !!navigator.requestMIDIAccess
   const supportsVR = !!navigator.xr
@@ -8,8 +13,17 @@
 
 <div class="container">
   <div class="col col-left">
-    <h1>Helicon 1.0</h1>
-    <span>An immersive introduction to polyrhythms</span>
+    <div class="title">
+      <h1>Helicon 1.0</h1>
+      <Typewriter text="An immersive introduction to polyrhythms." />
+    </div>
+    <div class="credits">
+      <a class="repo" href="https://www.github.com/hektormisplon/bap"><LogoGithub32 /></a>
+      <span
+        >By &ensp;
+        <a href="https://www.github.com/hektormisplon" target="_blank">Hektor Misplon</a>
+      </span>
+    </div>
   </div>
   <div class="col col-right">
     <div class="nav-group">
@@ -77,6 +91,38 @@
     color: var(--color-primary);
     background: var(--color-1);
     max-width: 48rem;
+  }
+
+  .credits {
+    border-top: 1px solid var(--color-3);
+    padding: 1.6rem 1.6rem 0.8rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .credits > span {
+    display: flex;
+    align-items: center;
+  }
+
+  .repo {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .repo::after {
+    content: '';
+  }
+
+  .title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .title > h1 {
+    margin: 1.6rem 0;
   }
 
   .nav-group {
