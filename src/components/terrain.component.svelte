@@ -78,16 +78,18 @@
   meshKnot.position.set(0, 12, -8)
   scene.add(meshKnot)
 
-  const ambientLight = new THREE.AmbientLight(0xeeeeee, 1)
+  const ambientLight = new THREE.AmbientLight(0xeeeeee, 1.25)
   scene.add(ambientLight)
 
   theme.subscribe(mode => {
     if (mode === 'dark') {
       scene.background.setHex(0x111111)
-      ambientLight.visible = false
+      ambientLight.color.setHex(0x111111)
+      ambientLight.intensity = 0.125
     } else {
       scene.background.setHex(0xeeeeee)
-      ambientLight.visible = true
+      ambientLight.color.setHex(0xeeeeee)
+      ambientLight.intensity = 1.25
     }
   })
 </script>
