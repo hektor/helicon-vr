@@ -42,6 +42,14 @@
         <a href="/#/requirements">Learn more</a>
       </div>
       <div class="supports">
+        <span>Resolution</span>
+        <select bind:value={$resolution} name="resolution">
+          <option selected={$resolution === 1} value={1}>Full</option>
+          <option selected={$resolution === 0.5} value={0.5}>Half</option>
+          <option selected={$resolution === 0.25} value={0.25}>Quarter</option>
+        </select>
+      </div>
+      <div class="supports">
         {#if supportsMIDI}
           <CheckmarkFilled32 />
           <div>
@@ -171,5 +179,17 @@
     .col-left {
       max-width: initial;
     }
+  }
+
+  select {
+    flex: 1;
+    margin: 0.8rem;
+    margin-left: 3.2rem;
+    margin-right: 0;
+    padding: 1.6rem;
+    appearance: none;
+    background: var(--color-bg);
+    color: var(--color-primary);
+    border-color: var(--color-2);
   }
 </style>
