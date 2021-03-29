@@ -56,17 +56,38 @@
 
   $: {
     if ($tracks$ > lights) {
-      const light = new RectAreaLight(0x00ff00, 2, width, 16)
+      const light = new RectAreaLight(0x00ff00, 2, width)
+      const helper = new RectAreaLightHelper(light)
+      light.name = $tracks$.length
+      helper.name = $tracks$.length
       lights = [...lights, light]
+      helpers = [...helpers, helper]
       scene.add(light)
-      scene.add(new RectAreaLightHelper(light))
-      updateLightPositions()
+      scene.add(helper)
     }
     if ($tracks$ < lights) {
-      lights.forEach(light => {
-        light.position.x = light.position.x - 1
+      const trackIds = $tracks$.map(({ id }) => id)
+      const lightIds = lights.map(({ name }) => name)
+      const helperIds = helpers.map(({ name }) => name)
+
+      const diffLights = lightIds.filter(x => !trackIds.includes(x))
+      lights.filter(light => {
+        if (diffLights.includes(light.name)) {
+          light.visible = false
+        }
       })
+
+      const diffHelpers = helperIds.filter(x => !trackIds.includes(x))
+      helpers.filter(helper => {
+        if (diffHelpers.includes(helper.name)) {
+          helper.visible = false
+        }
+      })
+
+      lights = lights.filter(light => !diffLights.includes(light.name))
+      helpers = helpers.filter(helper => !diffHelpers.includes(helper.name))
     }
+    updateLightPositions()
   }
 
   $: $tracks$.forEach(({ volume, mute }, i) => {
