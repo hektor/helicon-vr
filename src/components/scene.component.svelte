@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy, setContext } from 'svelte'
+  import { onMount, setContext } from 'svelte'
   import {
     Clock,
     Color,
@@ -8,31 +8,35 @@
     PerspectiveCamera,
     WebGLRenderer,
     PointLight,
-    ReinhardToneMapping,
     sRGBEncoding,
+    Vector3,
   } from 'three'
 
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
   import Stats from 'three/examples/jsm/libs/stats.module.js'
   import { VRButton } from 'three/examples/jsm/webxr/VRButton.js'
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+
   import { settings as cameraSettings, position as cameraPosition } from '../stores/camera'
   import { resolution } from '../stores/vr'
 
-  import GUI from './gui.component.svelte'
   import AmbientLighting from './ambient-lighting.component.svelte'
   import TorusKnot from './torus.component.svelte'
   import Floor from './floor.component.svelte'
   import ChannelLighting from './channel-strip-lighting.component.svelte'
   import Controls from './orbit-controls.component.svelte'
 
-  let target
-  let controls
+  let target // canvas mount point
+  let controls // capture controls for update
 
-  $: width = 0
-  $: height = 0
+  $: width = 0 // canvas parent width
+  $: height = 0 // canvas parent height
 
   const { fov, near, far } = $cameraSettings
+
+  /*
+   * Instantiate Scene objects
+   */
 
   const scene = new Scene()
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2)
@@ -45,6 +49,10 @@
   const clock = new Clock() // Makes use of performance.now()
   const stats = new Stats()
 
+  /*
+   * Canvas parent resize handler
+   */
+
   const resize = () => {
     renderer.setSize(width, height)
     composer.setSize(width, height)
@@ -55,47 +63,51 @@
   /*
    * Add fog to scene (fade distant objects)
    */
+
   scene.fog = new Fog(0x111111, near, far)
   scene.background = new Color(0x0c0c0c)
 
   /*
-   * Configure camera
+   * Configure camera, handle updates
    */
 
-  camera.position.set(...$cameraPosition)
   cameraPosition.subscribe(() => {
+    if (controls) controls.enabled = false
+    if (controls) controls.target = new Vector3(0, 16, 0)
     camera.position.set(...$cameraPosition)
+    if (controls) controls.enabled = true
   })
 
   /*
    * Configure renderer
    */
+
   renderer.xr.enabled = true
+  // set pixelratio based on resolution settings
   $: renderer.setPixelRatio(window.devicePixelRatio * $resolution)
   // color accuracy
   renderer.physicallyCorrectLights
   renderer.gammaFactor = 2.2
   renderer.outputEncoding = sRGBEncoding
+
   /*
    * Use setAnimationLoop for WebXR (requestAnimationFrame equiv)
    */
+
   renderer.setAnimationLoop(() => {
     // Monitor performance of enclosed code (begin to end)
     stats.begin()
     {
       // Render scene
       composer.render(scene, camera)
-      // Circling lights
-      const time = clock.getElapsedTime()
-      light.position.x = Math.sin(time * 8) * 8
-      light.position.z = Math.cos(time * 8) * 8
+      // Control damping is enabled
       controls.update()
     }
-
     stats.end()
   })
 
   onMount(() => {
+    // Handle the initial size
     resize()
 
     // Attach elements to DOM
@@ -113,17 +125,11 @@
   })
 
   composer.addPass(new RenderPass(scene, camera))
-
-  onDestroy(() => {
-    scene.remove.apply(scene, scene.children)
-  })
 </script>
 
+<!--Detect resizes (note: resize does not set window width)-->
 <svelte:window on:resize={resize} />
-<button on:click={() => console.log(camera.getWorldPosition())}>Camera position?</button>
-<button on:click={() => console.log(camera.getWorldDirection())}>Camera lookat?</button>
-<button on:click={() => cameraPosition.top()}>Top</button>
-<button on:click={() => cameraPosition.front()}>front</button>
+
 <div bind:this={target} on:resize={resize} bind:clientWidth={width} bind:clientHeight={height}>
   <Controls bind:controls />
   <Floor />
@@ -131,14 +137,13 @@
   <ChannelLighting />
   <TorusKnot />
   <!--
+  <button on:click={() => console.log(camera.getWorldPosition())}>Camera position?</button>
+  <button on:click={() => console.log(camera.getWorldDirection())}>Camera lookat?</button>
+  <button on:click={() => cameraPosition.top()}>Top</button>
+  <button on:click={() => cameraPosition.front()}>front</button>
   <Bloom />
-  <select bind:value={$resolution} name="resolution">
-    <option selected={$resolution === 1} value={1}>Full</option>
-    <option selected={$resolution === 0.5} value={0.5}>Half</option>
-    <option selected={$resolution === 0.25} value={0.25}>Quarter</option>
-  </select>
-  -->
   <GUI />
+  -->
 </div>
 
 <style>
