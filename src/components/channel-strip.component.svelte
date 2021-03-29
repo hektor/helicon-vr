@@ -1,5 +1,5 @@
 <script>
-  import VolumeSlider from '../components/volume-slider.component.svelte'
+  import VolumeSlider from '../components/channel-fader.component.svelte'
 
   export let label
   export let volume
