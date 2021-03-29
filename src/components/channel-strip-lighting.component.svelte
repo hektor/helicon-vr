@@ -1,11 +1,8 @@
 <script>
   import { tracks$ } from '../stores/mixer'
-  import * as THREE from 'three'
   import { RectAreaLight } from 'three'
   import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
   import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
-
-  import { theme } from '../stores/theme'
 
   import { getContext } from 'svelte'
   const { scene } = getContext('scene')
@@ -94,37 +91,5 @@
     lights[i].height = heightFrom(volume)
     mute ? lights[i].color.setHex(0x0c0c0c) : lights[i].color.setHex(0xffffff)
     volume > 0 && lights[i].color.setHex(0xff4400)
-  })
-
-  const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000)
-  const matStdFloor = new THREE.MeshStandardMaterial({
-    color: 0xcccccc,
-    roughness: 0.2,
-    metalness: 0,
-  })
-
-  const mshStdFloor = new THREE.Mesh(geoFloor, matStdFloor)
-  scene.add(mshStdFloor)
-
-  const geoKnot = new THREE.TorusKnotGeometry(8, 0.25, 128, 8)
-  const matKnot = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 1 })
-  const meshKnot = new THREE.Mesh(geoKnot, matKnot)
-  meshKnot.name = 'meshKnot'
-  meshKnot.position.set(0, 12, -8)
-  scene.add(meshKnot)
-
-  const ambientLight = new THREE.AmbientLight(0xeeeeee, 1.25)
-  scene.add(ambientLight)
-
-  theme.subscribe(mode => {
-    if (mode === 'dark') {
-      scene.background.setHex(0x111111)
-      ambientLight.color.setHex(0x111111)
-      ambientLight.intensity = 0.125
-    } else {
-      scene.background.setHex(0xeeeeee)
-      ambientLight.color.setHex(0xeeeeee)
-      ambientLight.intensity = 1.25
-    }
   })
 </script>

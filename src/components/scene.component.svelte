@@ -20,8 +20,10 @@
   import { resolution } from '../stores/vr'
 
   import GUI from './gui.component.svelte'
-  import Terrain from './terrain.component.svelte'
-  /* import Bloom from './bloom.component.svelte' */
+  import AmbientLighting from './ambient-lighting.component.svelte'
+  import TorusKnot from './torus.component.svelte'
+  import Floor from './floor.component.svelte'
+  import ChannelLighting from './channel-strip-lighting.component.svelte'
   import Controls from './orbit-controls.component.svelte'
 
   let target
@@ -123,8 +125,11 @@
 <button on:click={() => cameraPosition.top()}>Top</button>
 <button on:click={() => cameraPosition.front()}>front</button>
 <div bind:this={target} on:resize={resize} bind:clientWidth={width} bind:clientHeight={height}>
-  <Terrain />
   <Controls bind:controls />
+  <Floor />
+  <AmbientLighting />
+  <ChannelLighting />
+  <TorusKnot />
   <!--
   <Bloom />
   <select bind:value={$resolution} name="resolution">
