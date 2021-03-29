@@ -26,6 +26,16 @@
   let lights = $tracks$.map(() => new RectAreaLight(0xffffff, 2, width))
   let helpers = lights.map(light => new RectAreaLightHelper(light))
 
+  const indexLights = () =>
+    lights.forEach((light, i) => {
+      light.name = $tracks$[i].id
+    })
+
+  const indexHelpers = () =>
+    helpers.forEach((helper, i) => {
+      helper.name = $tracks$[i].id
+    })
+
   const addLights = () => lights.forEach(light => scene.add(light))
   const addLightHelpers = () => helpers.forEach(helper => scene.add(helper))
 
@@ -39,6 +49,8 @@
     )
 
   updateLightPositions()
+  indexLights()
+  indexHelpers()
   addLights()
   addLightHelpers()
 
