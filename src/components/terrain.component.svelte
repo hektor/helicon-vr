@@ -1,7 +1,7 @@
 <script>
   import { tracks$ } from '../stores/mixer'
   import * as THREE from 'three'
-  /* import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js' */
+  import { RectAreaLight } from 'three'
   import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
   import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
 
@@ -10,31 +10,55 @@
   import { getContext } from 'svelte'
   const { scene } = getContext('scene')
 
+  const normalizeFaderRange = dB => (dB - -60) / (6 - -60)
+  const heightFrom = volume => normalizeFaderRange(volume) * 8
+
   RectAreaLightUniformsLib.init()
 
-  const lights = $tracks$.map(({ volume }, i) => {
-    const normalizedVolume = (volume - -60) / (6 - -60)
-    const light = new THREE.RectAreaLight(0xffffff, 2, 2, normalizedVolume * 8)
-    const spacing = 4
-    light.position.set(-i * spacing + $tracks$.length + spacing / 2, 0)
-    scene.add(light)
-    return light
-  })
+  const spacing = 1
+  const width = 2
+  const offset = ($tracks$.length * width + $tracks$.length * spacing) / 2
 
-  lights.forEach(light => {
-    const helper = new RectAreaLightHelper(light)
-    scene.add(helper)
-  })
+  /*
+   * Create and return initial array for lights and helpers
+   */
+
+  let lights = $tracks$.map(({ volume: v }) => new RectAreaLight(0xffffff, 2, width, heightFrom(v)))
+  let helpers = lights.map(light => new RectAreaLightHelper(light))
+
+  const addLights = () => lights.forEach(light => scene.add(light))
+  const addLightHelpers = () => helpers.forEach(helper => scene.add(helper))
+
+  /*
+   * Set light positions so they are centered to scene
+   */
+
+  const updateLightPositions = () =>
+    lights.forEach(({ position: p }, i) => p.set(-i * width - spacing * i - width / 2 + offset, 0))
+
+  updateLightPositions()
+  addLights()
+  addLightHelpers()
+
+  $: {
+    if ($tracks$ > lights) {
+      const light = new RectAreaLight(0x00ff00, 2, width, 16)
+      lights = [...lights, light]
+      scene.add(light)
+      scene.add(new RectAreaLightHelper(light))
+      updateLightPositions()
+    }
+    if ($tracks$ < lights) {
+      lights.forEach(light => {
+        light.position.x = light.position.x - 1
+      })
+    }
+  }
 
   $: $tracks$.forEach(({ volume, mute }, i) => {
-    const normalizedVolume = (volume - -60) / (6 - -60)
-    lights[i].height = normalizedVolume * 8
-    if (mute) {
-      lights[i].color.setHex(0x0c0c0c)
-    } else {
-      lights[i].color.setHex(0xffffff)
-    }
-    if (volume > 0) lights[i].color.setHex(0xff4400)
+    lights[i].height = heightFrom(volume)
+    mute ? lights[i].color.setHex(0x0c0c0c) : lights[i].color.setHex(0xffffff)
+    volume > 0 && lights[i].color.setHex(0xff4400)
   })
 
   const geoFloor = new THREE.BoxGeometry(2000, 0.1, 2000)
