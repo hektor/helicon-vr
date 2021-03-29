@@ -20,7 +20,7 @@
   const addTrack = () =>
     tracks$.next([
       ...$tracks$,
-      { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: -60, mute: false },
+      { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: 0, mute: false },
     ])
 
   /*
