@@ -13,6 +13,8 @@ export const tracks$ = writable$(
   ],
 )
 
+export const selected$ = writable$(-1)
+
 /*
  * Persist all channel states
  */

@@ -6,7 +6,7 @@
   import { Transport, Channel, Synth } from 'tone'
 
   import { playing$, bpm$, vol$, mute$ } from '../stores/playback'
-  import { tracks$ } from '../stores/mixer'
+  import { tracks$, selected$ } from '../stores/mixer'
 
   import TransportControls from '../components/transport-controls.svelte'
   import ToggleTheme from '../components/toggle-theme.component.svelte'
@@ -170,15 +170,29 @@
           {label}
           bind:volume
           bind:mute
+          selected={$selected$ === id}
           on:contextmenu={e => {
             showMenu(e, id)
           }}
+          on:click={selected$.set(id)}
+          type="track"
         />
       {/each}
     </div>
     <AddTrack on:click={addTrack} />
-    <ChannelStrip label="Master" bind:volume={$vol$} bind:mute={$mute$} master />
+    <ChannelStrip
+      label="Master"
+      bind:volume={$vol$}
+      bind:mute={$mute$}
+      master
+      on:click={() => selected$.set(-1)}
+      selected={$selected$ === -1}
+      type="master"
+    />
   </div>
+  <pre>
+  {JSON.stringify($selected$, 0, 2)}
+</pre>
 </div>
 
 {#if trackMenu}
