@@ -3,6 +3,7 @@
   import LogoGithub32 from 'carbon-icons-svelte/lib/LogoGithub32'
   import Misuse32 from 'carbon-icons-svelte/lib/Misuse32'
 
+  import Header from '../components/header.component.svelte'
   import Typewriter from '../components/typewriter.component.svelte'
 
   import { resolution } from '../stores/vr'
@@ -12,77 +13,88 @@
 </script>
 
 <div class="container">
-  <div class="col col-left">
-    <div class="title">
-      <h1>Helicon 1.0</h1>
-      <Typewriter text="An immersive introduction to polyrhythms." />
-    </div>
-    <div class="credits">
-      <a class="repo" href="https://www.github.com/hektormisplon/bap"><LogoGithub32 /></a>
-      <span
-        >By &ensp;
-        <a href="https://www.github.com/hektormisplon" target="_blank">Hektor Misplon</a>
-      </span>
-    </div>
-  </div>
-  <div class="col col-right">
-    <div class="nav-group">
-      <nav>
-        <a href="/#/world">Discover</a>
-        <a href="/#/test">Test</a>
-      </nav>
-      <nav>
-        <a href="/#/about">About</a>
-        <a href="/#/faq">FAQ</a>
-      </nav>
-    </div>
-    <div class="supports-group">
-      <div class="supports-group-header">
-        <h2>Browser requirements</h2>
-        <a href="/#/requirements">Learn more</a>
+  <Header>
+    <span>Helicon</span>
+  </Header>
+  <main>
+    <div class="col col-left">
+      <div class="title">
+        <h1>Helicon 1.0</h1>
+        <Typewriter text="An immersive introduction to polyrhythms." />
       </div>
-      <div class="supports">
-        <span>Resolution</span>
-        <select bind:value={$resolution} name="resolution">
-          <option selected={$resolution === 1} value={1}>Full</option>
-          <option selected={$resolution === 0.5} value={0.5}>Half</option>
-          <option selected={$resolution === 0.25} value={0.25}>Quarter</option>
-        </select>
+      <div class="credits">
+        <a class="repo" href="https://www.github.com/hektormisplon/bap"><LogoGithub32 /></a>
+        <span
+          >By &ensp;
+          <a href="https://www.github.com/hektormisplon" target="_blank">Hektor Misplon</a>
+        </span>
       </div>
-      <div class="supports">
-        {#if supportsMIDI}
-          <CheckmarkFilled32 />
-          <div>
+    </div>
+    <div class="col col-right">
+      <div class="nav-group">
+        <nav>
+          <a href="/#/world">Discover</a>
+          <a href="/#/test">Test</a>
+        </nav>
+        <nav>
+          <a href="/#/about">About</a>
+          <a href="/#/faq">FAQ</a>
+        </nav>
+      </div>
+      <div class="supports-group">
+        <div class="supports-group-header">
+          <h2>Browser requirements</h2>
+          <a href="/#/requirements">Learn more</a>
+        </div>
+        <div class="supports">
+          <span>Resolution</span>
+          <select bind:value={$resolution} name="resolution">
+            <option selected={$resolution === 1} value={1}>Full</option>
+            <option selected={$resolution === 0.5} value={0.5}>Half</option>
+            <option selected={$resolution === 0.25} value={0.25}>Quarter</option>
+          </select>
+        </div>
+        <div class="supports">
+          {#if supportsMIDI}
+            <CheckmarkFilled32 />
+            <div>
+              <span>MIDI</span>
+              <small>Supported by your browser.</small>
+            </div>
+          {:else}
+            <Misuse32 />
             <span>MIDI</span>
-            <small>Supported by your browser.</small>
-          </div>
-        {:else}
-          <Misuse32 />
-          <span>MIDI</span>
-          <small>Not supported by your browser.</small>
-        {/if}
-      </div>
-      <div class="supports">
-        {#if supportsVR}
-          <CheckmarkFilled32 />
-          <div>
-            <span>VR</span>
-            <small>Supported by your browser.</small>
-          </div>
-        {:else}
-          <Misuse32 />
-          <div>
-            <span>VR</span>
             <small>Not supported by your browser.</small>
-          </div>
-        {/if}
+          {/if}
+        </div>
+        <div class="supports">
+          {#if supportsVR}
+            <CheckmarkFilled32 />
+            <div>
+              <span>VR</span>
+              <small>Supported by your browser.</small>
+            </div>
+          {:else}
+            <Misuse32 />
+            <div>
+              <span>VR</span>
+              <small>Not supported by your browser.</small>
+            </div>
+          {/if}
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
 <style>
   .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
     flex: 1;
     display: flex;
   }
