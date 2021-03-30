@@ -8,7 +8,7 @@
   const { scene } = getContext('scene')
 
   const normalizeFaderRange = dB => (dB - -60) / (6 - -60)
-  const heightFrom = volume => normalizeFaderRange(volume) * 8
+  const heightFrom = volume => normalizeFaderRange(volume) * 16
 
   RectAreaLightUniformsLib.init()
 
