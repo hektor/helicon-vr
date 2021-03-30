@@ -90,6 +90,6 @@
   $: $tracks$.forEach(({ volume, mute }, i) => {
     lights[i].height = heightFrom(volume)
     mute ? lights[i].color.setHex(0x0c0c0c) : lights[i].color.setHex(0xffffff)
-    volume > 0 && lights[i].color.setHex(0xff4400)
+    volume > 0 && !mute && lights[i].color.setHex(0xff4400)
   })
 </script>
