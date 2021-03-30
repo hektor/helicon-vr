@@ -8,6 +8,7 @@
   import { playing$, bpm$, vol$, mute$ } from '../stores/playback'
   import { tracks$, selected$ } from '../stores/mixer'
 
+  import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
   import ToggleTheme from '../components/toggle-theme.component.svelte'
   import ChannelStrip from '../components/channel-strip.component.svelte'
@@ -159,18 +160,20 @@
 </script>
 
 <div class="container">
-  <header>
-    <TransportControls>
-      <span class="mode-title">Performance</span>
-    </TransportControls>
-  </header>
+  <Header>
+    <TransportControls />
+  </Header>
+  <!--
   <select bind:value={oscType}>
     <option value="sine">Sine</option>
     <option value="square">Square</option>
     <option value="triangle">Triangle</option>
   </select>
+  -->
   <ToggleTheme />
   <Scene />
+  <!--
+  -->
   <div class="channel-strips">
     <div class="tracks">
       {#each $tracks$ as { id, label, volume, mute }}
@@ -289,13 +292,5 @@
     cursor: pointer;
     color: var(--color-1);
     background: var(--color-4);
-  }
-
-  .mode-title {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 1.6rem;
   }
 </style>
