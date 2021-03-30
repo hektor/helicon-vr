@@ -44,9 +44,17 @@
     trackMenu = null
   }
 
+  /*
+   * Create master channel
+   */
+
   const master = new Channel({
     volume: -Infinity,
   }).toDestination()
+
+  /*
+   * Add channels from state
+   */
 
   let channels = $tracks$.map(({ volume, mute, id }) =>
     new Channel({ volume, mute, id }).connect(master),
