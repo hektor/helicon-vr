@@ -17,10 +17,10 @@ const createPosition = init => {
 
   return {
     subscribe,
-    top: () => set([0, 64, 32]),
-    front: () => set([0, 0.5, -64]),
+    top: () => set([0, 64, 48]),
+    front: () => set([0, 0, -48]),
   }
 }
 
 export const settings = createSettings({ fov: 45, near: 0.1, far: 256 })
-export const position = createPosition([0, 0, -64])
+export const position = createPosition([0, 0, -48])
