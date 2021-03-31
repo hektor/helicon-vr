@@ -15,6 +15,32 @@
   import AddTrack from '../components/add-track.component.svelte'
 
   /*
+   * Menu
+   */
+
+  let position = { x: 0, y: 0 }
+  let shown = false
+  let trackMenu = null
+
+  /*
+   * Create channels
+   */
+
+  const master = new Channel({
+    volume: -Infinity,
+  }).toDestination()
+
+  let channels = $tracks$.map(({ volume, muted: mute, id }) =>
+    new Channel({ volume, mute, id }).connect(master),
+  )
+
+  /*
+   * Synthesizer settings
+   */
+
+  let oscType = 'square'
+
+  /*
    * Add a track
    */
 
@@ -24,42 +50,22 @@
       { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: 0, muted: false },
     ])
 
+  const indexTrack = (track, i) => ({
+    ...track,
+    id: i + 1,
+    label: `Track ${i + 1}`,
+  })
+
   /*
    * Remove track from its context menu,
    * other tracks are reindexed and relabeled
    */
 
+  const isMenuClosed = ({ id }) => id !== trackMenu
   const removeTrack = () => {
-    tracks$.next(
-      $tracks$
-        // remove
-        .filter(({ id }) => id !== trackMenu)
-        // reindex
-        .map((track, i) => ({
-          ...track,
-          id: i + 1,
-          label: `Track ${i + 1}`,
-        })),
-    )
-    // reset menu id
+    tracks$.next($tracks$.filter(isMenuClosed).map(indexTrack))
     trackMenu = null
   }
-
-  /*
-   * Create master channel
-   */
-
-  const master = new Channel({
-    volume: -Infinity,
-  }).toDestination()
-
-  /*
-   * Add channels from state
-   */
-
-  let channels = $tracks$.map(({ volume, muted, id }) =>
-    new Channel({ volume, mute: muted, id }).connect(master),
-  )
 
   const indexChannels = () =>
     channels.map((channel, i) => {
@@ -106,8 +112,6 @@
     Transport.bpm.value = $bpm$
   }
 
-  let oscType = 'square'
-
   /*
    * Configure synths
    */
@@ -141,12 +145,7 @@
 
   $: synth.oscillator.type = oscType
 
-  let position = { x: 0, y: 0 }
-  let shown = false
-  let trackMenu = null
-
-  const showMenu = (e, id) => {
-    const { clientX: x, clientY: y } = e
+  const showMenu = ({ clientX: x, clientY: y }, id) => {
     trackMenu = id
     shown = true
     position = { x, y }
@@ -201,9 +200,7 @@
       type="master"
     />
   </div>
-  <pre>
-  {JSON.stringify($selected$, 0, 2)}
-</pre>
+  <pre />
 </div>
 
 {#if trackMenu}

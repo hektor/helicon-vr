@@ -2,12 +2,12 @@
   import Router from 'svelte-spa-router'
   import { theme } from './stores/theme'
 
-  // Pages
-  import Home from './pages/home.page.svelte'
-  import World from './pages/world.page.svelte'
-  import About from './pages/about.page.svelte'
-  import MIDI from './pages/midi.page.svelte'
-  import Requirements from './pages/requirements.page.svelte'
+  // Routes
+  import Home from './routes/home.route.svelte'
+  import World from './routes/world.route.svelte'
+  import About from './routes/about.route.svelte'
+  import MIDI from './routes/midi.route.svelte'
+  import Requirements from './routes/requirements.route.svelte'
 
   const routes = {
     '/': Home,
