@@ -23,6 +23,6 @@ master$
   .pipe(debounce(() => interval(500)))
   .subscribe(master => localStorage.setItem('master', JSON.stringify(master)))
 
-// tracks$
-//   .pipe(debounce(() => interval(500)))
-//   .subscribe(tracks => localStorage.setItem('tracks', JSON.stringify(tracks)))
+tracks$
+  .pipe(debounce(() => interval(500)))
+  .subscribe(tracks => localStorage.setItem('tracks', JSON.stringify(tracks)))
