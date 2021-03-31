@@ -1,6 +1,6 @@
 <script>
-  import { tracks$ } from '../stores/mixer'
-  import { RectAreaLight } from 'three'
+  import { selected$, tracks$ } from '../stores/mixer'
+  import { BoxGeometry, Mesh, RectAreaLight, MeshStandardMaterial } from 'three'
   import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
   import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
 
@@ -87,9 +87,35 @@
     updateLightPositions()
   }
 
-  $: $tracks$.forEach(({ volume, mute }, i) => {
+  $: $tracks$.forEach(({ volume, mute, id }, i) => {
+    if ($selected$ === id) {
+      lights[i].intensity = 3
+    } else {
+      lights[i].intensity = 1
+    }
     lights[i].height = heightFrom(volume)
     mute ? lights[i].color.setHex(0x0c0c0c) : lights[i].color.setHex(0xffffff)
     volume > 0 && !mute && lights[i].color.setHex(0xff4400)
+  })
+
+  const cube = new Mesh(
+    new BoxGeometry(0.5, 0.5, 0.5),
+    new MeshStandardMaterial({ color: 0xffffff }),
+  )
+  scene.add(cube)
+
+  selected$.subscribe(id => {
+    if ($selected$ === -1) {
+      cube.visible = false
+    } else {
+      cube.visible = true
+      lights
+        .filter(light => light.name === id)
+        .forEach(light => {
+          cube.position.x = light.position.x
+          cube.position.y = light.position.y + 0.5
+          cube.position.z = light.position.z - 0.5
+        })
+    }
   })
 </script>
