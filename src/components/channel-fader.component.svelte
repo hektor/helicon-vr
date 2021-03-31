@@ -3,10 +3,10 @@
   export let max = 6
   export let label
   export let value
-  export let mute
+  export let muted
 </script>
 
-<div class="slider-container" style="--mute: {mute ? 0.5 : 1}">
+<div class="slider-container" style="--muted: {muted ? 0.5 : 1}">
   <label for="slider">{label || ''}</label>
   <div class="slider">
     <input name="slider" type="range" bind:value {min} {max} steps={max} list="zero-snap" />
@@ -30,7 +30,7 @@
     flex-direction: column;
     max-width: 8rem;
     align-items: center;
-    opacity: var(--mute);
+    opacity: var(--muted);
   }
 
   .slider {

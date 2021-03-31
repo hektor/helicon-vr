@@ -87,15 +87,15 @@
     updateLightPositions()
   }
 
-  $: $tracks$.forEach(({ volume, mute, id }, i) => {
+  $: $tracks$.forEach(({ volume, muted, id }, i) => {
     if ($selected$ === id) {
       lights[i].intensity = 3
     } else {
       lights[i].intensity = 1
     }
     lights[i].height = heightFrom(volume)
-    mute ? lights[i].color.setHex(0x0c0c0c) : lights[i].color.setHex(0xffffff)
-    volume > 0 && !mute && lights[i].color.setHex(0xff4400)
+    muted ? lights[i].color.setHex(0x0c0c0c) : lights[i].color.setHex(0xffffff)
+    volume > 0 && !muted && lights[i].color.setHex(0xff4400)
   })
 
   const cube = new Mesh(

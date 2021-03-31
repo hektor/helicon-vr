@@ -3,12 +3,12 @@ import { debounce } from 'rxjs/operators'
 import { writable$ } from './utils/observable-store'
 
 const defaults = {
-  master: { label: 'Master', volume: -60, mute: false },
+  master: { label: 'Master', volume: -60, muted: false },
   tracks: [
-    { id: 1, label: 'Track 1', volume: 0, mute: false },
-    { id: 2, label: 'Track 2', volume: 0, mute: false },
-    { id: 3, label: 'Track 3', volume: 0, mute: false },
-    { id: 4, label: 'Track 4', volume: 0, mute: false },
+    { id: 1, label: 'Track 1', volume: 0, muted: false },
+    { id: 2, label: 'Track 2', volume: 0, muted: false },
+    { id: 3, label: 'Track 3', volume: 0, muted: false },
+    { id: 4, label: 'Track 4', volume: 0, muted: false },
   ],
 }
 

@@ -3,19 +3,19 @@
 
   export let label
   export let volume
-  export let mute
+  export let muted
   export let type
   export let selected
 </script>
 
 <div class="channel-strip" class:type class:selected on:contextmenu>
-  <VolumeSlider {label} {mute} bind:value={volume} />
-  <input type="checkbox" class="channel-mute" class:mute bind:checked={mute} />
+  <VolumeSlider {label} {muted} bind:value={volume} />
+  <input type="checkbox" class="channel-muted" class:muted bind:checked={muted} />
   <button
-    class="channel-mute"
-    class:mute
+    class="channel-muted"
+    class:muted
     on:click={() => {
-      mute = !mute
+      muted = !muted
     }}>M</button
   >
   <button class="select" on:click><small>Select</small></button>
@@ -29,7 +29,7 @@
     min-width: 9.6rem;
   }
 
-  .channel-mute {
+  .channel-muted {
     margin: 0.8rem;
     padding: 0.8rem;
     color: var(--color-3);
@@ -41,7 +41,7 @@
     display: none;
   }
 
-  .mute {
+  .muted {
     color: var(--color-bg);
     border: 1px solid var(--color-bg);
     background: var(--color-primary);

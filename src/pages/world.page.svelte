@@ -5,7 +5,7 @@
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
 
-  import { playing$, bpm$, vol$, mute$ } from '../stores/playback'
+  import { playing$, bpm$, vol$, muted$ } from '../stores/playback'
   import { tracks$, selected$ } from '../stores/mixer'
 
   import Header from '../components/header.component.svelte'
@@ -21,7 +21,7 @@
   const addTrack = () =>
     tracks$.next([
       ...$tracks$,
-      { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: 0, mute: false },
+      { id: $tracks$.length + 1, label: `Track ${$tracks$.length + 1}`, volume: 0, muted: false },
     ])
 
   /*
@@ -57,8 +57,8 @@
    * Add channels from state
    */
 
-  let channels = $tracks$.map(({ volume, mute, id }) =>
-    new Channel({ volume, mute, id }).connect(master),
+  let channels = $tracks$.map(({ volume, muted, id }) =>
+    new Channel({ volume, mute: muted, id }).connect(master),
   )
 
   const indexChannels = () =>
@@ -70,7 +70,7 @@
 
   $: {
     if ($tracks$.length > channels.length) {
-      const channel = new Channel({ volume: 0, mute: false }).connect(master)
+      const channel = new Channel({ volume: 0 }).connect(master)
       channel.name = $tracks$.length
       channels = [...channels, channel]
     }
@@ -87,9 +87,9 @@
       channels = channels.filter(channel => !diff.includes(channel.name))
     }
 
-    $tracks$.forEach(({ volume, mute }, i) => {
+    $tracks$.forEach(({ volume, muted }, i) => {
       channels[i].volume.value = volume
-      channels[i].mute = mute
+      channels[i].mute = muted
     })
   }
 
@@ -100,7 +100,7 @@
    */
 
   $: {
-    master.set({ volume: $vol$, mute: $mute$ })
+    master.set({ volume: $vol$, mute: $muted$ })
     // Calling Tone.start() prevents suspended AudioContext
     $playing$ ? Tone.start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
@@ -176,11 +176,11 @@
   -->
   <div class="channel-strips">
     <div class="tracks">
-      {#each $tracks$ as { id, label, volume, mute }}
+      {#each $tracks$ as { id, label, volume, muted }}
         <ChannelStrip
           {label}
           bind:volume
-          bind:mute
+          bind:muted
           selected={$selected$ === id}
           on:contextmenu={e => {
             showMenu(e, id)
@@ -194,7 +194,7 @@
     <ChannelStrip
       label="Master"
       bind:volume={$vol$}
-      bind:mute={$mute$}
+      bind:muted={$muted$}
       master
       on:click={() => selected$.set(-1)}
       selected={$selected$ === -1}
