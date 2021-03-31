@@ -2,10 +2,17 @@ import { interval } from 'rxjs'
 import { debounce } from 'rxjs/operators'
 import { writable$ } from './utils/observable-store'
 
-export const playing$ = writable$(false)
-export const bpm$ = writable$(JSON.parse(localStorage.getItem('bpm')) || 120)
-export const vol$ = writable$(JSON.parse(localStorage.getItem('vol')) || -60) // decibels
-export const mute$ = writable$(JSON.parse(localStorage.getItem('mute')) || false)
+const defaults = {
+  playing: false,
+  bpm: 120,
+  volume: 0,
+  mute: false,
+}
+
+export const playing$ = writable$(defaults.playing)
+export const bpm$ = writable$(JSON.parse(localStorage.getItem('bpm')) || defaults.bpm)
+export const vol$ = writable$(JSON.parse(localStorage.getItem('vol')) || defaults.volume)
+export const mute$ = writable$(JSON.parse(localStorage.getItem('mute')) || defaults.mute)
 
 /*
  * Persist playback settings (rate-limited)
