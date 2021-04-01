@@ -3,6 +3,8 @@
   import { getContext } from 'svelte'
   const { camera, renderer } = getContext('scene')
 
+  import { interacting } from '../stores/vr-controls'
+
   export const controls = new OrbitControls(camera, renderer.domElement)
 
   /*
@@ -20,4 +22,5 @@
   controls.dampingFactor = 0.05
   controls.enablePan = false
   controls.update()
+  $: controls.enabled = !$interacting
 </script>
