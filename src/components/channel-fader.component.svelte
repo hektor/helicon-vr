@@ -6,8 +6,8 @@
   export let muted
 </script>
 
-<div class="slider-container" style="--muted: {muted ? 0.5 : 1}">
-  <label for="slider">{label || ''}</label>
+<div class="slider-container" style="--muted: {muted ? 0.2 : 1}">
+  <label for="slider">{muted ? 'Muted' : label || ''}</label>
   <div class="slider">
     <input name="slider" type="range" bind:value {min} {max} steps={max} list="zero-snap" />
     <datalist id="zero-snap"><option value="0" /></datalist>
@@ -51,6 +51,7 @@
   input[type='range']::-webkit-slider-runnable-track {
     cursor: pointer;
     background: var(--color-1);
+    border: 1px solid var(--color-bg);
   }
 
   input[type='range'] {
