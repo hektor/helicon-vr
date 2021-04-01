@@ -35,6 +35,7 @@
    * Synthesizer settings
    */
 
+  const synth = new Synth({ envelope: { attack: 0.25 } }).connect(channels[0])
   let oscType = 'square'
 
   /*
@@ -64,40 +65,46 @@
     trackMenu = null
   }
 
+  const addChannel = channel => {
+    channels = [...channels, channel]
+  }
   const indexChannels = () => channels.map((channel, i) => channel.set({ name: $tracks$[i].id }))
-
   indexChannels()
 
+  /*
+   * Update master channel
+   */
+
   $: {
-    if ($tracks$.length > channels.length) {
-      const channel = new Channel({ volume: 0 }).connect(master)
-      channel.set({ name: $tracks$.length })
-      channels = [...channels, channel]
-    }
+    const { volume, muted: mute } = $master$
+    master.set({ volume, mute })
+  }
+
+  /*
+   * Updated track channels
+   */
+
+  $: {
+    if ($tracks$.length > channels.length)
+      addChannel(new Channel().set({ name: $tracks$.length }).connect(master))
     if ($tracks$.length < channels.length) {
       const trackIds = $tracks$.map(({ id }) => id)
       const channelIds = channels.map(({ name }) => name)
       const diff = channelIds.filter(x => !trackIds.includes(x))
-      channels.filter(channel => {
-        if (diff.includes(channel.name)) {
-          channel.dispose()
-        }
-      })
-
+      // dispose unused channels
+      channels.filter(channel => diff.includes(channel.name) && channel.dispose())
+      // remove channel
       channels = channels.filter(channel => !diff.includes(channel.name))
     }
 
     $tracks$.forEach(({ volume, muted }, i) => channels[i].set({ volume, mute: muted }))
   }
 
-  const synth = new Synth({ envelope: { attack: 0.25 } }).connect(channels[0])
-
   /*
-   * Playback store updates
+   * Update transport playback
    */
 
   $: {
-    master.set({ volume: $vol$, mute: $muted$ })
     // Calling Tone.start() prevents suspended AudioContext
     $playing$ ? Tone.start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
@@ -123,8 +130,9 @@
     cMaj[Math.round(Math.random(cMaj.length - 1))],
   ]
 
-  let index = 0
+  $: synth.oscillator.type = oscType
 
+  let index = 0
   const loop = time => {
     let step = index % cycle.length
     let input = cycle[step]
@@ -133,8 +141,6 @@
   }
 
   Tone.Transport.scheduleRepeat(loop, '8n')
-
-  $: synth.oscillator.type = oscType
 
   const showMenu = ({ clientX: x, clientY: y }, id) => {
     trackMenu = id
