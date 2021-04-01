@@ -1,5 +1,5 @@
 <script>
-  import VolumeSlider from '../components/channel-fader.component.svelte'
+  import ChannelFader from '../components/channel-fader.component.svelte'
 
   export let label
   export let volume
@@ -9,7 +9,7 @@
 </script>
 
 <div class="channel-strip" class:type class:selected on:contextmenu>
-  <VolumeSlider {label} {muted} bind:value={volume} />
+  <ChannelFader {label} {muted} bind:value={volume} />
   <input type="checkbox" class="channel-muted" class:muted bind:checked={muted} />
   <button
     class="channel-muted"
