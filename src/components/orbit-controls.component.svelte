@@ -1,4 +1,5 @@
 <script>
+  import { Vector3 } from 'three'
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
   import { getContext } from 'svelte'
   const { camera, renderer } = getContext('scene')
@@ -11,7 +12,8 @@
    * Configure orbit controls
    */
 
-  controls.maxPolarAngle = (89.5 * Math.PI) / 180
+  controls.target = new Vector3(0, 8, 0)
+  controls.maxPolarAngle = (90 * Math.PI) / 180 + Math.atan(8 / 48) - (2 * Math.PI) / 180
   controls.maxDistance = 64
   controls.minDistance = 16
   controls.maxAzimuthAngle = -Math.PI / 2
@@ -19,8 +21,7 @@
   controls.rotateSpeed = 0.5
   controls.zoomSpeed = 0.5
   controls.enableDamping = true
-  controls.dampingFactor = 0.05
+  controls.dampingFactor = 0.075
   controls.enablePan = false
-  controls.update()
   $: controls.enabled = !$interacting
 </script>
