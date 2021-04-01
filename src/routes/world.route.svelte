@@ -64,17 +64,14 @@
     trackMenu = null
   }
 
-  const indexChannels = () =>
-    channels.map((channel, i) => {
-      channel.name = $tracks$[i].id
-    })
+  const indexChannels = () => channels.map((channel, i) => channel.set({ name: $tracks$[i].id }))
 
   indexChannels()
 
   $: {
     if ($tracks$.length > channels.length) {
       const channel = new Channel({ volume: 0 }).connect(master)
-      channel.name = $tracks$.length
+      channel.set({ name: $tracks$.length })
       channels = [...channels, channel]
     }
     if ($tracks$.length < channels.length) {
@@ -90,10 +87,7 @@
       channels = channels.filter(channel => !diff.includes(channel.name))
     }
 
-    $tracks$.forEach(({ volume, muted }, i) => {
-      channels[i].volume.value = volume
-      channels[i].mute = muted
-    })
+    $tracks$.forEach(({ volume, muted }, i) => channels[i].set({ volume, mute: muted }))
   }
 
   const synth = new Synth({ envelope: { attack: 0.25 } }).connect(channels[0])
