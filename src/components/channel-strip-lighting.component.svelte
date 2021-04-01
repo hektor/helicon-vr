@@ -3,12 +3,12 @@
   import { BoxGeometry, Mesh, RectAreaLight, MeshStandardMaterial } from 'three'
   import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
   import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
+  import { normalize as normalizeDecibels } from '../lib/decibels'
 
   import { getContext } from 'svelte'
   const { scene } = getContext('scene')
 
-  const normalizeFaderRange = dB => (dB - -60) / (6 - -60)
-  const heightFrom = volume => normalizeFaderRange(volume) * 16
+  const heightFrom = volume => normalizeDecibels(volume) * 16
 
   RectAreaLightUniformsLib.init()
 
