@@ -7,6 +7,7 @@
 
   import { playing$, bpm$ } from '../stores/playback'
   import { master$, tracks$, selected$ } from '../stores/mixer'
+  import { synth$ } from '../stores/synths'
 
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
@@ -35,8 +36,7 @@
    * Synthesizer settings
    */
 
-  const synth = new Synth({ envelope: { attack: 0.25 } }).connect(channels[0])
-  let oscType = 'square'
+  const synth = new Synth($synth$).connect(channels[0])
 
   /*
    * Add a track
@@ -130,8 +130,6 @@
     cMaj[Math.round(Math.random(cMaj.length - 1))],
   ]
 
-  $: synth.oscillator.type = oscType
-
   let index = 0
   const loop = time => {
     let step = index % cycle.length
@@ -159,17 +157,8 @@
   <Header>
     <TransportControls />
   </Header>
-  <!--
-  <select bind:value={oscType}>
-    <option value="sine">Sine</option>
-    <option value="square">Square</option>
-    <option value="triangle">Triangle</option>
-  </select>
-  -->
   <ToggleTheme />
   <Scene />
-  <!--
-  -->
   <div class="channel-strips">
     <div class="tracks">
       {#each $tracks$ as { id, label, volume, muted }}
