@@ -3,7 +3,8 @@ import { debounce } from 'rxjs/operators'
 import { writable$ } from './utils/observable-store'
 
 const defaults = {
-  master: { label: 'Master', volume: -60, muted: false },
+  selected: -1,
+  master: { label: 'Master', volume: 0, muted: false },
   tracks: [
     { id: 1, label: 'Track 1', volume: 0, muted: false },
     { id: 2, label: 'Track 2', volume: 0, muted: false },
@@ -14,7 +15,7 @@ const defaults = {
 
 export const master$ = writable$(defaults.master)
 export const tracks$ = writable$(JSON.parse(localStorage.getItem('tracks')) || defaults.tracks)
-export const selected$ = writable$(-1)
+export const selected$ = writable$(defaults.selected)
 
 /*
  * Persist all channel states

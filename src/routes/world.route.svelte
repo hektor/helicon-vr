@@ -5,8 +5,8 @@
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
 
-  import { playing$, bpm$, vol$, muted$ } from '../stores/playback'
-  import { tracks$, selected$ } from '../stores/mixer'
+  import { playing$, bpm$ } from '../stores/playback'
+  import { master$, tracks$, selected$ } from '../stores/mixer'
 
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
@@ -26,10 +26,7 @@
    * Create channels
    */
 
-  const master = new Channel({
-    volume: -Infinity,
-  }).toDestination()
-
+  const master = new Channel($master$).toDestination()
   let channels = $tracks$.map(({ volume, muted: mute, id }) =>
     new Channel({ volume, mute, id }).connect(master),
   )
@@ -192,9 +189,8 @@
     <AddTrack on:click={addTrack} />
     <ChannelStrip
       label="Master"
-      bind:volume={$vol$}
-      bind:muted={$muted$}
-      master
+      bind:volume={$master$.volume}
+      bind:muted={$master$.muted}
       on:click={() => selected$.set(-1)}
       selected={$selected$ === -1}
       type="master"
