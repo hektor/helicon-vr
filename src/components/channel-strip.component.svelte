@@ -53,6 +53,6 @@
   }
 
   .selected {
-    background: var(--color-2);
+    background: var(--color-1);
   }
 </style>
