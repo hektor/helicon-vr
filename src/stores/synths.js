@@ -15,6 +15,7 @@ const defaults = {
     },
     oscillator: {
       type: 'sine',
+      volume: 0,
     },
     portamento: 0,
   },
