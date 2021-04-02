@@ -7,9 +7,7 @@
 </script>
 
 <div class="container">
-  <Header>
-    <span>Helicon</span>
-  </Header>
+  <Header />
   <main>
     <div class="col col-left">
       <div class="title">
