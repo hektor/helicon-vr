@@ -1,10 +1,12 @@
 <script>
   import Header from '../components/header.component.svelte'
+  import NavBack from '../components/nav-back.component.svelte'
 </script>
 
 <div class="container">
   <Header>
     <h1>Frequently asked questions</h1>
+    <NavBack />
   </Header>
   <div class="faq">
     <details>
