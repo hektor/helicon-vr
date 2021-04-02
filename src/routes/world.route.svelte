@@ -128,6 +128,7 @@
 <div class="container">
   <Header>
     <TransportControls />
+    <MIDIDevices />
   </Header>
   <ToggleTheme />
   <Scene />
