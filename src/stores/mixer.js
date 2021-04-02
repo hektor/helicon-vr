@@ -13,7 +13,7 @@ const defaults = {
   ],
 }
 
-export const master$ = writable$(defaults.master)
+export const master$ = writable$(JSON.parse(localStorage.getItem('master')) || defaults.master)
 export const tracks$ = writable$(JSON.parse(localStorage.getItem('tracks')) || defaults.tracks)
 export const selected$ = writable$(defaults.selected)
 
