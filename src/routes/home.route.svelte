@@ -198,10 +198,5 @@
     margin: 0.8rem;
     margin-left: 3.2rem;
     margin-right: 0;
-    padding: 1.6rem;
-    appearance: none;
-    background: var(--color-bg);
-    color: var(--color-primary);
-    border-color: var(--color-2);
   }
 </style>

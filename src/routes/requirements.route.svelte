@@ -85,10 +85,6 @@
     margin-top: auto;
   }
 
-  .links span :global(svg) {
-    margin: 0.8rem 0.8rem 0.8rem 0;
-  }
-
   .links span {
     display: flex;
     align-items: center;

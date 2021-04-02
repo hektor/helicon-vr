@@ -220,17 +220,6 @@
     padding-right: 4rem;
   }
 
-  .tracks::-webkit-scrollbar {
-    width: 5px;
-    height: 0.8rem;
-    background-color: transparent;
-    border-bottom: 1px solid var(--color-1);
-  }
-
-  .tracks::-webkit-scrollbar-thumb {
-    background: var(--color-3);
-  }
-
   .tracks {
     flex: 8;
     display: flex;

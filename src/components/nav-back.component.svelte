@@ -12,8 +12,4 @@
     align-items: center;
     text-decoration: none;
   }
-
-  .back :global(svg) {
-    margin-right: 0.8rem;
-  }
 </style>
