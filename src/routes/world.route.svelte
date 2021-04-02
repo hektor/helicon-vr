@@ -18,11 +18,10 @@
   import ChannelStrip from '../components/channel-strip.component.svelte'
   import AddTrack from '../components/add-track.component.svelte'
 
+  // Menu
   let position = { x: 0, y: 0 }
   let shown = false
   let menuTrackId = null
-
-  // Menu
   const setMenuTrackId = id => (menuTrackId = id)
   const showMenu = () => (shown = true)
   const hideMenu = () => (shown = false)
@@ -45,8 +44,6 @@
   const addTrack = () => tracks$.next([...$tracks$, nextTrack({ volume: 0, muted: false })])
   const indexTrack = (track, id) => ({ ...track, id: id + 1, label: `Track ${id + 1}` })
   const removeTrack = () => tracks$.next($tracks$.filter(isMenuClosed).map(indexTrack))
-
-  const handleRemove = () => removeTrack() && closeMenu()
 
   // Create from state
   const master = newChannel($master$).toDestination()
@@ -71,22 +68,25 @@
 
   // Handle state updates
   $: {
+    // Master channel
     master.set({ volume: $master$.volume, mute: $master$.muted })
+    // Track channels
     if (shouldAddTrack()) addChannel(new Channel().set({ name: $tracks$.length }).connect(master))
     if (shouldRemoveTrack()) disposeRemovedTrack()
     if (shouldRemoveTrack()) removeRemovedTrack()
     updateChannels()
-  }
-
-  /*
-   * Update transport playback
-   */
-
-  $: {
-    // Calling Tone.start() prevents suspended AudioContext
+    // Playback (calling Tone.start() prevents suspended AudioContext)
     $playing$ ? Tone.start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
   }
+
+  const handleContextMenu = ({ clientX: x, clientY: y }, id) => {
+    setMenuTrackId(id)
+    showMenu()
+    setMenuPosition({ x, y })
+  }
+
+  const handleRemove = () => removeTrack() && closeMenu()
 
   /*
    * Configure synths
@@ -118,11 +118,9 @@
 
   Tone.Transport.scheduleRepeat(loop, '8n')
 
-  const handleContextMenu = ({ clientX: x, clientY: y }, id) => {
-    setMenuTrackId(id)
-    showMenu()
-    setMenuPosition({ x, y })
-  }
+  /*
+   * Handle DOM events
+   */
 
   onDestroy(() => Transport.stop())
 </script>
