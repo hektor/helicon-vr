@@ -3,7 +3,9 @@
 </script>
 
 <div class="container">
-  <Header />
+  <Header>
+    <h1>Frequently asked questions</h1>
+  </Header>
   <div class="faq">
     <details>
       <summary>How can I connect my MIDI devices?</summary>

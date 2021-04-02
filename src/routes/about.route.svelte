@@ -5,9 +5,9 @@
 
 <div class="container">
   <Header>
+    <h1>About</h1>
     <NavBack />
   </Header>
-  <h1>About</h1>
 </div>
 
 <style>
