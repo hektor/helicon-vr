@@ -1,11 +1,8 @@
 <script>
   import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
-  import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
-  /* import { BloomPass } from 'three/examples/jsm/postprocessing/BloomPass.js' */
-  /* import { FilmPass } from 'three/examples/jsm/postprocessing/FilmPass.js' */
   import { getContext } from 'svelte'
   import * as THREE from 'three'
-  const { composer, scene, camera } = getContext('scene')
+  const { composer } = getContext('scene')
 
   const bloomParams = {
     bloomStrength: 2,
