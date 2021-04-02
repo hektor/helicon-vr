@@ -6,6 +6,7 @@
   import TransportControls from '../components/transport-controls.svelte'
   import EnvelopeSettings from '../components/envelope-settings.component.svelte'
   import OscillatorSettings from '../components/oscillator-settings.component.svelte'
+  import MIDIDevices from '../components/midi-devices.component.svelte'
 
   import { playing$ } from '../stores/playback'
   import { bpm$ } from '../stores/playback'
@@ -37,6 +38,7 @@
 <div class="container">
   <Header>
     <TransportControls />
+    <MIDIDevices />
   </Header>
   <div class="modules">
     <EnvelopeSettings />
