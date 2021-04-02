@@ -5,9 +5,9 @@
   const { composer } = getContext('scene')
 
   const bloomParams = {
-    bloomStrength: 2,
-    bloomThreshold: 0.1,
-    bloomRadius: 0.2,
+    bloomStrength: 1,
+    bloomThreshold: 0,
+    bloomRadius: 0,
   }
 
   const bloomPass = new UnrealBloomPass(
