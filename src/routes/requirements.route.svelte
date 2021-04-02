@@ -3,25 +3,27 @@
 
   import Header from '../components/header.component.svelte'
   import NavBack from '../components/nav-back.component.svelte'
+  import BrowserSupport from '../components/browser-support.component.svelte'
+  import HardwareSupport from '../components/hardware-support.component.svelte'
 </script>
 
 <div class="container">
   <Header>
+    <h1>Requirements</h1>
     <NavBack />
   </Header>
   <main>
-    <h1>Requirements</h1>
     <div class="row">
       <section>
         <h2>Browser support</h2>
         <ul>
-          <li>Chrome (recommended)</li>
-          <li>Chromium (recommended)</li>
-          <li>Brave (recommended)</li>
+          <li>Chrome <small>(recommended)</small></li>
+          <li>Chromium <small>(recommended)</small></li>
+          <li>Brave <small>(recommended)</small></li>
         </ul>
         <ul>
-          <li>Edge (not recommended)</li>
-          <li>Opera (not recommended)</li>
+          <li>Edge <small>(not recommended)</small></li>
+          <li>Opera <small>(not recommended)</small></li>
         </ul>
         <div class="links">
           <span>
@@ -33,12 +35,18 @@
         </div>
       </section>
       <section>
+        <BrowserSupport><h2 slot="header">Browser check</h2></BrowserSupport>
+      </section>
+      <section>
         <h2>Hardware requirements</h2>
         <ul>
-          <li>8GB+ RAM</li>
-          <li>Recent CPU</li>
-          <li>Recent graphics card</li>
+          <li>8GB+ RAM <small>(recommended)</small></li>
+          <li>Recent CPU <small>(recommened)</small></li>
+          <li>Recent graphics card <small>(recommended)<small /></small></li>
         </ul>
+      </section>
+      <section>
+        <HardwareSupport><h2 slot="header">Hardware check</h2></HardwareSupport>
       </section>
     </div>
   </main>
@@ -52,36 +60,41 @@
   }
 
   h1 {
-    margin: 1.6rem 0;
+    font-size: 2.4rem;
   }
 
   main {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 3.2rem;
-    background: var(--color-1);
+    padding: 1.6rem;
   }
 
   .row {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
+    gap: 1.6rem;
   }
 
   section {
+    border: 1px solid var(--color-1);
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin: 1.6rem 6.4rem 0 0;
     min-width: 32rem;
+  }
+
+  section h2 {
+    background: var(--color-1);
+    padding: 1.6rem;
   }
 
   .links {
     display: flex;
     flex-direction: column;
     padding: 1.6rem;
-    background: var(--color-1);
+    background: var(--color-bg);
     margin-top: auto;
   }
 
@@ -96,12 +109,18 @@
 
   ul {
     margin: 0;
-    padding: 1.6rem 0;
+    padding: 0;
   }
 
   li {
+    display: flex;
+    flex-direction: column;
     list-style: none;
-    padding: 1.6rem 0;
+    padding: 3.2rem 1.6rem;
     border-bottom: 1px solid var(--color-1);
+  }
+
+  span :global(svg) {
+    margin-right: 0.8rem;
   }
 </style>
