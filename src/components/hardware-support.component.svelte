@@ -74,7 +74,6 @@
 
   .supports-group-header > h2 {
     margin-right: auto;
-    font-size: 2rem;
   }
 
   .supports-group-header > a {

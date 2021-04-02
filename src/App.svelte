@@ -60,4 +60,12 @@
     color: var(--color-primary);
     border-color: var(--color-2);
   }
+
+  :global(h1) {
+    font-size: 2.4rem;
+  }
+
+  :global(h2) {
+    font-size: 2rem;
+  }
 </style>

@@ -43,7 +43,6 @@
   }
 
   .envelope h2 {
-    font-size: 2.4rem;
     color: var(--color-5);
     margin: 1.6rem 3.2rem;
   }

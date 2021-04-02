@@ -59,10 +59,6 @@
     flex-direction: column;
   }
 
-  h1 {
-    font-size: 2.4rem;
-  }
-
   main {
     flex: 1;
     display: flex;
