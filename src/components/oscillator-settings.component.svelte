@@ -56,10 +56,5 @@
 
   select {
     flex: 1;
-    padding: 1.6rem;
-    appearance: none;
-    background: var(--color-bg);
-    color: var(--color-primary);
-    border-color: var(--color-2);
   }
 </style>
