@@ -27,6 +27,10 @@
 <Router {routes} />
 
 <style>
+  /*
+   * App specific global styling
+   */
+
   /* Minimal outlines */
   :global(a:focus, button:focus, input:focus, select:focus, summary:focus) {
     outline: 0.1rem dashed var(--color-5);
