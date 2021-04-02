@@ -6,6 +6,7 @@
   import Home from './routes/home.route.svelte'
   import World from './routes/world.route.svelte'
   import About from './routes/about.route.svelte'
+  import FAQ from './routes/faq.route.svelte'
   import MIDI from './routes/midi.route.svelte'
   import Requirements from './routes/requirements.route.svelte'
   import Test from './routes/test.route.svelte'
@@ -14,6 +15,7 @@
     '/': Home,
     '/world': World,
     '/about': About,
+    '/faq': FAQ,
     '/requirements': Requirements,
     '/midi': MIDI,
     '/test': Test,
