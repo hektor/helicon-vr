@@ -50,6 +50,7 @@
   main {
     flex: 1;
     display: flex;
+    flex-wrap: wrap;
   }
 
   .col {
@@ -63,7 +64,8 @@
   .col-left {
     color: var(--color-primary);
     background: var(--color-1);
-    max-width: 48rem;
+    min-width: 32rem;
+    max-width: 64rem;
   }
 
   .credits {
