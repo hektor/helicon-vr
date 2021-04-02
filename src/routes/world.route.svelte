@@ -5,6 +5,8 @@
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
 
+  import { diff } from '../lib/array'
+
   import { playing$, bpm$ } from '../stores/playback'
   import { master$, tracks$, selected$ } from '../stores/mixer'
   import { synth$ } from '../stores/synths'
@@ -55,7 +57,6 @@
   indexChannel(master, -1)
   channels.forEach((channel, i) => indexChannel(channel, $tracks$[i].id))
 
-  const diff = (a, b) => a.filter(x => !b.includes(x))
   const trackIds = () => $tracks$.map(({ id }) => id)
   const channelIds = () => channels.map(({ name }) => name)
   const removedTrackId = () => diff(channelIds(), trackIds())
