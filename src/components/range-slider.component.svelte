@@ -24,8 +24,10 @@
   }
 
   label {
+    color: var(--color-5);
     position: relative;
     top: -2.2rem;
+    pointer-events: none;
   }
 
   input[type='range']::-webkit-slider-runnable-track {
