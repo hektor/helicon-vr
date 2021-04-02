@@ -23,3 +23,39 @@
 </script>
 
 <Router {routes} />
+
+<style>
+  /* Minimal outlines */
+  :global(a:focus, button:focus, input:focus, select:focus, summary:focus) {
+    outline: 0.1rem dashed var(--color-5);
+  }
+
+  /* Minimal scrollbars */
+  :global(::-webkit-scrollbar) {
+    width: 5px;
+    height: 0.8rem;
+    background-color: transparent;
+    border-bottom: 1px solid var(--color-1);
+  }
+
+  :global(::-webkit-scrollbar-thumb) {
+    background: var(--color-3);
+  }
+
+  /* Space icons from text in buttons and links */
+  :global(button > svg:first-child, a > svg:first-child) {
+    margin-right: 0.8rem;
+  }
+
+  :global(button > svg:last-child, a > svg:last-child) {
+    margin-left: 0.8rem;
+  }
+
+  :global(select) {
+    padding: 1.6rem;
+    appearance: none;
+    background: var(--color-bg);
+    color: var(--color-primary);
+    border-color: var(--color-2);
+  }
+</style>
