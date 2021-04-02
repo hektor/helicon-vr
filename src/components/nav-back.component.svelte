@@ -8,6 +8,8 @@
 
 <style>
   .back {
+    margin-left: auto;
+    padding: 0 3.2rem;
     display: flex;
     align-items: center;
     text-decoration: none;
