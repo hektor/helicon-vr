@@ -3,13 +3,12 @@
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
-  import { Transport, Channel, Synth } from 'tone'
+  import { Transport, Channel } from 'tone'
 
   import { diff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
   import { master$, tracks$, selected$ } from '../stores/mixer'
-  import { synth$ } from '../stores/synths'
 
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
@@ -19,15 +18,19 @@
   import AddTrack from '../components/add-track.component.svelte'
 
   // Menu
+
   let position = { x: 0, y: 0 }
   let shown = false
   let menuTrackId = null
-  const setMenuTrackId = id => (menuTrackId = id)
-  const showMenu = () => (shown = true)
-  const hideMenu = () => (shown = false)
-  const setMenuPosition = coordinates => (position = coordinates)
-  const closeMenu = () => (menuTrackId = null)
-  const isMenuClosed = ({ id }) => id !== menuTrackId
+
+  const menu = {
+    show: () => (shown = true),
+    hide: () => (shown = false),
+    close: () => (menuTrackId = null),
+    setTrackId: id => (menuTrackId = id),
+    setPosition: coordinates => (position = coordinates),
+    isClosed: ({ id }) => id !== menuTrackId,
+  }
 
   // New track creation
   const nextTrackId = () => $tracks$.length + 1
@@ -41,14 +44,13 @@
   const indexChannel = (channel, id) => channel.set({ name: id })
   const removeChannel = ({ name: a }) => (channels = channels.filter(({ name: b }) => a !== b))
 
-  const addTrack = () => tracks$.next([...$tracks$, nextTrack({ volume: 0, muted: false })])
+  const addTrack = track => tracks$.next([...$tracks$, track])
   const indexTrack = (track, id) => ({ ...track, id: id + 1, label: `Track ${id + 1}` })
-  const removeTrack = () => tracks$.next($tracks$.filter(isMenuClosed).map(indexTrack))
+  const removeTrack = () => tracks$.next($tracks$.filter(menu.isClosed).map(indexTrack))
 
   // Create from state
   const master = newChannel($master$).toDestination()
   let channels = $tracks$.map(track => newChannel(track).connect(master))
-  const synth = new Synth($synth$).connect(channels[0])
 
   // Index all channels (master and track channels)
   indexChannel(master, -1)
@@ -66,7 +68,10 @@
   const shouldAddTrack = () => $tracks$.length > channels.length
   const shouldRemoveTrack = () => $tracks$.length < channels.length
 
-  // Handle state updates
+  /*
+   * Handle state updates
+   */
+
   $: {
     // Master channel
     master.set({ volume: $master$.volume, mute: $master$.muted })
@@ -80,47 +85,18 @@
     Transport.bpm.value = $bpm$
   }
 
-  const handleContextMenu = ({ clientX: x, clientY: y }, id) => {
-    setMenuTrackId(id)
-    showMenu()
-    setMenuPosition({ x, y })
-  }
-
-  const handleRemove = () => removeTrack() && closeMenu()
-
-  /*
-   * Configure synths
-   */
-
-  const cMaj = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', null, null]
-  const cycle = [
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-    null,
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-    null,
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-    null,
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-    null,
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-    null,
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-    cMaj[Math.round(Math.random(cMaj.length - 1))],
-  ]
-
-  let index = 0
-  const loop = time => {
-    let step = index % cycle.length
-    let input = cycle[step]
-    if (input !== null) synth.triggerAttackRelease(cycle[step], '32n', time)
-    index++
-  }
-
-  Tone.Transport.scheduleRepeat(loop, '8n')
-
   /*
    * Handle DOM events
    */
+
+  const handleContextMenu = ({ clientX: x, clientY: y }, id) => {
+    menu.setTrackId(id)
+    menu.show()
+    menu.setPosition({ x, y })
+  }
+
+  const handleRemove = () => removeTrack() && menu.close()
+  const handleAddTrack = () => addTrack(nextTrack({ volume: 0, muted: false }))
 
   onDestroy(() => Transport.stop())
 </script>
@@ -146,7 +122,7 @@
         />
       {/each}
     </div>
-    <AddTrack on:click={addTrack} />
+    <AddTrack on:click={handleAddTrack} />
     <ChannelStrip
       label="Master"
       bind:volume={$master$.volume}
@@ -156,7 +132,6 @@
       type="master"
     />
   </div>
-  <pre />
 </div>
 
 {#if menuTrackId}
@@ -172,7 +147,7 @@
     </ul>
   </div>
 {/if}
-<svelte:body on:click={hideMenu} on:contextmenu|preventDefault />
+<svelte:body on:click={menu.hide} on:contextmenu|preventDefault />
 
 <style>
   .container {
