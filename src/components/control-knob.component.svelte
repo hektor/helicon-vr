@@ -3,8 +3,6 @@
   const dispatch = createEventDispatcher()
 
   export let id = ''
-  let className
-  export { className as class }
   export let value = 50
   export let min = 0
   export let max = 100
@@ -39,17 +37,7 @@
       stroke-width={strokeWidth}
     />
     <foreignObject width="100" height="100">
-      <input
-        class={className}
-        {id}
-        {min}
-        {max}
-        {step}
-        type="number"
-        on:change={handleChange}
-        on:input
-        {value}
-      />
+      <input {id} {min} {max} {step} type="number" on:change={handleChange} on:input {value} />
     </foreignObject>
   </svg>
 </div>
