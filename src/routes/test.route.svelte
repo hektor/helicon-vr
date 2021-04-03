@@ -1,5 +1,6 @@
 <script>
   import { onDestroy } from 'svelte'
+  import * as Tone from 'tone'
   import { Channel, Transport, Synth, start } from 'tone'
   import Header from '../components/header.component.svelte'
 
@@ -7,11 +8,19 @@
   import EnvelopeSettings from '../components/envelope-settings.component.svelte'
   import OscillatorSettings from '../components/oscillator-settings.component.svelte'
   import MIDIDevices from '../components/midi-devices.component.svelte'
+  import MIDIEvents from '../components/midi-events.component.svelte'
+  import MIDINotes from '../components/midi-notes.component.svelte'
+  import Piano from '../components/piano.component.svelte'
 
   import { playing$ } from '../stores/playback'
   import { bpm$ } from '../stores/playback'
   import { master$ } from '../stores/mixer'
   import { synth$ } from '../stores/synths'
+
+  const context = new Tone.Context({ latencyHint: 'interactive' })
+  /* Tone.context.lookAhead = 0 */
+  Tone.setContext(context)
+  const now = () => Tone.now()
 
   const master = new Channel($master$).toDestination()
   const synth = new Synth($synth$).toDestination(master)
@@ -24,6 +33,7 @@
     input && synth.triggerAttackRelease(cycle[step], '32n', time)
     index++
   }
+
   Transport.scheduleRepeat(loop, '4n')
 
   $: {
@@ -32,6 +42,12 @@
     $playing$ ? start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
   }
+
+  const midiMessageToNoteName = msg => Tone.Frequency(msg[1], 'midi')
+
+  const handleNoteOn = ({ detail }) => synth.triggerAttack(midiMessageToNoteName(detail), now())
+  const handleNoteOff = () => synth.triggerRelease(now())
+
   onDestroy(() => Transport.stop())
 </script>
 
@@ -44,6 +60,9 @@
     <EnvelopeSettings />
     <OscillatorSettings />
   </div>
+  <MIDIEvents />
+  <MIDINotes on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
+  <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
 </div>
 
 <style>
