@@ -74,4 +74,21 @@
   :global(h2) {
     font-size: 2rem;
   }
+  :global(summary) {
+    padding: 3.2rem 1.6rem;
+    border-bottom: 1px solid var(--color-1);
+  }
+  :global(details[open] summary ~ *) {
+    animation: sweep 0.5s ease-in-out;
+  }
+  @keyframes -global-sweep {
+    0% {
+      opacity: 0;
+      margin-left: -10px;
+    }
+    100% {
+      opacity: 1;
+      margin-left: 0px;
+    }
+  }
 </style>
