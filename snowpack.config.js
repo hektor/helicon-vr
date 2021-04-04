@@ -9,7 +9,5 @@ module.exports = {
   optimize: {},
   devOptions: {},
   buildOptions: {},
-  packageOptions: {
-    source: 'remote',
-  },
+  packageOptions: {},
 }
