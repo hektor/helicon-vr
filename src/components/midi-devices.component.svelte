@@ -30,7 +30,6 @@
   onMount(init)
 </script>
 
-{@debug $inputNames$, $outputNames$}
 <button on:click={modal.showModal()}>
   <MidiPort />
   <small>MIDI</small>
@@ -88,11 +87,6 @@
   dialog::backdrop {
     background: rgba(0, 0, 0, 0.75);
     animation: appear 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
-  }
-
-  summary {
-    padding: 3.2rem 1.6rem;
-    border-bottom: 1px solid var(--color-1);
   }
 
   button {
