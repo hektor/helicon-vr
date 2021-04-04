@@ -5,6 +5,7 @@
   const { camera, renderer } = getContext('scene')
 
   import { interacting } from '../stores/vr-controls'
+  import { rad } from '../lib/trig'
 
   export const controls = new OrbitControls(camera, renderer.domElement)
 
@@ -13,7 +14,7 @@
    */
 
   controls.target = new Vector3(0, 8, 0)
-  controls.maxPolarAngle = (90 * Math.PI) / 180 + Math.atan(8 / 48) - (2 * Math.PI) / 180
+  controls.maxPolarAngle = rad(88) + Math.atan(8 / 48)
   controls.maxDistance = 64
   controls.minDistance = 16
   controls.maxAzimuthAngle = -Math.PI / 2
