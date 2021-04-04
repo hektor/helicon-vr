@@ -10,6 +10,7 @@
   import MIDI from './routes/midi.route.svelte'
   import Requirements from './routes/requirements.route.svelte'
   import Test from './routes/test.route.svelte'
+  import NotFound from './routes/not-found.route.svelte'
 
   const routes = {
     '/': Home,
@@ -19,6 +20,7 @@
     '/requirements': Requirements,
     '/midi': MIDI,
     '/test': Test,
+    '*': NotFound,
   }
 
   theme.subscribe(mode => document.documentElement.setAttribute('data-theme', mode))
