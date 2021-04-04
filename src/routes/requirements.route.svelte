@@ -33,8 +33,12 @@
             <Information24 />
             More details:
           </span>
-          <a target="_blank" href="https://caniuse.com/?search=midi"> MIDI support</a>
-          <a target="_blank" href="https://caniuse.com/?search=webxr"> WebXR support</a>
+          <a target="_blank" rel="noopener" href="https://caniuse.com/?search=midi">
+            MIDI support</a
+          >
+          <a target="_blank" rel="noopener" href="https://caniuse.com/?search=webxr">
+            WebXR support</a
+          >
         </div>
       </section>
       <section>

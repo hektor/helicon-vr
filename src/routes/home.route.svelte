@@ -21,7 +21,9 @@
         <a class="repo" href="https://www.github.com/hektormisplon/bap"><LogoGithub32 /></a>
         <span
           >By &ensp;
-          <a href="https://www.github.com/hektormisplon" target="_blank">Hektor Misplon</a>
+          <a href="https://www.github.com/hektormisplon" target="_blank" rel="noopener"
+            >Hektor Misplon</a
+          >
         </span>
       </div>
     </div>
