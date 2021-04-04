@@ -7,6 +7,9 @@
   import HardwareSupport from '../components/hardware-support.component.svelte'
 </script>
 
+<svelte:head>
+  <title>Requirements</title>
+</svelte:head>
 <div class="container">
   <Header>
     <h1>Requirements</h1>

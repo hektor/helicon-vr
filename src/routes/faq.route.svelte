@@ -3,6 +3,9 @@
   import NavBack from '../components/nav-back.component.svelte'
 </script>
 
+<svelte:head>
+  <title>FAQ</title>
+</svelte:head>
 <div class="container">
   <Header>
     <h1>Frequently asked questions</h1>

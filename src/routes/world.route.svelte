@@ -101,6 +101,9 @@
   onDestroy(() => Transport.stop())
 </script>
 
+<svelte:head>
+  <title>World</title>
+</svelte:head>
 <div class="container">
   <Header>
     <TransportControls />

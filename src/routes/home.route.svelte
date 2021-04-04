@@ -6,6 +6,9 @@
   import Supports from '../components/browser-support.component.svelte'
 </script>
 
+<svelte:head>
+  <title>Welcome</title>
+</svelte:head>
 <div class="container">
   <Header />
   <main>
