@@ -17,8 +17,8 @@
   controls.maxPolarAngle = rad(88) + Math.atan(8 / 48)
   controls.maxDistance = 64
   controls.minDistance = 16
-  controls.maxAzimuthAngle = -Math.PI / 2
-  controls.minAzimuthAngle = Math.PI / 2
+  controls.maxAzimuthAngle = -rad(90)
+  controls.minAzimuthAngle = rad(90)
   controls.rotateSpeed = 0.5
   controls.zoomSpeed = 0.5
   controls.enableDamping = true
