@@ -1,10 +1,12 @@
 <script>
   import { synth$ } from '../stores/synths'
+  import ADSR from './adsr.component.svelte'
   import ControlKnob from './control-knob.component.svelte'
 </script>
 
 <div class="envelope">
   <h2>Envelope</h2>
+  <ADSR bind:envelope={$synth$.envelope} />
   <div class="action-group">
     <fieldset>
       <ControlKnob id="attack" min={0} max={2} step={0.02} bind:value={$synth$.envelope.attack} />
