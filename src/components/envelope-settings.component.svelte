@@ -33,10 +33,6 @@
 </div>
 
 <style>
-  hr {
-    border-color: var(--color-1);
-  }
-
   .envelope {
     padding: 1.6rem 0.8rem;
     border: 1px solid var(--color-1);

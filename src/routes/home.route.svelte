@@ -74,6 +74,7 @@
   .credits {
     border-top: 1px solid var(--color-3);
     padding: 1.6rem 1.6rem 0.8rem 0;
+    margin: 0.8rem 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -97,10 +98,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-  }
-
-  .title > h1 {
-    margin: 1.6rem 0;
   }
 
   .nav-group {
