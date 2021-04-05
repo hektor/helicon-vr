@@ -3,7 +3,7 @@
   "author": "Hektor Misplon",
   "license": "MIT",
   "scripts": {
-    "start": "sirv build --port $PORT",
+    "start": "sirv build --port $PORT --host $HOST",
     "dev": "snowpack dev",
     "build": "snowpack build"
   },
