@@ -24,10 +24,13 @@
   import TorusKnot from './torus.component.svelte'
   import Floor from './floor.component.svelte'
   import ChannelLighting from './channel-strip-lighting.component.svelte'
-  import Controls from './orbit-controls.component.svelte'
+  import OrbitControls from './orbit-controls.component.svelte'
+  import PointerLockControls from './pointer-lock-controls.component.svelte'
 
   let target // canvas mount point
-  let controls // capture controls for update
+  let orbitControls // capture controls for update
+  let pointerLockControls
+  let locked
 
   $: width = 0 // canvas parent width
   $: height = 0 // canvas parent height
@@ -101,7 +104,6 @@
       // Render scene
       composer.render(scene, camera)
       // Control damping is enabled
-      controls.update()
     }
     stats.end()
   })
@@ -114,6 +116,12 @@
     target && target.appendChild(renderer.domElement)
     target && target.appendChild(VRButton.createButton(renderer))
     target && target.appendChild(stats.dom)
+
+    if (pointerLockControls) {
+      console.log('Add', pointerLockControls)
+      scene.add(pointerLockControls.getObject())
+      // pointerLockControls.lock()
+    }
   })
 
   //Expose scene objects
@@ -129,9 +137,14 @@
 
 <!--Detect resizes (note: resize does not set window width)-->
 <svelte:window on:resize={resize} />
-
-<div bind:this={target} on:resize={resize} bind:clientWidth={width} bind:clientHeight={height}>
-  <Controls bind:controls />
+<div
+  class="scene"
+  bind:this={target}
+  on:resize={resize}
+  bind:clientWidth={width}
+  bind:clientHeight={height}
+>
+  <PointerLockControls bind:locked bind:controls={pointerLockControls} />
   <Floor />
   <AmbientLighting />
   <ChannelLighting />
@@ -144,10 +157,77 @@
   <Bloom />
   <GUI />
   -->
+  {#if !locked}
+    <div class="enter" on:click={() => pointerLockControls.lock()}>
+      <div class="control-info">
+        <div class="control">
+          <span> Move up</span>
+          <span><kbd>W</kbd>,<kbd>&#129121;</kbd></span>
+        </div>
+        <div class="control">
+          <span> Move left</span>
+          <span>
+            <kbd>A</kbd>,<kbd>&#129128;</kbd>
+          </span>
+        </div>
+        <div class="control">
+          <span> Move down</span>
+          <span>
+            <kbd>S</kbd>,<kbd>&#129123;</kbd>
+          </span>
+        </div>
+        <div class="control">
+          <span> Move right</span>
+          <span>
+            <kbd>S</kbd>, <kbd>&#129122;</kbd>
+          </span>
+        </div>
+        <button>Enter interactive mode</button>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style>
-  div {
+  .enter {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .control-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--color-bg);
+    border: 1px solid var(--color-1);
+  }
+
+  .control {
+    display: flex;
+    padding: 1.6rem;
+    border-width: 1px;
+    border-color: var(--color-1);
+    border-style: solid;
+  }
+
+  .control > * {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  button {
+    padding: 1.6rem;
+    background: var(--color-1);
+    grid-column: 1 / -1;
+    border: 1px solid var(--color-2);
+  }
+
+  .scene {
     flex: 1;
     display: flex;
     max-height: 100vh;
