@@ -1,5 +1,5 @@
 <script>
-  import { onMount, setContext } from 'svelte'
+  import { onMount, onDestroy, setContext } from 'svelte'
   import {
     Color,
     Clock,
@@ -131,6 +131,10 @@
   })
 
   composer.addPass(new RenderPass(scene, camera))
+
+  onDestroy(() => {
+    renderer.dispose()
+  })
 </script>
 
 <!--Detect resizes (note: resize does not set window width)-->
