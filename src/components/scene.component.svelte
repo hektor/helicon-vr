@@ -23,6 +23,7 @@
   import ChannelLighting from './channel-strip-lighting.component.svelte'
   import OrbitControls from './orbit-controls.component.svelte'
   import PointerLockControls from './pointer-lock-controls.component.svelte'
+  import Sequencer from './sequencer.component.svelte'
 
   let target // canvas mount point
   let orbitControls // capture controls for update
@@ -101,6 +102,8 @@
       // Render scene
       composer.render(scene, camera)
       // Control damping is enabled
+      // Sequencer
+      if (flow) flow.moveAlongCurve(0.001)
     }
     stats.end()
   })
@@ -145,6 +148,7 @@
   <Floor />
   <AmbientLighting />
   <ChannelLighting />
+  <Sequencer bind:flow />
   <!--
   <button on:click={() => console.log(camera.getWorldPosition())}>Camera position?</button>
   <button on:click={() => console.log(camera.getWorldDirection())}>Camera lookat?</button>
