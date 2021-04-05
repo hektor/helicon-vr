@@ -91,4 +91,13 @@
       margin-left: 0px;
     }
   }
+
+  :global(kbd) {
+    background-color: var(--color-1);
+    border: 1px solid var(--color-5);
+    color: var(--color-primary);
+    line-height: 1;
+    padding: 1.6rem;
+    margin: 0.8rem;
+  }
 </style>

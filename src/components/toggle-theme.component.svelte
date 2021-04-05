@@ -20,7 +20,7 @@
 <style>
   .theme-toggle {
     display: flex;
-    padding: 0.8rem 0.4rem;
+    padding: 1.6rem 0.8rem;
   }
 
   .theme-toggle > :global(svg) {
