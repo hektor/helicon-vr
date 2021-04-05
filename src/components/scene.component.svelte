@@ -29,6 +29,7 @@
   let orbitControls // capture controls for update
   let pointerLockControls
   let locked
+  let flow
 
   $: width = 0 // canvas parent width
   $: height = 0 // canvas parent height
