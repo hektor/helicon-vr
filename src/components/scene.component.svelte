@@ -1,15 +1,14 @@
 <script>
   import { onMount, setContext } from 'svelte'
   import {
-    Clock,
     Color,
+    Clock,
     Fog,
     Scene,
     PerspectiveCamera,
-    WebGLRenderer,
     PointLight,
+    WebGLRenderer,
     sRGBEncoding,
-    Vector3,
   } from 'three'
 
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -18,10 +17,8 @@
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 
   import { settings as cameraSettings, position as cameraPosition } from '../stores/camera'
-  import { resolution } from '../stores/vr'
 
   import AmbientLighting from './ambient-lighting.component.svelte'
-  import TorusKnot from './torus.component.svelte'
   import Floor from './floor.component.svelte'
   import ChannelLighting from './channel-strip-lighting.component.svelte'
   import OrbitControls from './orbit-controls.component.svelte'
@@ -148,7 +145,6 @@
   <Floor />
   <AmbientLighting />
   <ChannelLighting />
-  <TorusKnot />
   <!--
   <button on:click={() => console.log(camera.getWorldPosition())}>Camera position?</button>
   <button on:click={() => console.log(camera.getWorldDirection())}>Camera lookat?</button>
