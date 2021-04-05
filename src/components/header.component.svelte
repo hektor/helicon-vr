@@ -1,5 +1,6 @@
 <script>
-  import Logo from '../components/logo.component.svelte'
+  import ToggleTheme from './toggle-theme.component.svelte'
+  import Logo from './logo.component.svelte'
   let scrollY
   $: scrolled = scrollY > 0
 </script>
@@ -9,6 +10,7 @@
     <Logo />
   </a>
   <slot />
+  <ToggleTheme />
 </header>
 <svelte:window bind:scrollY />
 
