@@ -13,7 +13,6 @@
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
   import MIDIDevices from '../components/midi-devices.component.svelte'
-  import ToggleTheme from '../components/toggle-theme.component.svelte'
   import ChannelStrip from '../components/channel-strip.component.svelte'
   import AddTrack from '../components/add-track.component.svelte'
 
@@ -109,7 +108,6 @@
     <TransportControls />
     <MIDIDevices />
   </Header>
-  <ToggleTheme />
   <Scene />
   <div class="channel-strips">
     <div class="tracks">
