@@ -1,4 +1,135 @@
-/* Add CSS styles here! */
+@import url('https://rsms.me/inter/inter.css');
+
+/*
+ * Variables
+ */
+
+:root {
+  --font-family: 'Inter', sans serif;
+  /* Color variables */
+  --color-bg: #eee;
+  --color-1: #ccc;
+  --color-2: #999;
+  --color-3: #888;
+  --color-4: #777;
+  --color-5: #666;
+  --color-primary: #333;
+
+  /* tweakpane colors */
+  --tp-base-background-color: hsla(0, 0%, 7%, 1);
+  --tp-base-shadow-color: hsla(0, 0%, 5%, 1);
+  --tp-button-background-color: hsla(0, 0%, 20%, 1);
+  --tp-button-background-color-active: rgba(89, 89, 89, 1);
+  --tp-button-background-color-focus: rgba(77, 77, 77, 1);
+  --tp-button-background-color-hover: rgba(64, 64, 64, 1);
+  --tp-button-foreground-color: hsla(0, 0%, 80%, 1);
+  --tp-folder-background-color: hsla(0, 0%, 13%, 1);
+  --tp-folder-background-color-active: hsla(0, 0%, 28%, 1);
+  --tp-folder-background-color-focus: hsla(0, 0%, 23%, 1);
+  --tp-folder-background-color-hover: hsla(0, 0%, 18%, 1);
+  --tp-folder-foreground-color: hsla(0, 0%, 80%, 1);
+  --tp-input-background-color: hsla(0, 0%, 11%, 1);
+  --tp-input-background-color-active: hsla(0, 0%, 26%, 1);
+  --tp-input-background-color-focus: hsla(0, 0%, 21%, 1);
+  --tp-input-background-color-hover: hsla(0, 0%, 16%, 1);
+  --tp-input-foreground-color: hsla(0, 0%, 80%, 1);
+  --tp-input-guide-color: hsla(0, 0%, 20%, 1);
+  --tp-monitor-background-color: hsla(0, 0%, 7%, 1);
+  --tp-monitor-foreground-color: hsla(0, 0%, 80%, 1);
+  --tp-label-foreground-color: hsla(0, 0%, 80%, 1);
+  --tp-separator-color: hsla(0, 0%, 7%, 1);
+}
+
+[data-theme='dark'] {
+  --color-bg: #0f0f0f;
+  --color-1: #222;
+  --color-2: #333;
+  --color-3: #444;
+  --color-4: #555;
+  --color-5: #666;
+  --color-primary: #eee;
+}
+
+/*
+ * Reset
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Base
+ */
+
+html {
+  font-size: 62.5%;
+}
+
 body {
-  font-family: sans-serif;
+  display: flex;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-family: var(--font-family);
+  font-size: 1.6rem;
+  min-height: 100vh;
+  line-height: 1.62;
+}
+
+/*
+ * Typography
+ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 400;
+  margin: 0;
+}
+
+a,
+button {
+  background-color: inherit;
+  color: inherit;
+}
+
+a[href^="https://"]::after
+{
+  content: '↗';
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input {
+  margin: 0;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+select {
+  font-size: inherit;
+}
+
+p {margin: 0}
+p+h1,p+h2,p+h3 {margin-top: 3.2rem;}
+h1+p {margin-top: 3.2rem;}
+h2+p {margin-top: 1.6rem;}
+h3+p {margin-top: .8rem;}
+p + p {margin-top: 1.6rem;}
+
+hr {
+  margin: 3.2rem 1.6rem; 
+  border-color: var(--color-1);
 }
