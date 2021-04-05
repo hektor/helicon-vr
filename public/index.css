@@ -76,6 +76,7 @@ body {
   font-family: var(--font-family);
   font-size: 1.6rem;
   min-height: 100vh;
+  line-height: 1.62;
 }
 
 /*
@@ -90,10 +91,6 @@ h5,
 h6 {
   font-weight: 400;
   margin: 0;
-}
-
-p {
-  margin: 0.8rem 0;
 }
 
 a,
@@ -123,4 +120,16 @@ input {
 
 select {
   font-size: inherit;
+}
+
+p {margin: 0}
+p+h1,p+h2,p+h3 {margin-top: 3.2rem;}
+h1+p {margin-top: 3.2rem;}
+h2+p {margin-top: 1.6rem;}
+h3+p {margin-top: .8rem;}
+p + p {margin-top: 1.6rem;}
+
+hr {
+  margin: 3.2rem 1.6rem; 
+  border-color: var(--color-1);
 }
