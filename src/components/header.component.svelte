@@ -18,7 +18,7 @@
   a {
     display: flex;
     text-decoration: none;
-    padding: 1rem;
+    padding: 1rem 0.8rem;
   }
 
   header {
