@@ -83,7 +83,7 @@
 
   renderer.xr.enabled = true
   // set pixelratio based on resolution settings
-  $: renderer.setPixelRatio(window.devicePixelRatio * $resolution)
+  // $: renderer.setPixelRatio(window.devicePixelRatio * $resolution)
   // color accuracy
   renderer.physicallyCorrectLights
   renderer.gammaFactor = 2.2
