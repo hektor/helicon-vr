@@ -74,10 +74,7 @@
    */
 
   cameraPosition.subscribe(() => {
-    if (controls) controls.enabled = false
-    if (controls) controls.target = new Vector3(0, 16, 0)
     camera.position.set(...$cameraPosition)
-    if (controls) controls.enabled = true
   })
 
   /*
