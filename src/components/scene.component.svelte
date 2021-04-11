@@ -87,7 +87,6 @@
   $: renderer.setPixelRatio(window.devicePixelRatio)
   // color accuracy
   renderer.physicallyCorrectLights
-  renderer.gammaFactor = 2.2
   renderer.outputEncoding = sRGBEncoding
 
   /*
