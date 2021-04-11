@@ -133,3 +133,12 @@ hr {
   margin: 3.2rem 1.6rem; 
   border-color: var(--color-1);
 }
+
+/* 
+ * Selection
+ */
+
+ ::selection {
+   color: var(--color-bg);
+   background: var(--color-primary);
+ }
