@@ -6,7 +6,7 @@
     "start": "sirv build --port $PORT --host $HOST",
     "dev": "snowpack dev",
     "dev:cert": "snowpack dev --secure",
-    "gen:cert": "./cert",
+    "gen:cert": "./scripts/cert",
     "build": "snowpack build"
   },
   "devDependencies": {
