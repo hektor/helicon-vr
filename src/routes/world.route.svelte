@@ -3,12 +3,13 @@
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
-  import { Transport, Channel } from 'tone'
+  import { Transport, Channel, Synth } from 'tone'
 
   import { diff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
   import { master$, tracks$, selected$ } from '../stores/mixer'
+  import { synths$ } from '../stores/synths'
 
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
@@ -83,6 +84,32 @@
     $playing$ ? Tone.start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
   }
+
+  /*
+   * Add synths
+   */
+
+  const synths = $synths$.map(settings => new Synth(settings))
+
+  synths.forEach((synth, i) => synth.connect(channels[i]))
+
+  const cycles = [
+    ['C4', null, 'D4', null],
+    ['E4', 'F4', 'F4', 'G4', 'E4'],
+    ['G4', 'A4', 'A4'],
+    ['G4', 'A4', 'A4', 'C5'],
+  ]
+
+  let indeces = [0, 0, 0, 0]
+  const loops = $tracks$.map((_, i) => time => {
+    let step = indeces[i] % cycles[i].length
+    console.log(cycles[i].length)
+    let input = cycles[i][step]
+    input && synths[i].triggerAttackRelease(cycles[i][step], '32n', time)
+    indeces[i]++
+  })
+
+  loops.forEach(loop => Transport.scheduleRepeat(loop, '4n'))
 
   /*
    * Handle DOM events

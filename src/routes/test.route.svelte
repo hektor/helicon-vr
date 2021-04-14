@@ -15,7 +15,7 @@
   import { playing$ } from '../stores/playback'
   import { bpm$ } from '../stores/playback'
   import { master$ } from '../stores/mixer'
-  import { synth$ } from '../stores/synths'
+  import { synths$ } from '../stores/synths'
 
   const context = new Tone.Context({ latencyHint: 'interactive' })
   /* Tone.context.lookAhead = 0 */
@@ -23,7 +23,7 @@
   const now = () => Tone.now()
 
   const master = new Channel($master$).toDestination()
-  const synth = new Synth($synth$).toDestination(master)
+  const synth = new Synth($synths$.synths[0]).toDestination(master)
 
   const cycle = ['C4', null, 'E4', null]
   let index = 0
@@ -37,7 +37,7 @@
   Transport.scheduleRepeat(loop, '4n')
 
   $: {
-    synth.set($synth$)
+    synth.set($synths$.synths[0])
     // Calling Tone.start() prevents suspended AudioContext
     $playing$ ? start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
