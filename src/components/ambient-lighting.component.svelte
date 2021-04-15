@@ -14,7 +14,7 @@
     } else {
       scene.background.setHex(0xeeeeee)
       ambientLight.color.setHex(0xeeeeee)
-      ambientLight.intensity = 1.25
+      ambientLight.intensity = 1
     }
   })
 </script>
