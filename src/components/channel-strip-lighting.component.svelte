@@ -42,7 +42,7 @@
 
   const updateLightPositions = () =>
     lights.forEach(({ position: p }, i) =>
-      p.set(-i * width - spacing * i - width / 2 + getOffset(), 0),
+      p.set(-i * width - spacing * i - width / 2 + getOffset(), 0, 16),
     )
 
   updateLightPositions()
