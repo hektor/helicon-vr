@@ -220,6 +220,7 @@
       handleController(controller1)
       handleController(controller2)
       // Control damping is enabled
+      if (selectedControls === 'orbit') controls.update()
       // Sequencer
       if (flow) flow.moveAlongCurve(0.001)
     }
