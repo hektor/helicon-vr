@@ -110,10 +110,9 @@
     this.userData.isSelecting = false
   }
 
-  function buildController(data) {
+  const buildController = ({ targetRayMode }) => {
     let geometry, material
-
-    switch (data.targetRayMode) {
+    switch (targetRayMode) {
       case 'tracked-pointer':
         geometry = new THREE.BufferGeometry()
         geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, -1], 3))
@@ -131,17 +130,13 @@
     }
   }
 
-  function handleController(controller) {
-    if (controller.userData.isSelecting) {
-      console.log(controller)
-    }
-  }
+  const handleController = controller => controller.userData.isSelecting && console.log(controller)
 
   controller1 = renderer.xr.getController(0)
   controller1.addEventListener('selectstart', onSelectStart)
   controller1.addEventListener('selectend', onSelectEnd)
-  controller1.addEventListener('connected', function (event) {
-    this.add(buildController(event.data))
+  controller1.addEventListener('connected', function ({ data }) {
+    this.add(buildController(data))
   })
   controller1.addEventListener('disconnected', function () {
     this.remove(this.children[0])
@@ -149,8 +144,8 @@
   controller2 = renderer.xr.getController(1)
   controller2.addEventListener('selectstart', onSelectStart)
   controller2.addEventListener('selectend', onSelectEnd)
-  controller2.addEventListener('connected', function (event) {
-    this.add(buildController(event.data))
+  controller2.addEventListener('connected', function ({ data }) {
+    this.add(buildController(data))
   })
   controller2.addEventListener('disconnected', function () {
     this.remove(this.children[0])
