@@ -41,7 +41,7 @@
   ]
 
   export let flow
-  let control, action
+  let control, target, action, hover
   const curveHandles = []
   const mouse = new Vector2(0, 0)
   const raycaster = new Raycaster()
@@ -49,6 +49,7 @@
   // Create geometry
   const boxGeometry = new BoxGeometry(...smallBoxDimensions)
   const boxMaterial = new MeshBasicMaterial({ color: colors.gray2 })
+  const boxActiveMaterial = new MeshBasicMaterial({ color: colors.white })
 
   const curves = curvePositions.map(curvePoints => {
     const curveVertices = curvePoints.map(position => {
@@ -90,24 +91,45 @@
   control.showX = false
   control.showZ = false
 
+  $: {
+    raycaster.setFromCamera(mouse, camera)
+    const intersects = raycaster.intersectObjects(curveHandles)
+    if (intersects.length) {
+      if (target !== intersects[0].object) {
+        // Remove active material from current target
+        target && (target.material = boxMaterial)
+        // Set new target
+        target = intersects[0].object
+      }
+    } else {
+      target && (target.material = boxMaterial)
+      target = null
+    }
+  }
+
+  $: target && (target.material = boxActiveMaterial)
+
   $: if (action) {
     action = false
     raycaster.setFromCamera(mouse, camera)
     const intersects = raycaster.intersectObjects(curveHandles)
     if (intersects.length) {
-      const target = intersects[0].object
       control.attach(target)
       scene.add(control)
     }
   }
 
-  const onPointerDown = ({ offsetX: x, offsetY: y }) => {
-    action = true
+  const onPointerDown = () => (action = true)
+  const onMouseMove = ({ offsetX: x, offsetY: y }) => updateMousePosition({ x, y })
+
+  const updateMousePosition = ({ x, y }) => {
     mouse.x = (x / renderer.domElement.width) * 2 - 1
     mouse.y = -(y / renderer.domElement.height) * 2 + 1
   }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown)
+  renderer.domElement.addEventListener('mousemove', onMouseMove)
+
   control.addEventListener('mouseDown', () => interacting.set(true))
   control.addEventListener('mouseUp', () => interacting.set(false))
   control.addEventListener('dragging-changed', ({ value }) => {
