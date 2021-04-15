@@ -12,6 +12,7 @@
     LineLoop,
     Raycaster,
     Vector2,
+    Vector3,
   } from 'three'
   import { getContext } from 'svelte'
   const { scene, renderer, camera } = getContext('scene')
@@ -90,6 +91,11 @@
   control = new TransformControls(camera, renderer.domElement)
   control.showX = false
   control.showZ = false
+  control.translationSnap = 1
+  // Translation constraints
+  control.addEventListener('change', () => {
+    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 10, 100))
+  })
 
   $: {
     raycaster.setFromCamera(mouse, camera)
