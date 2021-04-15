@@ -68,10 +68,7 @@
   const stats = new Stats()
 
   const dolly = new THREE.Group()
-  dolly.add(camera)
   scene.add(dolly)
-
-  // dolly.position.set(0, 8, 0)
 
   /*
    * Canvas parent resize handler
@@ -94,13 +91,6 @@
   /*
    * Configure camera, handle updates
    */
-
-  /* cameraPosition.subscribe(() => { */
-  /*   camera.position.set(...$cameraPosition) */
-  /* }) */
-
-  /* dolly.position.set(0, 0, -32) */
-  /* dolly.lookAt(0, 0, -64) */
 
   const room = new THREE.LineSegments(
     new BoxLineGeometry(128, 128, 128, 16, 16, 16),
@@ -173,32 +163,40 @@
 
   controllerGrip1 = renderer.xr.getControllerGrip(0)
   controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1))
-  scene.add(controllerGrip1)
 
   controllerGrip2 = renderer.xr.getControllerGrip(1)
   controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2))
+
+  scene.add(controllerGrip1)
   scene.add(controllerGrip2)
 
   const handModelFactory = new XRHandModelFactory().setPath('./models/fbx/')
 
-  // Hand 1
-  controllerGrip1 = renderer.xr.getControllerGrip(0)
-  controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1))
-  scene.add(controllerGrip1)
-
   hand1 = renderer.xr.getHand(0)
   hand1.add(handModelFactory.createHandModel(hand1, 'boxes'))
-
-  // Hand 2
-  controllerGrip2 = renderer.xr.getControllerGrip(1)
-  controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2))
-  scene.add(controllerGrip2)
 
   hand2 = renderer.xr.getHand(1)
   hand2.add(handModelFactory.createHandModel(hand2, 'boxes'))
 
   scene.add(hand1)
   scene.add(hand2)
+
+  renderer.xr.addEventListener('sessionstart', () => {
+    dolly.position.set(0, 1.6, -32)
+    dolly.lookAt(0, 0, -64)
+  })
+
+  /*
+   * Add VR headset, controls and hands to dolly
+   */
+
+  dolly.add(camera)
+  dolly.add(controller1)
+  dolly.add(controller2)
+  dolly.add(controllerGrip1)
+  dolly.add(controllerGrip2)
+  dolly.add(hand1)
+  dolly.add(hand2)
 
   //
 
