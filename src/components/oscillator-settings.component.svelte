@@ -6,7 +6,7 @@
 <div class="oscillator">
   <h2>Oscillator</h2>
   <div class="action-group">
-    <select bind:value={$synths$.synths[0].oscillator.type}>
+    <select bind:value={$synths$[0].oscillator.type}>
       <option value="sine"> Sine</option>
       <option value="square">Square</option>
       <option value="triangle">Triangle</option>
@@ -28,8 +28,8 @@
       min={-60}
       max={6}
       step={0.01}
-      label={`${$synths$.synths[0].oscillator.volume}dB`}
-      bind:value={$synths$.synths[0].oscillator.volume}
+      label={`${$synths$[0].oscillator.volume}dB`}
+      bind:value={$synths$[0].oscillator.volume}
     />
   </div>
 </div>

@@ -12,9 +12,9 @@
 
   const normalize = time => time / totalTime()
 
-  $: attackWidth = (width - 16) * normalize($synths$.synths[0].envelope.attack)
-  $: decayWidth = (width - 16) * normalize($synths$.synths[0].envelope.decay)
-  $: releaseWidth = (width - 16) * normalize($synths$.synths[0].envelope.release)
+  $: attackWidth = (width - 16) * normalize($synths$[0].envelope.attack)
+  $: decayWidth = (width - 16) * normalize($synths$[0].envelope.decay)
+  $: releaseWidth = (width - 16) * normalize($synths$[0].envelope.release)
 </script>
 
 <div>

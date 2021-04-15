@@ -6,7 +6,7 @@
 
 <div class="envelope">
   <h2>Envelope</h2>
-  <ADSR bind:envelope={$synths$.synths[0].envelope} />
+  <ADSR bind:envelope={$synths$[0].envelope} />
   <div class="action-group">
     <fieldset>
       <ControlKnob
@@ -14,18 +14,12 @@
         min={0}
         max={2}
         step={0.02}
-        bind:value={$synths$.synths[0].envelope.attack}
+        bind:value={$synths$[0].envelope.attack}
       />
       <label for="attack">Attack</label>
     </fieldset>
     <fieldset>
-      <ControlKnob
-        id="decay"
-        min={0}
-        max={2}
-        step={0.02}
-        bind:value={$synths$.synths[0].envelope.decay}
-      />
+      <ControlKnob id="decay" min={0} max={2} step={0.02} bind:value={$synths$[0].envelope.decay} />
       <label for="decay">Decay</label>
     </fieldset>
     <fieldset>
@@ -34,7 +28,7 @@
         min={0}
         max={1}
         step={0.01}
-        bind:value={$synths$.synths[0].envelope.sustain}
+        bind:value={$synths$[0].envelope.sustain}
       />
       <label for="sustain">Sustain</label>
     </fieldset>
@@ -44,7 +38,7 @@
         min={0}
         max={5}
         step={0.05}
-        bind:value={$synths$.synths[0].envelope.release}
+        bind:value={$synths$[0].envelope.release}
       />
       <label for="release">Release</label>
     </fieldset>
@@ -55,7 +49,7 @@
         min={0}
         max={5}
         step={0.05}
-        bind:value={$synths$.synths[0].portamento}
+        bind:value={$synths$[0].portamento}
       />
       <label for="portamento">Portamento</label>
     </fieldset>
