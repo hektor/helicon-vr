@@ -23,18 +23,21 @@
 
   import { settings as cameraSettings, position as cameraPosition } from '../stores/camera'
 
+  import Helicopter16 from 'carbon-icons-svelte/lib/Helicopter16'
+  import NavaidMilitary16 from 'carbon-icons-svelte/lib/NavaidMilitary16'
+
   import AmbientLighting from './ambient-lighting.component.svelte'
   import Floor from './floor.component.svelte'
   import ChannelLighting from './channel-strip-lighting.component.svelte'
   import OrbitControls from './orbit-controls.component.svelte'
   import PointerLockControls from './pointer-lock-controls.component.svelte'
+  import PointerLockControlsInfo from './pointer-lock-controls-info.component.svelte'
   import Sequencer from './sequencer.component.svelte'
 
   let target // canvas mount point
-  // Preview controls
-  let orbitControls // capture controls for update
-  // 360 experience controls
-  let pointerLockControls
+  let selectedControls = 'orbit'
+  // Preview controls (orbit or pointerlock)
+  let controls // capture controls for update
   // VR controls
   let controller1, controller2
   let controllerGrip1, controllerGrip2
@@ -55,7 +58,6 @@
 
   const scene = new Scene()
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2)
-  const light = new PointLight(0xffffff, 1, 16)
   const renderer = new WebGLRenderer({
     antialias: true,
     powerPreference: 'high-performance',
@@ -63,6 +65,12 @@
   const composer = new EffectComposer(renderer)
   const clock = new Clock() // Makes use of performance.now()
   const stats = new Stats()
+
+  const dolly = new THREE.Group()
+  dolly.add(camera)
+  scene.add(dolly)
+
+  // dolly.position.set(0, 8, 0)
 
   /*
    * Canvas parent resize handler
@@ -86,15 +94,17 @@
    * Configure camera, handle updates
    */
 
-  cameraPosition.subscribe(() => {
-    camera.position.set(...$cameraPosition)
-  })
+  /* cameraPosition.subscribe(() => { */
+  /*   camera.position.set(...$cameraPosition) */
+  /* }) */
+
+  /* dolly.position.set(0, 0, -32) */
+  /* dolly.lookAt(0, 0, -64) */
 
   const room = new THREE.LineSegments(
-    new BoxLineGeometry(6, 6, 6, 10, 10, 10),
-    new THREE.LineBasicMaterial({ color: 0x808080 }),
+    new BoxLineGeometry(64, 64, 64, 16, 16, 16),
+    new THREE.LineBasicMaterial({ color: 0x111111 }),
   )
-  room.geometry.translate(0, 3, 0)
   scene.add(room)
 
   /*
@@ -148,8 +158,6 @@
   controller1.addEventListener('disconnected', function () {
     this.remove(this.children[0])
   })
-  scene.add(controller1)
-
   controller2 = renderer.xr.getController(1)
   controller2.addEventListener('selectstart', onSelectStart)
   controller2.addEventListener('selectend', onSelectEnd)
@@ -159,6 +167,8 @@
   controller2.addEventListener('disconnected', function () {
     this.remove(this.children[0])
   })
+
+  scene.add(controller1)
   scene.add(controller2)
 
   const controllerModelFactory = new XRControllerModelFactory()
@@ -181,8 +191,6 @@
   hand1 = renderer.xr.getHand(0)
   hand1.add(handModelFactory.createHandModel(hand1, 'boxes'))
 
-  scene.add(hand1)
-
   // Hand 2
   controllerGrip2 = renderer.xr.getControllerGrip(1)
   controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2))
@@ -190,6 +198,8 @@
 
   hand2 = renderer.xr.getHand(1)
   hand2.add(handModelFactory.createHandModel(hand2, 'boxes'))
+
+  scene.add(hand1)
   scene.add(hand2)
 
   //
@@ -234,10 +244,9 @@
     target && target.appendChild(VRButton.createButton(renderer))
     target && target.appendChild(stats.dom)
 
-    if (pointerLockControls) {
-      console.log('Add', pointerLockControls)
-      scene.add(pointerLockControls.getObject())
-      // pointerLockControls.lock()
+    if (selectedControls === 'pointerlock') {
+      console.log('Add', controls)
+      scene.add(controls.getObject())
     }
   })
 
@@ -265,7 +274,11 @@
   bind:clientWidth={width}
   bind:clientHeight={height}
 >
-  <PointerLockControls bind:locked bind:controls={pointerLockControls} />
+  {#if selectedControls === 'pointerlock'}
+    <PointerLockControls bind:locked bind:controls />
+  {:else}
+    <OrbitControls bind:controls />
+  {/if}
   <Floor />
   <AmbientLighting />
   <ChannelLighting />
@@ -278,67 +291,44 @@
   <Bloom />
   <GUI />
   -->
-  {#if !locked}
-    <div class="enter" on:click={() => pointerLockControls.lock()}>
-      <div class="control-info">
-        <div class="control">
-          <span> Move up</span>
-          <span><kbd>W</kbd>,<kbd>&#129121;</kbd></span>
-        </div>
-        <div class="control">
-          <span> Move left</span>
-          <span>
-            <kbd>A</kbd>,<kbd>&#129128;</kbd>
-          </span>
-        </div>
-        <div class="control">
-          <span> Move down</span>
-          <span>
-            <kbd>S</kbd>,<kbd>&#129123;</kbd>
-          </span>
-        </div>
-        <div class="control">
-          <span> Move right</span>
-          <span>
-            <kbd>S</kbd>, <kbd>&#129122;</kbd>
-          </span>
-        </div>
-        <button>Enter interactive mode</button>
-      </div>
-    </div>
+
+  {#if !locked && selectedControls === 'pointerlock'}
+    <PointerLockControlsInfo>
+      <button on:click={() => controls.lock()}>Enter interactive mode</button>
+    </PointerLockControlsInfo>
   {/if}
+  <details class="preview">
+    <summary>Preview</summary>
+    <div>
+      <button
+        id="orbit"
+        on:click={() => (selectedControls = 'orbit')}
+        class:preview-active={selectedControls === 'orbit'}
+      >
+        <Helicopter16 />
+        <label for="orbit">Overview</label>
+      </button>
+    </div>
+    <div>
+      <button
+        id="pointerlock"
+        on:click={() => (selectedControls = 'pointerlock')}
+        class:preview-active={selectedControls === 'pointerlock'}
+      >
+        <NavaidMilitary16 />
+        <label for="pointerlock">First person</label>
+      </button>
+    </div>
+  </details>
 </div>
 
 <style>
-  .enter {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .control-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    background: var(--color-bg);
-    border: 1px solid var(--color-1);
-  }
-
-  .control {
-    display: flex;
-    padding: 1.6rem;
-    border-width: 1px;
-    border-color: var(--color-1);
-    border-style: solid;
-  }
-
-  .control > * {
+  .scene {
     flex: 1;
     display: flex;
-    align-items: center;
+    max-height: 100vh;
+    max-width: 100vw;
+    overflow: hidden;
   }
 
   button {
@@ -348,11 +338,39 @@
     border: 1px solid var(--color-2);
   }
 
-  .scene {
+  .preview {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    border: 1px solid var(--color-1);
+    border-bottom: none;
+    padding: 0.8rem;
+  }
+
+  .preview > summary {
+    padding: 0.8rem;
+  }
+
+  .preview > div {
     flex: 1;
     display: flex;
-    max-height: 100vh;
-    max-width: 100vw;
-    overflow: hidden;
+  }
+
+  .preview > div:not(:last-child) {
+    margin: 0.8rem 0;
+  }
+
+  .preview button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .preview-active {
+    background: var(--color-primary);
+    color: var(--color-bg);
   }
 </style>
