@@ -22,6 +22,7 @@
   import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js'
 
   import { settings as cameraSettings, position as cameraPosition } from '../stores/camera'
+  import { theme } from '../stores/theme'
 
   import Helicopter16 from 'carbon-icons-svelte/lib/Helicopter16'
   import NavaidMilitary16 from 'carbon-icons-svelte/lib/NavaidMilitary16'
@@ -126,13 +127,10 @@
       case 'tracked-pointer':
         geometry = new THREE.BufferGeometry()
         geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, -1], 3))
-        geometry.setAttribute(
-          'color',
-          new THREE.Float32BufferAttribute([0.5, 0.5, 0.5, 0, 0, 0], 3),
-        )
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute([1, 1, 1, 0, 0, 0], 3))
         material = new THREE.LineBasicMaterial({
           vertexColors: true,
-          blending: THREE.AdditiveBlending,
+          blending: $theme === 'light' ? THREE.SubtractiveBlending : THREE.AdditiveBlending,
         })
 
         return new THREE.Line(geometry, material)
