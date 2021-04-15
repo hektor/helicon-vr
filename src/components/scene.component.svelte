@@ -102,7 +102,7 @@
   /* dolly.lookAt(0, 0, -64) */
 
   const room = new THREE.LineSegments(
-    new BoxLineGeometry(64, 64, 64, 16, 16, 16),
+    new BoxLineGeometry(128, 128, 128, 16, 16, 16),
     new THREE.LineBasicMaterial({ color: 0x111111 }),
   )
   scene.add(room)
