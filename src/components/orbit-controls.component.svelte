@@ -1,5 +1,4 @@
 <script>
-  import { Vector3 } from 'three'
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
   import { getContext } from 'svelte'
   const { camera, renderer } = getContext('scene')
