@@ -1,27 +1,16 @@
 <script>
   import { onMount, onDestroy, setContext } from 'svelte'
-  import {
-    Color,
-    Clock,
-    Fog,
-    Scene,
-    PerspectiveCamera,
-    PointLight,
-    WebGLRenderer,
-    sRGBEncoding,
-  } from 'three'
-
+  import { Color, Clock, Fog, Scene, PerspectiveCamera, WebGLRenderer, sRGBEncoding } from 'three'
   import * as THREE from 'three'
 
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
   import Stats from 'three/examples/jsm/libs/stats.module.js'
   import { VRButton } from 'three/examples/jsm/webxr/VRButton.js'
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
-  import { BoxLineGeometry } from 'three/examples/jsm/geometries/BoxLineGeometry.js'
   import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js'
   import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js'
 
-  import { settings as cameraSettings, position as cameraPosition } from '../stores/camera'
+  import { settings as cameraSettings } from '../stores/camera'
   import { theme } from '../stores/theme'
 
   import Helicopter16 from 'carbon-icons-svelte/lib/Helicopter16'
