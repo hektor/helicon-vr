@@ -9,6 +9,7 @@
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
   import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js'
   import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js'
+  import { BoxLineGeometry } from 'three/examples/jsm/geometries/BoxLineGeometry'
 
   import { settings as cameraSettings } from '../stores/camera'
   import { theme } from '../stores/theme'
