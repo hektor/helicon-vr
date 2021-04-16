@@ -77,10 +77,6 @@
   scene.fog = new Fog(0x111111, near, far)
   scene.background = new Color(0x0c0c0c)
 
-  /*
-   * Configure camera, handle updates
-   */
-
   const room = new THREE.LineSegments(
     new BoxLineGeometry(128, 128, 128, 16, 16, 16),
     new THREE.LineBasicMaterial({ color: 0x111111 }),
@@ -280,7 +276,6 @@
     target && target.appendChild(stats.dom)
 
     if (selectedControls === 'pointerlock') {
-      console.log('Add', controls)
       scene.add(controls.getObject())
     }
   })
@@ -319,10 +314,6 @@
   <ChannelLighting />
   <Sequencer bind:flow />
   <!--
-  <button on:click={() => console.log(camera.getWorldPosition())}>Camera position?</button>
-  <button on:click={() => console.log(camera.getWorldDirection())}>Camera lookat?</button>
-  <button on:click={() => cameraPosition.top()}>Top</button>
-  <button on:click={() => cameraPosition.front()}>front</button>
   <Bloom />
   <GUI />
   -->
