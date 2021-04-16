@@ -91,14 +91,6 @@
    * Controllers
    */
 
-  function onSelectStart() {
-    this.userData.isSelecting = true
-  }
-
-  function onSelectEnd() {
-    this.userData.isSelecting = false
-  }
-
   const buildController = ({ targetRayMode }) => {
     let geometry, material
     switch (targetRayMode) {
@@ -119,11 +111,17 @@
     }
   }
 
-  const handleController = controller => controller.userData.isSelecting && console.log(controller)
+  const handleController = controller =>
+    controller.userData.isSelecting && console.log('Controller', controller)
+
+  let controller1Selecting = false
+  let controller2Selecting = false
+
+  $: console.log('Controller selection', { controller1Selecting, controller2Selecting })
 
   controller1 = renderer.xr.getController(0)
-  controller1.addEventListener('selectstart', onSelectStart)
-  controller1.addEventListener('selectend', onSelectEnd)
+  controller1.addEventListener('selectstart', () => (controller1Selecting = true))
+  controller1.addEventListener('selectend', () => (controller1Selecting = false))
   controller1.addEventListener('connected', function ({ data }) {
     this.add(buildController(data))
   })
@@ -131,8 +129,8 @@
     this.remove(this.children[0])
   })
   controller2 = renderer.xr.getController(1)
-  controller2.addEventListener('selectstart', onSelectStart)
-  controller2.addEventListener('selectend', onSelectEnd)
+  controller2.addEventListener('selectstart', () => (controller2Selecting = true))
+  controller2.addEventListener('selectend', () => (controller2Selecting = false))
   controller2.addEventListener('connected', function ({ data }) {
     this.add(buildController(data))
   })
