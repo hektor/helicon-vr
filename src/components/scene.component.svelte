@@ -163,11 +163,6 @@
   scene.add(hand1)
   scene.add(hand2)
 
-  renderer.xr.addEventListener('sessionstart', () => {
-    dolly.position.set(0, 1.6, -32)
-    dolly.lookAt(0, 0, -64)
-  })
-
   /*
    * Add VR headset, controls and hands to dolly
    */
@@ -180,7 +175,60 @@
   dolly.add(hand1)
   dolly.add(hand2)
 
-  //
+  renderer.xr.addEventListener('sessionstart', () => {
+    // dolly.position.set(0, 1.6, -32)
+    dolly.position.set(8, 2.5, -12)
+    dolly.lookAt(0, 0, -64)
+  })
+
+  /*
+   * Controller raycasting
+   */
+
+  const geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, -1),
+  ])
+
+  const line = new THREE.Line(geo)
+  line.name = 'line'
+  line.scale.z = 5
+
+  controller1.add(line.clone())
+  controller2.add(line.clone())
+
+  let intersected, hover
+
+  const tempMatrix = new THREE.Matrix4()
+  const raycaster = new THREE.Raycaster()
+
+  const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 })
+  const boxActiveMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
+
+  const getIntersections = controller => {
+    tempMatrix.identity().extractRotation(controller.matrixWorld)
+    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld)
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix)
+    return raycaster.intersectObjects(scene.children)
+  }
+
+  const intersectObjects = controller => {
+    // TODO: Split controllers
+    const line = controller.getObjectByName('line')
+    const intersections = getIntersections(controller)
+    const object = intersections[0].object
+    if (intersections.length) {
+      if (intersected !== object) {
+        intersected && (intersected.material = boxMaterial)
+        intersected = object
+      }
+    } else {
+      intersected && (intersected.material = boxMaterial)
+      intersected = null
+    }
+  }
+
+  $: intersected && (intersected.material = boxActiveMaterial)
 
   /*
    * Configure renderer
@@ -204,8 +252,16 @@
     {
       // Render scene
       composer.render(scene, camera)
+
       handleController(controller1)
       handleController(controller2)
+
+      // XR controller intersections
+      if (renderer.xr.isPresenting) {
+        intersectObjects(controller1)
+        intersectObjects(controller2)
+      }
+
       // Control damping is enabled
       if (selectedControls === 'orbit') controls.update()
       // Sequencer
