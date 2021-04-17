@@ -1,7 +1,9 @@
-export const regularPolygon = (n, r) => {
+import { rad } from './trig'
+
+export const regularPolygon = (n, r, angleOffset) => {
   let vertices = []
-  for (let a = 0; a < Math.PI * 2; a += (Math.PI * 2) / n) {
-    vertices.push([Math.round(Math.cos(a) * r), Math.round(Math.sin(a) * r)])
+  for (let a = angleOffset; a < rad(360) + angleOffset; a += rad(360) / n) {
+    vertices.push([Math.cos(a) * r, Math.sin(a) * r])
   }
   return vertices
 }
