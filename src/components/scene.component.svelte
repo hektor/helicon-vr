@@ -83,22 +83,25 @@
    */
 
   const buildController = ({ targetRayMode }) => {
-    let geometry, material
     switch (targetRayMode) {
       case 'tracked-pointer':
+        let geometry
         geometry = new THREE.BufferGeometry()
         geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, -1], 3))
         geometry.setAttribute('color', new THREE.Float32BufferAttribute([1, 1, 1, 0, 0, 0], 3))
-        material = new THREE.LineBasicMaterial({
-          vertexColors: true,
-          blending: $theme === 'light' ? THREE.SubtractiveBlending : THREE.AdditiveBlending,
-        })
+        return new THREE.Line(
+          geometry,
+          new THREE.LineBasicMaterial({
+            vertexColors: true,
+            blending: $theme === 'light' ? THREE.SubtractiveBlending : THREE.AdditiveBlending,
+          }),
+        )
 
-        return new THREE.Line(geometry, material)
       case 'gaze':
-        geometry = new THREE.RingGeometry(0.02, 0.04, 32).translate(0, 0, -1)
-        material = new THREE.MeshBasicMaterial({ opacity: 0.5, transparent: true })
-        return new THREE.Mesh(geometry, material)
+        return new THREE.Mesh(
+          new THREE.RingGeometry(0.02, 0.04, 32).translate(0, 0, -1),
+          new THREE.MeshBasicMaterial({ opacity: 0.5, transparent: true }),
+        )
     }
   }
 
@@ -107,8 +110,6 @@
 
   let controller1Selecting = false
   let controller2Selecting = false
-
-  $: console.log('Controller selection', { controller1Selecting, controller2Selecting })
 
   controller1 = renderer.xr.getController(0)
   controller1.addEventListener('selectstart', () => (controller1Selecting = true))
@@ -176,27 +177,28 @@
    * Controller raycasting
    */
 
+  let intersected, hover
+
   const geo = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(0, 0, 0),
     new THREE.Vector3(0, 0, -1),
   ])
 
   const line = new THREE.Line(geo)
+
   line.name = 'line'
   line.scale.z = 5
 
   controller1.add(line.clone())
   controller2.add(line.clone())
 
-  let intersected, hover
-
-  const tempMatrix = new THREE.Matrix4()
   const raycaster = new THREE.Raycaster()
 
   const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 })
   const boxActiveMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
 
   const getIntersections = controller => {
+    const tempMatrix = new THREE.Matrix4()
     tempMatrix.identity().extractRotation(controller.matrixWorld)
     raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld)
     raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix)
