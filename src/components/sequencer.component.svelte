@@ -19,6 +19,8 @@
 
   import { interacting } from '../stores/vr-controls'
 
+  import { regularPolygon } from '../lib/regular-polygon'
+
   const colors = {
     white: 0xffffff,
     gray1: 0x333333,
@@ -26,19 +28,12 @@
   }
 
   const smallBoxDimensions = [0.5, 0.5, 0.5]
+
   const curvePositions = [
-    [
-      { x: 8, y: 2, z: -8 },
-      { x: 8, y: 2, z: 8 },
-      { x: -8, y: 2, z: 8 },
-      { x: -8, y: 2, z: -8 },
-    ],
-    [
-      { x: 8, y: 4, z: -8 },
-      { x: 8, y: 4, z: 8 },
-      { x: -8, y: 4, z: 8 },
-      { x: -8, y: 4, z: -8 },
-    ],
+    regularPolygon(3, 8).map(point => ({ x: point[0], y: 2, z: point[1] })),
+    regularPolygon(4, 8).map(point => ({ x: point[0], y: 4, z: point[1] })),
+    regularPolygon(5, 8).map(point => ({ x: point[0], y: 6, z: point[1] })),
+    regularPolygon(16, 8).map(point => ({ x: point[0], y: 8, z: point[1] })),
   ]
 
   export let flow
