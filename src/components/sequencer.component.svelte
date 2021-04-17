@@ -19,6 +19,7 @@
 
   import { interacting } from '../stores/vr-controls'
 
+  import { rad } from '../lib/trig'
   import { regularPolygon } from '../lib/regular-polygon'
 
   const colors = {
@@ -28,13 +29,6 @@
   }
 
   const smallBoxDimensions = [0.5, 0.5, 0.5]
-
-  const curvePositions = [
-    regularPolygon(3, 8).map(point => ({ x: point[0], y: 2, z: point[1] })),
-    regularPolygon(4, 8).map(point => ({ x: point[0], y: 4, z: point[1] })),
-    regularPolygon(5, 8).map(point => ({ x: point[0], y: 6, z: point[1] })),
-    regularPolygon(16, 8).map(point => ({ x: point[0], y: 8, z: point[1] })),
-  ]
 
   export let flow
   let control, target, action, hover
@@ -47,21 +41,27 @@
   const boxMaterial = new MeshBasicMaterial({ color: colors.gray2 })
   const boxActiveMaterial = new MeshBasicMaterial({ color: colors.white })
 
-  const curves = curvePositions.map(curvePoints => {
-    const curveVertices = curvePoints.map(position => {
-      const handle = new Mesh(boxGeometry, boxMaterial)
-      handle.position.copy(position)
-      curveHandles.push(handle)
-      scene.add(handle)
-      return handle.position
-    })
-
-    const curve = new CatmullRomCurve3(curveVertices)
-    curve.curveType = 'centripetal'
+  const curves = [
+    regularPolygon(3, 4, rad(-90)).map(point => ({ x: point[0], y: 2, z: point[1] })),
+    regularPolygon(4, 6, rad(-90)).map(point => ({ x: point[0], y: 4, z: point[1] })),
+    regularPolygon(5, 8, rad(-90)).map(point => ({ x: point[0], y: 6, z: point[1] })),
+    regularPolygon(16, 10, rad(-90)).map(point => ({ x: point[0], y: 8, z: point[1] })),
+  ].map(curvePoints => {
+    const curve = new CatmullRomCurve3(
+      curvePoints.map(position => {
+        const handle = new Mesh(boxGeometry, boxMaterial)
+        handle.position.copy(position)
+        curveHandles.push(handle)
+        scene.add(handle)
+        return handle.position
+      }),
+    )
+    curve.tension = 0
+    curve.curveType = 'catmullrom'
     curve.closed = true
 
     const line = new LineLoop(
-      new BufferGeometry().setFromPoints(curve.getPoints(16)),
+      new BufferGeometry().setFromPoints(curve.getPoints(32)),
       new LineBasicMaterial({ color: colors.gray1 }),
     )
 
