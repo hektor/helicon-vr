@@ -9,7 +9,6 @@
   import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
   import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js'
   import { XRHandModelFactory } from 'three/examples/jsm/webxr/XRHandModelFactory.js'
-  import { BoxLineGeometry } from 'three/examples/jsm/geometries/BoxLineGeometry'
 
   import { settings as cameraSettings } from '../stores/camera'
   import { theme } from '../stores/theme'
@@ -19,6 +18,7 @@
 
   import AmbientLighting from './ambient-lighting.component.svelte'
   import Floor from './floor.component.svelte'
+  import Room from './room.component.svelte'
   import ChannelLighting from './channel-strip-lighting.component.svelte'
   import OrbitControls from './orbit-controls.component.svelte'
   import PointerLockControls from './pointer-lock-controls.component.svelte'
@@ -77,12 +77,6 @@
 
   scene.fog = new Fog(0x111111, near, far)
   scene.background = new Color(0x0c0c0c)
-
-  const room = new THREE.LineSegments(
-    new BoxLineGeometry(128, 128, 128, 16, 16, 16),
-    new THREE.LineBasicMaterial({ color: 0x111111 }),
-  )
-  scene.add(room)
 
   /*
    * Controllers
@@ -311,6 +305,7 @@
     <OrbitControls bind:controls />
   {/if}
   <Floor />
+  <Room />
   <AmbientLighting />
   <ChannelLighting />
   <Sequencer bind:flow />
