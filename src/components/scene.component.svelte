@@ -304,6 +304,8 @@
     camera,
   })
 
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap // default THREE.PCFShadowMap
+
   composer.addPass(new RenderPass(scene, camera))
 
   onDestroy(() => {
