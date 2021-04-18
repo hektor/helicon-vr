@@ -203,11 +203,9 @@
   }
 
   const intersectObjects = (controller, controllerNumber) => {
-    const line = controller.getObjectByName('line')
     const intersections = getIntersections(controller)
     if (intersections.length) {
       const object = intersections[0].object
-      line.scale.z = intersections[0].distance
       if (controllerNumber === 1) {
         intersected1 = object
       } else if (controllerNumber === 2) {
@@ -219,7 +217,6 @@
       } else if (controllerNumber === 2) {
         intersected2 = null
       }
-      line.scale.z = 1
     }
   }
 
