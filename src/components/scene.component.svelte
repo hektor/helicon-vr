@@ -177,7 +177,7 @@
    * Controller raycasting
    */
 
-  let intersected, hover
+  let intersected1, intersected2, hover
 
   const geo = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(0, 0, 0),
@@ -187,15 +187,12 @@
   const line = new THREE.Line(geo)
 
   line.name = 'line'
-  line.scale.z = 5
+  line.scale.z = 1
 
   controller1.add(line.clone())
   controller2.add(line.clone())
 
   const raycaster = new THREE.Raycaster()
-
-  const boxMaterial = new THREE.MeshBasicMaterial({ color: 0x555555 })
-  const boxActiveMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
 
   const getIntersections = controller => {
     const tempMatrix = new THREE.Matrix4()
@@ -205,23 +202,46 @@
     return raycaster.intersectObjects(scene.children)
   }
 
-  const intersectObjects = controller => {
-    // TODO: Split controllers
+  const intersectObjects = (controller, controllerNumber) => {
     const line = controller.getObjectByName('line')
     const intersections = getIntersections(controller)
-    const object = intersections[0].object
     if (intersections.length) {
-      if (intersected !== object) {
-        intersected && (intersected.material = boxMaterial)
-        intersected = object
+      const object = intersections[0].object
+      line.scale.z = intersections[0].distance
+      if (controllerNumber === 1) {
+        intersected1 = object
+      } else if (controllerNumber === 2) {
+        intersected2 = object
       }
     } else {
-      intersected && (intersected.material = boxMaterial)
-      intersected = null
+      if (controllerNumber === 1) {
+        intersected1 = null
+      } else if (controllerNumber === 2) {
+        intersected2 = null
+      }
+      line.scale.z = 1
     }
   }
 
-  $: intersected && (intersected.material = boxActiveMaterial)
+  $: if (intersected1) {
+    // intersected1.material.color.setHex(0xff0000)
+
+    console.log(intersected1.type)
+  }
+
+  $: if (intersected2) {
+    // intersected2.material.color.setHex(0x00ff00)
+
+    console.log(intersected2.type)
+  }
+
+  const cleanIntersected = () => {
+    // intersected1 && intersected1.material.color.setHex(0x555555)
+    // intersected2 && intersected2.material.color.setHex(0x555555)
+
+    intersected1 = null
+    intersected2 = null
+  }
 
   /*
    * Configure renderer
@@ -245,18 +265,17 @@
     {
       // Render scene
       composer.render(scene, camera)
-
-      handleController(controller1)
-      handleController(controller2)
-
       // XR controller intersections
       if (renderer.xr.isPresenting) {
-        intersectObjects(controller1)
-        intersectObjects(controller2)
+        handleController(controller1)
+        handleController(controller2)
+        cleanIntersected()
+        intersectObjects(controller1, 1)
+        intersectObjects(controller2, 2)
+      } else {
+        // Control damping is enabled
+        if (selectedControls === 'orbit') controls.update()
       }
-
-      // Control damping is enabled
-      if (selectedControls === 'orbit') controls.update()
       // Sequencer
       if (flow) flow.moveAlongCurve(0.001)
     }
