@@ -11,6 +11,9 @@
   import { master$, tracks$, selected$ } from '../stores/mixer'
   import { synths$ } from '../stores/synths'
 
+  import Collapsible from '../components/collapsible.component.svelte'
+  import Scene from '../components/scene.component.svelte'
+  import SynthModules from '../components/synth-modules.component.svelte'
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
   import MIDIDevices from '../components/midi-devices.component.svelte'
@@ -90,8 +93,8 @@
    */
 
   const synths = $synths$.map(settings => new Synth(settings))
-
   synths.forEach((synth, i) => synth.connect(channels[i]))
+  synths$.subscribe(settings => settings.forEach((setting, i) => synths[i].set(setting)))
 
   const cycles = [
     ['C4', null, 'D4', null],
@@ -136,30 +139,41 @@
     <MIDIDevices />
   </Header>
   <Scene />
-  <div class="channel-strips">
-    <div class="tracks">
-      {#each $tracks$ as { id, label, volume, muted }}
-        <ChannelStrip
-          {label}
-          bind:volume
-          bind:muted
-          selected={$selected$ === id}
-          on:contextmenu={e => handleContextMenu(e, id)}
-          on:click={selected$.set(id)}
-          type="track"
-        />
+  <Collapsible title="Instruments">
+    <div class="module-groups">
+      {#each $synths$ as synth}
+        <div class="module-group">
+          <SynthModules bind:synth />
+        </div>
       {/each}
     </div>
-    <AddTrack on:click={handleAddTrack} />
-    <ChannelStrip
-      label="Master"
-      bind:volume={$master$.volume}
-      bind:muted={$master$.muted}
-      on:click={() => selected$.set(-1)}
-      selected={$selected$ === -1}
-      type="master"
-    />
-  </div>
+  </Collapsible>
+  <Collapsible title="Mixer">
+    <div class="channel-strips">
+      <div class="tracks">
+        {#each $tracks$ as { id, label, volume, muted }}
+          <ChannelStrip
+            {label}
+            bind:volume
+            bind:muted
+            selected={$selected$ === id}
+            on:contextmenu={e => handleContextMenu(e, id)}
+            on:click={selected$.set(id)}
+            type="track"
+          />
+        {/each}
+      </div>
+      <AddTrack on:click={handleAddTrack} />
+      <ChannelStrip
+        label="Master"
+        bind:volume={$master$.volume}
+        bind:muted={$master$.muted}
+        on:click={() => selected$.set(-1)}
+        selected={$selected$ === -1}
+        type="master"
+      />
+    </div>
+  </Collapsible>
 </div>
 
 {#if menuTrackId}
@@ -183,6 +197,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    max-height: 100vh;
   }
 
   .channel-strips {
@@ -192,6 +207,20 @@
     display: flex;
     padding: 1.6rem 1.6rem;
     padding-right: 4rem;
+  }
+
+  .module-groups {
+    flex: 1;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .module-group {
+    flex: 1;
+    display: flex;
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
+    margin-left: 0.8rem;
   }
 
   .tracks {
