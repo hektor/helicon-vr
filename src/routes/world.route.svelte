@@ -35,6 +35,13 @@
     isClosed: ({ id }) => id !== menuTrackId,
   }
 
+  /*
+   * Tone settings
+   */
+
+  const context = new Tone.Context({ latencyHint: 'interactive' })
+  Tone.setContext(context)
+
   // New track creation
   const nextTrackId = () => $tracks$.length + 1
   const nextTrackLabel = () => `Tracks ${nextTrackId()}`
