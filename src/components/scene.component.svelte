@@ -25,23 +25,39 @@
   import PointerLockControlsInfo from './pointer-lock-controls-info.component.svelte'
   import Sequencer from './sequencer.component.svelte'
 
-  let target // canvas mount point
-  let selectedControls = 'orbit'
-  // Preview controls (orbit or pointerlock)
-  let controls // capture controls for update
-  // VR controls
-  let controller1, controller2
-  let controllerGrip1, controllerGrip2
-  // VR hands
-  let hand1, hand2
+  // Canvas
+  let target //    DOM element
+  $: width = 0 //  parent width
+  $: height = 0 // parent height
 
-  let locked
+  // Preview controls (orbit or pointerlock)
+  let controls, locked
+  let selectedControls = 'orbit'
+
+  // VR controls & hands
+  let controller1, controller2, controllerGrip1, controllerGrip2, hand1, hand2
   let flow
 
-  $: width = 0 // canvas parent width
-  $: height = 0 // canvas parent height
-
   const { fov, near, far } = $cameraSettings
+
+  const rendererSettings = {
+    antialias: true,
+    powerPreference: 'high-performance',
+  }
+
+  const colors = {
+    fog: 0x111111,
+    bg: 0x0c0c0c,
+  }
+
+  const initial = {
+    // TODO: Orbit,
+    // TODO: Pointerlock
+    xr: {
+      position: [0, 1.6, -32],
+      lookAt: [0, 0, -64],
+    },
+  }
 
   /*
    * Instantiate Scene objects
@@ -49,14 +65,10 @@
 
   const scene = new Scene()
   const camera = new PerspectiveCamera(fov, width / height, near, far / 2)
-  const renderer = new WebGLRenderer({
-    antialias: true,
-    powerPreference: 'high-performance',
-  })
+  const renderer = new WebGLRenderer(rendererSettings)
   const composer = new EffectComposer(renderer)
   const clock = new Clock() // Makes use of performance.now()
   const stats = new Stats()
-
   const dolly = new THREE.Group()
   scene.add(dolly)
 
@@ -75,8 +87,8 @@
    * Add fog to scene (fade distant objects)
    */
 
-  scene.fog = new Fog(0x111111, near, far)
-  scene.background = new Color(0x0c0c0c)
+  scene.fog = new Fog(colors.fog, near, far)
+  scene.background = new Color(colors.bg)
 
   /*
    * Controllers
@@ -168,9 +180,8 @@
   dolly.add(hand2)
 
   renderer.xr.addEventListener('sessionstart', () => {
-    // dolly.position.set(0, 1.6, -32)
-    dolly.position.set(8, 2.5, -12)
-    dolly.lookAt(0, 0, -64)
+    dolly.position.set(...initial.xr.position)
+    dolly.lookAt(...initial.xr.lookAt)
   })
 
   /*
@@ -245,8 +256,6 @@
    */
 
   renderer.xr.enabled = true
-  // set pixelratio based on resolution settings
-  // $: renderer.setPixelRatio(window.devicePixelRatio * $resolution)
   $: renderer.setPixelRatio(window.devicePixelRatio)
   // color accuracy
   renderer.physicallyCorrectLights
@@ -287,10 +296,6 @@
     target && target.appendChild(renderer.domElement)
     target && target.appendChild(VRButton.createButton(renderer))
     target && target.appendChild(stats.dom)
-
-    if (selectedControls === 'pointerlock') {
-      scene.add(controls.getObject())
-    }
   })
 
   //Expose scene objects
