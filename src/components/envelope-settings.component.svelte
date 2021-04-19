@@ -1,56 +1,34 @@
 <script>
-  import { synths$ } from '../stores/synths'
+  export let envelope
+  export let portamento
+
   import ADSR from './adsr.component.svelte'
   import ControlKnob from './control-knob.component.svelte'
 </script>
 
 <div class="envelope">
   <h2>Envelope</h2>
-  <ADSR bind:envelope={$synths$[0].envelope} />
+  <ADSR bind:envelope />
   <div class="action-group">
     <fieldset>
-      <ControlKnob
-        id="attack"
-        min={0}
-        max={2}
-        step={0.02}
-        bind:value={$synths$[0].envelope.attack}
-      />
+      <ControlKnob id="attack" min={0} max={2} step={0.02} bind:value={envelope.attack} />
       <label for="attack">Attack</label>
     </fieldset>
     <fieldset>
-      <ControlKnob id="decay" min={0} max={2} step={0.02} bind:value={$synths$[0].envelope.decay} />
+      <ControlKnob id="decay" min={0} max={2} step={0.02} bind:value={envelope.decay} />
       <label for="decay">Decay</label>
     </fieldset>
     <fieldset>
-      <ControlKnob
-        id="sustain"
-        min={0}
-        max={1}
-        step={0.01}
-        bind:value={$synths$[0].envelope.sustain}
-      />
+      <ControlKnob id="sustain" min={0} max={1} step={0.01} bind:value={envelope.sustain} />
       <label for="sustain">Sustain</label>
     </fieldset>
     <fieldset>
-      <ControlKnob
-        id="release"
-        min={0}
-        max={5}
-        step={0.05}
-        bind:value={$synths$[0].envelope.release}
-      />
+      <ControlKnob id="release" min={0} max={5} step={0.05} bind:value={envelope.release} />
       <label for="release">Release</label>
     </fieldset>
     <hr />
     <fieldset>
-      <ControlKnob
-        id="portamento"
-        min={0}
-        max={5}
-        step={0.05}
-        bind:value={$synths$[0].portamento}
-      />
+      <ControlKnob id="portamento" min={0} max={5} step={0.05} bind:value={portamento} />
       <label for="portamento">Portamento</label>
     </fieldset>
   </div>
