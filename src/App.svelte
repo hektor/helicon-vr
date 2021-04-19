@@ -10,7 +10,6 @@
   import FAQ from './routes/faq.route.svelte'
   import MIDI from './routes/midi.route.svelte'
   import Requirements from './routes/requirements.route.svelte'
-  import Test from './routes/test.route.svelte'
   import NotFound from './routes/not-found.route.svelte'
 
   const routes = {
@@ -20,7 +19,6 @@
     '/faq': FAQ,
     '/requirements': Requirements,
     '/midi': MIDI,
-    '/test': Test,
     '*': NotFound,
   }
 
