@@ -1,20 +1,24 @@
 <script>
-  import Scene from '../components/scene.component.svelte'
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
-  import { Transport, Channel } from 'tone'
+  import { Transport, Channel, Synth } from 'tone'
 
   import { diff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
   import { master$, tracks$, selected$ } from '../stores/mixer'
+  import { synths$ } from '../stores/synths'
 
+  import Collapsible from '../components/collapsible.component.svelte'
+  import Scene from '../components/scene.component.svelte'
+  import SynthModules from '../components/synth-modules.component.svelte'
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
   import MIDIDevices from '../components/midi-devices.component.svelte'
   import ChannelStrip from '../components/channel-strip.component.svelte'
   import AddTrack from '../components/add-track.component.svelte'
+  import Piano from '../components/piano.component.svelte'
 
   // Menu
 
@@ -30,6 +34,13 @@
     setPosition: coordinates => (position = coordinates),
     isClosed: ({ id }) => id !== menuTrackId,
   }
+
+  /*
+   * Tone settings
+   */
+
+  const context = new Tone.Context({ latencyHint: 'interactive' })
+  Tone.setContext(context)
 
   // New track creation
   const nextTrackId = () => $tracks$.length + 1
@@ -85,6 +96,32 @@
   }
 
   /*
+   * Add synths
+   */
+
+  const synths = $synths$.map(settings => new Synth(settings))
+  synths.forEach((synth, i) => synth.connect(channels[i]))
+  synths$.subscribe(settings => settings.forEach((setting, i) => synths[i].set(setting)))
+
+  const cycles = [
+    ['C4', null, 'D4', null],
+    ['E4', 'F4', 'F4', 'G4', 'E4'],
+    ['G4', 'A4', 'A4'],
+    ['G4', 'A4', 'A4', 'C5'],
+  ]
+
+  let indeces = [0, 0, 0, 0]
+  const loops = $tracks$.map((_, i) => time => {
+    let step = indeces[i] % cycles[i].length
+    console.log(cycles[i].length)
+    let input = cycles[i][step]
+    input && synths[i].triggerAttackRelease(cycles[i][step], '32n', time)
+    indeces[i]++
+  })
+
+  loops.forEach(loop => Transport.scheduleRepeat(loop, '4n'))
+
+  /*
    * Handle DOM events
    */
 
@@ -97,7 +134,21 @@
   const handleRemove = () => removeTrack() && menu.close()
   const handleAddTrack = () => addTrack(nextTrack({ volume: 0, muted: false }))
 
-  onDestroy(() => Transport.stop())
+  /*
+   * Piano
+   */
+
+  let pianoSynth = null
+  selected$.subscribe(selected =>
+    selected !== -1 ? (pianoSynth = synths[selected - 1]) : (pianoSynth = null),
+  )
+  const midiMessageToNoteName = msg => Tone.Frequency(msg[1], 'midi')
+  const handleNoteOn = ({ detail }) => pianoSynth.triggerAttack(midiMessageToNoteName(detail))
+  const handleNoteOff = () => pianoSynth.triggerRelease()
+
+  onDestroy(() => {
+    playing$.next(false)
+  })
 </script>
 
 <svelte:head>
@@ -109,30 +160,46 @@
     <MIDIDevices />
   </Header>
   <Scene />
-  <div class="channel-strips">
-    <div class="tracks">
-      {#each $tracks$ as { id, label, volume, muted }}
-        <ChannelStrip
-          {label}
-          bind:volume
-          bind:muted
-          selected={$selected$ === id}
-          on:contextmenu={e => handleContextMenu(e, id)}
-          on:click={selected$.set(id)}
-          type="track"
-        />
+  <Collapsible title="Instruments">
+    <div class="module-groups">
+      {#each $synths$ as synth}
+        <div class="module-group">
+          <SynthModules bind:synth />
+        </div>
       {/each}
     </div>
-    <AddTrack on:click={handleAddTrack} />
-    <ChannelStrip
-      label="Master"
-      bind:volume={$master$.volume}
-      bind:muted={$master$.muted}
-      on:click={() => selected$.set(-1)}
-      selected={$selected$ === -1}
-      type="master"
-    />
-  </div>
+  </Collapsible>
+  <Collapsible title="Mixer">
+    <div class="channel-strips">
+      <div class="tracks">
+        {#each $tracks$ as { id, label, volume, muted }}
+          <ChannelStrip
+            {label}
+            bind:volume
+            bind:muted
+            selected={$selected$ === id}
+            on:contextmenu={e => handleContextMenu(e, id)}
+            on:click={selected$.set(id)}
+            type="track"
+          />
+        {/each}
+      </div>
+      <AddTrack on:click={handleAddTrack} />
+      <ChannelStrip
+        label="Master"
+        bind:volume={$master$.volume}
+        bind:muted={$master$.muted}
+        on:click={() => selected$.set(-1)}
+        selected={$selected$ === -1}
+        type="master"
+      />
+    </div>
+  </Collapsible>
+  {#if pianoSynth}
+    <Collapsible title={`Piano (track ${$selected$})`}>
+      <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
+    </Collapsible>
+  {/if}
 </div>
 
 {#if menuTrackId}
@@ -156,6 +223,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    max-height: 100vh;
   }
 
   .channel-strips {
@@ -165,6 +233,20 @@
     display: flex;
     padding: 1.6rem 1.6rem;
     padding-right: 4rem;
+  }
+
+  .module-groups {
+    flex: 1;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .module-group {
+    flex: 1;
+    display: flex;
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
+    margin-left: 0.8rem;
   }
 
   .tracks {

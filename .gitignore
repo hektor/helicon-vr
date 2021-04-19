@@ -118,3 +118,8 @@ dist
 # snowpack
 .snowpack
 build
+
+# ssl
+*.crt
+*.cert
+*.key

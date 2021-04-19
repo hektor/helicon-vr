@@ -1,6 +1,7 @@
 <script>
   import Router from 'svelte-spa-router'
   import { theme } from './stores/theme'
+  import { setThemeAttribute } from './lib/theme'
 
   // Routes
   import Home from './routes/home.route.svelte'
@@ -9,7 +10,6 @@
   import FAQ from './routes/faq.route.svelte'
   import MIDI from './routes/midi.route.svelte'
   import Requirements from './routes/requirements.route.svelte'
-  import Test from './routes/test.route.svelte'
   import NotFound from './routes/not-found.route.svelte'
 
   const routes = {
@@ -19,11 +19,10 @@
     '/faq': FAQ,
     '/requirements': Requirements,
     '/midi': MIDI,
-    '/test': Test,
     '*': NotFound,
   }
 
-  theme.subscribe(mode => document.documentElement.setAttribute('data-theme', mode))
+  theme.subscribe(setThemeAttribute)
 </script>
 
 <Router {routes} />
@@ -74,13 +73,16 @@
   :global(h2) {
     font-size: 2rem;
   }
+
   :global(summary) {
     padding: 3.2rem 1.6rem;
     border-bottom: 1px solid var(--color-1);
   }
+
   :global(details[open] summary ~ *) {
     animation: sweep 0.5s ease-in-out;
   }
+
   @keyframes -global-sweep {
     0% {
       opacity: 0;

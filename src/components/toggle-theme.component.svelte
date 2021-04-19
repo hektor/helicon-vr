@@ -2,11 +2,7 @@
   import Moon24 from 'carbon-icons-svelte/lib/Moon24'
   import LightFilled24 from 'carbon-icons-svelte/lib/LightFilled24'
 
-  import { theme } from '../stores/theme'
-
-  const toggle = () => {
-    $theme === 'dark' ? theme.set('light') : theme.set('dark')
-  }
+  import { theme, toggle } from '../stores/theme'
 </script>
 
 <button class="theme-toggle" on:click={toggle}>

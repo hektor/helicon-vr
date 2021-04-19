@@ -1,5 +1,4 @@
 <script>
-  import { Vector3 } from 'three'
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
   import { getContext } from 'svelte'
   const { camera, renderer } = getContext('scene')
@@ -13,8 +12,10 @@
    * Configure orbit controls
    */
 
-  controls.target = new Vector3(0, 8, 0)
-  controls.maxPolarAngle = rad(88) + Math.atan(8 / 48)
+  camera.position.set(0, 64, -16)
+  camera.lookAt(0, 0, -16)
+  controls.update()
+  controls.maxPolarAngle = rad(88)
   controls.maxDistance = 64
   controls.minDistance = 16
   controls.maxAzimuthAngle = -rad(90)

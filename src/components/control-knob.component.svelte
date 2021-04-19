@@ -1,7 +1,4 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
-  const dispatch = createEventDispatcher()
-
   export let id = ''
   export let value = 50
   export let min = 0
@@ -17,10 +14,7 @@
   $: if (value > max) value = max
   $: if (value < min) value = min
 
-  const handleChange = ({ target }) => {
-    dispatch('twist', target.valueAsNumber)
-    value = target.valueAsNumber
-  }
+  const handleChange = ({ target }) => (value = target.valueAsNumber)
 </script>
 
 <div>
@@ -37,7 +31,7 @@
       stroke-width={strokeWidth}
     />
     <foreignObject width="100" height="100">
-      <input {id} {min} {max} {step} type="number" on:change={handleChange} on:input {value} />
+      <input {id} {min} {max} {step} type="number" on:change={handleChange} {value} />
     </foreignObject>
   </svg>
 </div>

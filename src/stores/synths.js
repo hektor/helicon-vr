@@ -3,29 +3,76 @@ import { debounce } from 'rxjs/operators'
 import { writable$ } from './utils/observable-store'
 
 const defaults = {
-  synth: {
-    envelope: {
-      attack: 0.01,
-      attackCurve: 'linear', // linear/exponential
-      decay: 0.1,
-      decayCurve: 'exponential',
-      release: 1,
-      releaseCurve: 'exponential',
-      sustain: 0.5,
+  synths: [
+    {
+      envelope: {
+        attack: 0.01,
+        attackCurve: 'linear',
+        decay: 0.1,
+        decayCurve: 'exponential',
+        release: 1,
+        releaseCurve: 'exponential',
+        sustain: 0.5,
+      },
+      oscillator: {
+        type: 'sine',
+        volume: 0,
+      },
+      portamento: 0,
     },
-    oscillator: {
-      type: 'sine',
-      volume: 0,
+    {
+      envelope: {
+        attack: 0.01,
+        attackCurve: 'linear',
+        decay: 0.1,
+        decayCurve: 'exponential',
+        release: 1,
+        releaseCurve: 'exponential',
+        sustain: 0.5,
+      },
+      oscillator: {
+        type: 'sine',
+        volume: 0,
+      },
+      portamento: 0,
     },
-    portamento: 0,
-  },
+    {
+      envelope: {
+        attack: 0.01,
+        attackCurve: 'linear',
+        decay: 0.1,
+        decayCurve: 'exponential',
+        release: 1,
+        releaseCurve: 'exponential',
+        sustain: 0.5,
+      },
+      oscillator: {
+        type: 'sine',
+        volume: 0,
+      },
+      portamento: 0,
+    },
+    {
+      envelope: {
+        attack: 0.01,
+        attackCurve: 'linear',
+        decay: 0.1,
+        decayCurve: 'exponential',
+        release: 1,
+        releaseCurve: 'exponential',
+        sustain: 0.5,
+      },
+      oscillator: {
+        type: 'sine',
+        volume: 0,
+      },
+      portamento: 0,
+    },
+  ],
 }
 
-export const synth$ = writable$(
-  //  JSON.parse(localStorage.getItem('synth')) ||
-  defaults.synth,
-)
+export const synths$ = writable$(defaults.synths)
 
-synth$
+synths$
   .pipe(debounce(() => interval(100)))
-  .subscribe(master => localStorage.setItem('synth', JSON.stringify(master)))
+  .subscribe(master => localStorage.setItem('synths', JSON.stringify(master)))

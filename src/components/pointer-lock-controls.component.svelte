@@ -8,8 +8,8 @@
   export let locked
   export const controls = new PointerLockControls(camera, renderer.domElement)
 
-  camera.position.set(0, 1.6, -12)
-  camera.lookAt(0, 8, 0)
+  camera.position.set(0, 1.6, 0)
+  camera.lookAt(0, 2, 16)
   controls.maxPolarAngle = rad(88) + Math.atan(8 / 48)
   controls.minAzimuthAngle = rad(90)
 
