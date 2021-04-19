@@ -1,5 +1,4 @@
 <script>
-  import Scene from '../components/scene.component.svelte'
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
@@ -134,7 +133,9 @@
   const handleRemove = () => removeTrack() && menu.close()
   const handleAddTrack = () => addTrack(nextTrack({ volume: 0, muted: false }))
 
-  onDestroy(() => Transport.stop())
+  onDestroy(() => {
+    playing$.next(false)
+  })
 </script>
 
 <svelte:head>
