@@ -18,6 +18,7 @@
   import MIDIDevices from '../components/midi-devices.component.svelte'
   import ChannelStrip from '../components/channel-strip.component.svelte'
   import AddTrack from '../components/add-track.component.svelte'
+  import Piano from '../components/piano.component.svelte'
 
   // Menu
 
@@ -133,6 +134,18 @@
   const handleRemove = () => removeTrack() && menu.close()
   const handleAddTrack = () => addTrack(nextTrack({ volume: 0, muted: false }))
 
+  /*
+   * Piano
+   */
+
+  let pianoSynth = null
+  selected$.subscribe(selected =>
+    selected !== -1 ? (pianoSynth = synths[selected - 1]) : (pianoSynth = null),
+  )
+  const midiMessageToNoteName = msg => Tone.Frequency(msg[1], 'midi')
+  const handleNoteOn = ({ detail }) => pianoSynth.triggerAttack(midiMessageToNoteName(detail))
+  const handleNoteOff = () => pianoSynth.triggerRelease()
+
   onDestroy(() => {
     playing$.next(false)
   })
@@ -182,6 +195,11 @@
       />
     </div>
   </Collapsible>
+  {#if pianoSynth}
+    <Collapsible title={`Piano (track ${$selected$})`}>
+      <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
+    </Collapsible>
+  {/if}
 </div>
 
 {#if menuTrackId}
