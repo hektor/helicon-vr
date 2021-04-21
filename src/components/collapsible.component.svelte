@@ -28,6 +28,9 @@
 
 <style>
   .header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     display: flex;
     border-top: 1px solid var(--color-2);
     border-bottom: 1px solid var(--color-1);
@@ -52,12 +55,12 @@
     position: relative;
     max-height: 6.4rem;
     overflow-y: hidden;
-    transition: 0.1s cubic-bezier(0.2, 0.2, 0.38, 0.9);
+    transition: 0.15s cubic-bezier(0.2, 0.2, 0.38, 0.9);
   }
 
   .slider.open {
     max-height: 100%;
-    overflow-y: hidden;
+    overflow-y: auto;
     transition: 0.3s cubic-bezier(0.2, 0.2, 0.38, 0.9);
   }
 </style>
