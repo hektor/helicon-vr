@@ -9,10 +9,12 @@
   import { playing$, bpm$ } from '../stores/playback'
   import { master$, tracks$, selected$ } from '../stores/mixer'
   import { defaultSettings as defaultSynthSettings, synths$ } from '../stores/synths'
+  import { sequencer$ } from '../stores/euclid-sequencer'
 
   import Collapsible from '../components/collapsible.component.svelte'
   import Scene from '../components/scene.component.svelte'
   import SynthModules from '../components/synth-modules.component.svelte'
+  import SequencerSettings from '../components/sequencer-settings.component.svelte'
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
   import MIDIDevices from '../components/midi-devices.component.svelte'
@@ -212,16 +214,50 @@
     <MIDIDevices />
   </Header>
   <Scene />
-  <Collapsible title="Instruments">
-    <div class="module-groups">
-      {#each $synths$ as synth}
+  {#if $selected$ > 0}
+    <Collapsible title={`Instrument (track ${$selected$})`}>
+      <div class="module-groups">
         <div class="module-group">
-          <SynthModules bind:synth />
+          <SynthModules bind:synth={$synths$[$selected$ - 1]} />
         </div>
-      {/each}
-    </div>
-  </Collapsible>
-  <Collapsible title="Mixer">
+      </div>
+    </Collapsible>
+  {:else}
+    <Collapsible title="Instruments (all tracks)">
+      <div class="module-groups">
+        {#each $synths$ as synth}
+          <div class="module-group">
+            <SynthModules bind:synth />
+          </div>
+        {/each}
+      </div>
+    </Collapsible>
+  {/if}
+  {#if $selected$ > 0}
+    <Collapsible title={`Euclidean sequencer (track ${$selected$})`}>
+      <div class="module-groups">
+        <div class="module-group">
+          <SequencerSettings bind:cycles={$sequencer$[$selected$ - 1].cycles} />
+        </div>
+      </div>
+    </Collapsible>
+  {:else}
+    <Collapsible title="Euclidean sequencer (all tracks)">
+      <div class="module-groups">
+        {#each $sequencer$ as { cycles }}
+          <div class="module-group">
+            <SequencerSettings bind:cycles />
+          </div>
+        {/each}
+      </div>
+    </Collapsible>
+  {/if}
+  {#if pianoSynth}
+    <Collapsible title={`Piano (track ${$selected$})`}>
+      <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
+    </Collapsible>
+  {/if}
+  <Collapsible title={`Mixer${$selected$ !== -1 ? ' (track ' + $selected$ + ')' : ''}`}>
     <div class="channel-strips">
       <div class="tracks">
         {#each $tracks$ as { id, label, volume, muted }}
@@ -247,11 +283,6 @@
       />
     </div>
   </Collapsible>
-  {#if pianoSynth}
-    <Collapsible title={`Piano (track ${$selected$})`}>
-      <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
-    </Collapsible>
-  {/if}
 </div>
 
 {#if menuTrackId}
@@ -294,7 +325,6 @@
   }
 
   .module-group {
-    flex: 1;
     display: flex;
     margin-top: 0.8rem;
     margin-bottom: 0.8rem;
