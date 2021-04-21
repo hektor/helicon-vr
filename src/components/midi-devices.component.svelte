@@ -30,7 +30,7 @@
   onMount(init)
 </script>
 
-<button on:click={modal.showModal()}>
+<button id="midi" on:click={modal.showModal()}>
   <MidiPort />
   <small>MIDI</small>
 </button>
