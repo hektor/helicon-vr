@@ -9,8 +9,8 @@ const defaults = {
     { id: 1, label: 'Track 1', volume: 0, muted: false },
     { id: 2, label: 'Track 2', volume: 0, muted: false },
     { id: 3, label: 'Track 3', volume: 0, muted: false },
-    { id: 4, label: 'Track 4', volume: 0, muted: false },
-  ],
+    { id: 4, label: 'Track 4', volume: 0, muted: false }
+  ]
 }
 
 export const master$ = writable$(JSON.parse(localStorage.getItem('master')) || defaults.master)
