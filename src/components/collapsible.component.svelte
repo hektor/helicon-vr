@@ -1,16 +1,21 @@
 <script>
   import Pin16 from 'carbon-icons-svelte/lib/Pin16'
   import PinFilled16 from 'carbon-icons-svelte/lib/PinFilled16'
-  let open = false
+
+  export let open = false
   export let title = ''
+
+  let pinned = false
+
+  const handlePin = () => (!pinned ? (open = true) && (pinned = true) : (pinned = false))
 </script>
 
-<div class="slider" class:open>
-  <div class="header">
+<div class="slider" class:open class:pinned>
+  <div class="header" on:click={() => (open = !pinned ? !open : open)}>
     <span>{title}</span>
     <div class="actions">
-      <button on:click={() => (open = !open)}>
-        {#if open}
+      <button on:click={handlePin}>
+        {#if pinned}
           <PinFilled16 />
         {:else}
           <Pin16 />
@@ -50,7 +55,6 @@
     transition: 0.1s cubic-bezier(0.2, 0.2, 0.38, 0.9);
   }
 
-  .slider:hover,
   .slider.open {
     max-height: 100%;
     overflow-y: hidden;
