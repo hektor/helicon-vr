@@ -9,7 +9,7 @@ const defaults = tracks$.getValue().map((_, i) => ({
     envelope: {
       attack: 0.01,
       attackCurve: 'linear',
-      decay: 0.1,
+      decay: 1,
       decayCurve: 'exponential',
       release: 1,
       releaseCurve: 'exponential',

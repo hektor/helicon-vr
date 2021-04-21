@@ -8,14 +8,14 @@
   {#each cycles as { steps, pulses }, i}
     <div class="cycle">
       <span>Cycle {i + 1}</span>
-      <fieldset>
+      <div class="cycle-setting">
         <ControlKnob bind:value={steps} min={0} max={16} />
         <label for="steps">Steps</label>
-      </fieldset>
-      <fieldset>
+      </div>
+      <div class="cycle-setting">
         <ControlKnob bind:value={pulses} min={0} max={16} />
         <label for="pulses">Pulses</label>
-      </fieldset>
+      </div>
     </div>
   {/each}
 </div>
@@ -36,25 +36,23 @@
     text-align: center;
   }
 
-  /* TODO: modularize css */
-  fieldset {
+  .cycle-setting {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 0.8rem;
-    margin: 0;
     border: 1px solid var(--color-1);
     border-width: 0 1px;
     margin-right: -1px;
     margin-top: -1px;
   }
 
-  fieldset:nth-child(2) {
+  .cycle-setting:nth-child(2) {
     border-top-width: 1px;
   }
 
-  fieldset:last-child {
+  .cycle-setting:last-child {
     border-bottom-width: 1px;
   }
 

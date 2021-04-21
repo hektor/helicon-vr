@@ -1,6 +1,6 @@
 <script>
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
-  import { onDestroy } from 'svelte'
+  import { onMount, onDestroy } from 'svelte'
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
 
@@ -21,6 +21,7 @@
   import ChannelStrip from '../components/channel-strip.component.svelte'
   import AddTrack from '../components/add-track.component.svelte'
   import Piano from '../components/piano.component.svelte'
+  import Tour from '../components/tour.component.svelte'
 
   // Menu
 
@@ -211,7 +212,9 @@
 <div class="container">
   <Header>
     <TransportControls />
-    <MIDIDevices />
+    <div class="actions">
+      <MIDIDevices />
+    </div>
   </Header>
   <Scene />
   {#if $selected$ > 0}
@@ -299,6 +302,7 @@
   </div>
 {/if}
 <svelte:body on:click={menu.hide} on:contextmenu|preventDefault />
+<Tour />
 
 <style>
   .container {
@@ -307,6 +311,10 @@
     flex-direction: column;
     overflow: hidden;
     max-height: 100vh;
+  }
+
+  .actions {
+    margin-left: auto;
   }
 
   .channel-strips {
