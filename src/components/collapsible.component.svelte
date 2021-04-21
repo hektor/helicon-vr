@@ -34,6 +34,13 @@
     display: flex;
     border-top: 1px solid var(--color-2);
     border-bottom: 1px solid var(--color-1);
+    background: var(--color-bg);
+    cursor: pointer;
+  }
+
+  .header:not(.pinned):hover {
+    background: var(--color-1);
+    transition: 0.15s cubic-bezier(0.2, 0.2, 0.38, 0.9);
   }
 
   .actions {
