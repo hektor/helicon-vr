@@ -58,30 +58,30 @@
     }
   }
 
-  const newChannel = ({ muted: mute, ...rest }) => new Channel({ mute, ...rest })
-  const setChannel = (channel, { muted: mute, volume }) => channel.set({ volume, mute })
-
-  const addChannel = channel => (channels = [...channels, channel])
-  const addSynth = synth => (synths = [...synths, synth])
-  const indexChannel = (channel, id) => channel.set({ name: id })
-  const removeChannel = ({ name: a }) => (channels = channels.filter(({ name: b }) => a !== b))
-
-  const nextTrack = track => tracks$.next([...$tracks$, track])
-  const nextSynth = synth => synths$.next([...$synths$, synth])
-  const nremoveTrack = () => tracks$.next($tracks$.filter(menu.isClosed).map(indexTrack))
-  const nremoveSynth = () => synths$.next($synths$.filter(menu.isClosed).map(indexSynth))
-
   const indexTrack = (track, id) => ({ ...track, id: id + 1, label: `Track ${id + 1}` })
   const indexSynth = (synth, id) => ({ ...synth, id: id + 1 })
 
+  const nextTrack = track => tracks$.next([...$tracks$, track])
+  const nextSynth = synth => synths$.next([...$synths$, synth])
+  const nextRemoveTrack = () => tracks$.next($tracks$.filter(menu.isClosed).map(indexTrack))
+  const nextRemoveSynth = () => synths$.next($synths$.filter(menu.isClosed).map(indexSynth))
+
+  const addChannel = channel => (channels = [...channels, channel])
+  const addSynth = synth => (synths = [...synths, synth])
+
+  const removeChannel = ({ name: a }) => (channels = channels.filter(({ name: b }) => a !== b))
   const removeSynth = ({ name: a }) => (synths = synths.filter(({ name: b }) => a !== b))
+
+  const newChannel = ({ muted: mute, ...rest }) => new Channel({ mute, ...rest })
+  const setChannel = (channel, { muted: mute, volume }) => channel.set({ volume, mute })
+  const indexChannel = (channel, id) => channel.set({ name: id })
+
+  const newSynth = ({ id, ...rest }) => new Synth({ ...rest }).set({ name: id })
 
   // Create from state
   const master = newChannel($master$).toDestination()
   let channels = $tracks$.map(track => newChannel(track).connect(master))
-  let synths = $synths$.map((settings, i) =>
-    new Synth(settings).set({ name: settings.id }).connect(channels[i])
-  )
+  let synths = $synths$.map((settings, i) => newSynth(settings).connect(channels[i]))
 
   // Index all channels (master and track channels)
   indexChannel(master, -1)
@@ -98,10 +98,7 @@
   const removeRemovedTrackChannel = () =>
     removedChannel().forEach(channel => removeChannel(channel))
   const disposeRemovedTrackSynth = () => removedSynth().forEach(synth => synth.dispose())
-  const removeRemovedTrackSynth = () => {
-    console.log('Removed', removedSynth())
-    removedSynth().forEach(synth => removeSynth(synth))
-  }
+  const removeRemovedTrackSynth = () => removedSynth().forEach(synth => removeSynth(synth))
 
   const updateChannels = () => channels.forEach((channel, i) => setChannel(channel, $tracks$[i]))
   const updateSynths = () => synths.forEach((synth, i) => synth.set($synths$[i]))
@@ -174,8 +171,8 @@
   }
 
   const handleRemove = () => {
-    nremoveSynth()
-    nremoveTrack()
+    nextRemoveSynth()
+    nextRemoveTrack()
     menu.close()
   }
   const handleAddTrack = () => {
@@ -188,9 +185,15 @@
    */
 
   let pianoSynth = null
-  selected$.subscribe(selected =>
-    selected !== -1 ? (pianoSynth = synths[selected - 1]) : (pianoSynth = null)
-  )
+
+  selected$.subscribe(selected => {
+    if (selected !== -1) {
+      pianoSynth = synths[selected - 1]
+    } else {
+      pianoSynth = null
+    }
+  })
+
   const midiMessageToNoteName = msg => Tone.Frequency(msg[1], 'midi')
   const handleNoteOn = ({ detail }) => pianoSynth.triggerAttack(midiMessageToNoteName(detail))
   const handleNoteOff = () => pianoSynth.triggerRelease()
