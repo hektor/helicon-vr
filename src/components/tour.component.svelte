@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+
   let shep
   onMount(async () => {
     const url = {
@@ -9,7 +10,8 @@
     shep = (await import(url.js)).default
     // const shepStylesFound = document.styleSheets[document.styleSheets.length - 1].href === url.css
     const shepStylesFound = true
-    if (shep && shepStylesFound) init()
+    if (shep && shepStylesFound && !!!localStorage.getItem('receivedTourOffer')) init()
+    localStorage.setItem('receivedTourOffer', true)
   })
 
   const init = () => {
