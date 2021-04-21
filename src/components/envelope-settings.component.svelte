@@ -58,6 +58,8 @@
     justify-content: center;
     align-items: center;
     border: none;
+    margin: 0;
+    padding: 0.8rem;
   }
 
   label {
