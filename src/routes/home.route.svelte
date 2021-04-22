@@ -65,6 +65,7 @@
     flex-basis: 64rem;
     border-right: 1px solid var(--color-1);
     min-width: 48rem;
+    min-height: 48rem;
   }
 
   .credits {
