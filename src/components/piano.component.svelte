@@ -19,8 +19,8 @@
         { type: 'ebony', x: 36, keybinding: 'u' },
         { type: 'ivory', x: 40, keybinding: 'j' },
         { type: 'ebony', x: 44, keybinding: 'i' },
-        { type: 'ebony', x: 52, keybinding: 'o' },
         { type: 'ivory', x: 48, keybinding: 'k' },
+        { type: 'ebony', x: 52, keybinding: 'o' },
         { type: 'ivory', x: 56, keybinding: 'l' },
       ].map((key, id) => ({
         ...key,
