@@ -1,6 +1,6 @@
 <script>
   import { Subject, interval } from 'rxjs'
-  import { tap, debounce } from 'rxjs/operators'
+  import { debounce } from 'rxjs/operators'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
 
