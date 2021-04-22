@@ -1,4 +1,7 @@
 <script>
+  import { tweened } from 'svelte/motion'
+  import { cubicOut } from 'svelte/easing'
+  import * as THREE from 'three'
   import { InstancedFlow } from 'three/examples/jsm/modifiers/CurveModifier'
   import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
   import {
@@ -17,6 +20,8 @@
   import { getContext } from 'svelte'
   const { scene, renderer, camera } = getContext('scene')
 
+  import { tracks$, selected$ } from '../stores/mixer'
+  import { sequencer$ } from '../stores/euclid-sequencer'
   import { interacting } from '../stores/vr-controls'
 
   import { rad } from '../lib/trig'
@@ -30,11 +35,8 @@
     white: 0xffffff,
   }
 
-  const smallBoxDimensions = [0.5, 0.5, 0.5]
-
-  export let flow
-  let control, target, action, hover
-  const curveHandles = []
+  let control, target, action
+  const handles = []
   const mouse = new Vector2(0, 0)
   const raycaster = new Raycaster()
 
@@ -43,46 +45,80 @@
   const mat = new MeshBasicMaterial({ color: colors.gray2 })
   const matActive = new MeshBasicMaterial({ color: colors.gray3 })
 
-  const curves = [
-    regularPolygon(3, 8, rad(-90)).map(point => ({ x: point[0], y: 2, z: point[1] })),
-    regularPolygon(4, 8, rad(-90)).map(point => ({ x: point[0], y: 10, z: point[1] })),
-    regularPolygon(5, 8, rad(-90)).map(point => ({ x: point[0], y: 18, z: point[1] })),
-    regularPolygon(16, 8, rad(-90)).map(point => ({ x: point[0], y: 26, z: point[1] })),
-  ].map(curvePoints => {
-    const curve = new CatmullRomCurve3(
-      curvePoints.map(position => {
-        const handle = new Mesh(geo, mat)
-        handle.position.copy(position)
-        curveHandles.push(handle)
-        scene.add(handle)
-        return handle.position
-      }),
-    )
-    curve.tension = 0
-    curve.curveType = 'catmullrom'
-    curve.closed = true
+  /*
+   * Get all polygon data
+   * Every point of every polygon of every cycle of every track
+   *
+   * Space points on xz-plane
+   * Space cycles on y-axis
+   */
 
-    const line = new LineLoop(
-      new BufferGeometry().setFromPoints(curve.getPoints(32)),
-      new LineBasicMaterial({ color: colors.gray1 }),
-    )
+  const data = $sequencer$.map((sequencer, i) =>
+    sequencer.cycles.map(({ steps }, j) =>
+      regularPolygon(steps, 8, rad(-90)).map(point => ({
+        x: point[0] + i * 20,
+        y: j * 8 + 2,
+        z: point[1],
+      })),
+    ),
+  )
 
-    scene.add(line)
+  const curveGroups = data.map((curveGroup, i) =>
+    curveGroup.map(curvePoints => {
+      const handleGroup = new THREE.Group()
+      const curve = new CatmullRomCurve3(
+        curvePoints.map(position => {
+          const handle = new Mesh(geo, mat)
+          handle.position.copy(position)
+          handles.push(handle)
+          handleGroup.add(handle)
+          return handle.position
+        }),
+      )
 
-    return { curve, line }
+      curve.tension = 0
+      curve.curveType = 'catmullrom'
+      curve.closed = true
+
+      const line = new LineLoop(
+        new BufferGeometry().setFromPoints(curve.getPoints(32)),
+        new LineBasicMaterial({ color: colors.gray1 }),
+      )
+
+      scene.add(line)
+      scene.add(handleGroup)
+
+      return { curve, line, handleGroup }
+    }),
+  )
+
+  export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, mat))
+
+  const offset = tweened(20, {
+    duration: 150,
+    easing: cubicOut,
   })
+  $: offset.set($selected$ === -1 ? 1 : $selected$)
+  $: curveGroups.forEach(group =>
+    group.forEach(({ line, handleGroup }) => {
+      line.position.x = -$tracks$.length * 20 + 20 * $offset
+      handleGroup.position.x = -$tracks$.length * 20 + 20 * $offset
+    }),
+  )
 
-  flow = new InstancedFlow(curves.length, curves.length, geo, mat)
+  for (let i = 0; i < curveGroups.length; i++) {
+    curveGroups[i].forEach(({ curve }, j) => {
+      flows[i].updateCurve(j, curve)
+      scene.add(flows[i].object3D)
+    })
+  }
 
-  curves.forEach(({ curve }, i) => {
-    flow.updateCurve(i, curve)
-    scene.add(flow.object3D)
-  })
-
-  for (let i = 0; i < curves.length; i++) {
-    flow.setCurve(i, i % curves.length)
-    flow.moveIndividualAlongCurve(i, i)
-    flow.object3D.setColorAt(i, new Color(colors.white))
+  for (let i = 0; i < curveGroups.length; i++) {
+    for (let j = 0; j < curveGroups[i].length; j++) {
+      flows[i].setCurve(j, j % curveGroups[i].length)
+      flows[i].moveIndividualAlongCurve(j, 0)
+      flows[i].object3D.setColorAt(j, new Color(0xff0000))
+    }
   }
 
   control = new TransformControls(camera, renderer.domElement)
@@ -91,7 +127,7 @@
   control.translationSnap = 1
   // Translation constraints
   control.addEventListener('change', () => {
-    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 10, 100))
+    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
   })
 
   const renderActive = target => {
@@ -112,7 +148,7 @@
 
   $: {
     raycaster.setFromCamera(mouse, camera)
-    const intersects = raycaster.intersectObjects(curveHandles)
+    const intersects = raycaster.intersectObjects(handles)
     if (intersects.length) {
       if (target !== intersects[0].object) {
         renderInactive(target)
@@ -129,7 +165,7 @@
   $: if (action) {
     action = false
     raycaster.setFromCamera(mouse, camera)
-    const intersects = raycaster.intersectObjects(curveHandles)
+    const intersects = raycaster.intersectObjects(handles)
     if (intersects.length) {
       control.attach(target)
       scene.add(control)
@@ -150,10 +186,13 @@
   control.addEventListener('mouseDown', () => interacting.set(true))
   control.addEventListener('mouseUp', () => interacting.set(false))
   control.addEventListener('dragging-changed', ({ value }) => {
-    !value &&
-      curves.forEach(({ curve, line }, i) => {
-        line.geometry.setFromPoints(curve.getPoints(50))
-        flow.updateCurve(i, curve)
-      })
+    if (!value) {
+      for (let i = 0; i < curveGroups.length; i++) {
+        curveGroups[i].forEach(({ curve, line }, j) => {
+          line.geometry.setFromPoints(curve.getPoints(50))
+          flows[i].updateCurve(j, curve)
+        })
+      }
+    }
   })
 </script>

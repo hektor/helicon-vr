@@ -36,7 +36,7 @@
 
   // VR controls & hands
   let controller1, controller2, controllerGrip1, controllerGrip2, hand1, hand2
-  let flow
+  let flows
 
   const { fov, near, far } = $cameraSettings
 
@@ -283,7 +283,7 @@
         if (selectedControls === 'orbit') controls.update()
       }
       // Sequencer
-      if (flow) flow.moveAlongCurve(0.001)
+      if (flows) flows.forEach(flow => flow.moveAlongCurve(0.001))
     }
     stats.end()
   })
@@ -333,7 +333,7 @@
   <Room />
   <AmbientLighting />
   <ChannelLighting />
-  <Sequencer bind:flow />
+  <Sequencer bind:flows />
   <!--
   <Bloom />
   <GUI />
