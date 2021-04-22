@@ -1,17 +1,26 @@
 <script>
-  import { onMount } from 'svelte'
   import { fromEvent } from 'rxjs'
   import { inputs$, outputs$, inputNames$, outputNames$ } from '../stores/devices'
 
   let modal
 
-  import Renew from 'carbon-icons-svelte/lib/Renew16'
   import Close32 from 'carbon-icons-svelte/lib/Close32'
   import MidiPort from './icons/midi-port-icon.component.svelte'
 
-  const doesMIDI = !!navigator.requestMIDIAccess
+  import { from } from 'rxjs'
+  import { catchError, partition, take } from 'rxjs/operators'
+
+  let blocked
+
+  const [access, denial] = from(navigator.requestMIDIAccess({ sysex: true })).pipe(
+    catchError(() => [false]),
+    partition(midi => !!midi),
+  )
+
+  const refresh = () => access.pipe(take(1)).subscribe(allow)
 
   const allow = async midi => {
+    blocked = false
     const { inputs, outputs } = midi
 
     inputs$.next([...inputs.values()])
@@ -19,15 +28,11 @@
     inputNames$.next([...inputs.values()].map(({ name }) => name))
     outputNames$.next([...outputs.values()].map(({ name }) => name))
 
-    fromEvent(midi, 'statechange').subscribe(console.log)
+    fromEvent(midi, 'statechange').subscribe(refresh)
   }
 
-  const reject = e => console.error('No MIDI access', e)
-
-  const init = async () =>
-    doesMIDI && (await navigator.requestMIDIAccess({ sysex: true }).then(allow, reject))
-
-  onMount(init)
+  access.subscribe(allow)
+  denial.subscribe(() => (blocked = true))
 </script>
 
 <button id="midi" on:click={modal.showModal()}>
@@ -40,29 +45,43 @@
     <button on:click={modal.close()}> Close <Close32 /></button>
   </div>
   <div class="modal-body">
-    <details>
-      <summary>
-        <span>Input devices</span>
-      </summary>
-      <ul>
-        {#each $inputNames$ as name}
-          <li>{name}</li>
-        {/each}
-      </ul>
-    </details>
-    <details>
-      <summary>
-        <span>Output devices</span>
-      </summary>
-      <ul>
-        {#each $outputNames$ as name}
-          <li>{name}</li>
-        {/each}
-      </ul>
-    </details>
-  </div>
-  <div class="action-group">
-    <button on:click={init}><Renew />Scan devices</button>
+    {#if !blocked && ($inputs$.length > 0 || $outputs$.length > 0)}
+      <details>
+        <summary>
+          <span>Input devices</span>
+        </summary>
+        <ul>
+          {#each $inputNames$ as name}
+            <li>{name}</li>
+          {/each}
+        </ul>
+      </details>
+      <details>
+        <summary>
+          <span>Output devices</span>
+        </summary>
+        <ul>
+          {#each $outputNames$ as name}
+            <li>{name}</li>
+          {/each}
+        </ul>
+      </details>
+    {:else if !blocked}
+      <div class="empty">
+        <p>
+          <strong>No MIDI devices found.</strong>
+        </p>
+        <p>Connect a new (virtual) MIDI device or check your connections.</p>
+      </div>
+    {:else}
+      <div class="empty">
+        <p>
+          <strong> MIDI unavailable. </strong>
+        </p>
+        <p>It is likely that you have blocked MIDI access or your browser does not support MIDI.</p>
+        <small> (You can allow MIDI access from your browser settings.) </small>
+      </div>
+    {/if}
   </div>
 </dialog>
 
@@ -78,6 +97,11 @@
     padding: 0;
     border: 1px solid var(--color-2);
     color: var(--color-primary);
+  }
+
+  .empty {
+    margin: auto 6.4rem;
+    max-width: 48rem;
   }
 
   :global(dialog[open]) {
@@ -125,16 +149,8 @@
     overflow-y: auto;
     padding: 3.2rem;
     background: var(--color-bg);
-  }
-
-  .action-group {
-    padding: 3.2rem;
-    background: var(--color-bg);
-  }
-
-  .action-group button {
-    width: 100%;
-    border: 1px solid var(--color-2);
+    display: flex;
+    flex-direction: column;
   }
 
   @keyframes appear {
