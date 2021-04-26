@@ -174,10 +174,14 @@
     curveGroups = curveGroups.filter((_, i) => i !== id - 1)
     /* Remove from scene */
     sequencerGroup.children.filter(({ name }) => name === id).forEach(child => child.remove())
-    /* Remove from group */
-    sequencerGroup.children = sequencerGroup.children.filter(({ name }) => name !== id)
     /* Close the gap */
     sequencerGroup.children.filter(({ name }) => name > id).forEach(child => child.translateX(20))
+    /* Remove from group */
+    sequencerGroup.children = sequencerGroup.children.filter(({ name }) => name !== id)
+    /* Close ID gaps */
+    sequencerGroup.children
+      .filter(({ name }) => name > id)
+      .forEach(child => (child.name = child.name - 1))
   }
 
   latestAddedTrack$.subscribe(track => {
