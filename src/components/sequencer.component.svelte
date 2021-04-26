@@ -23,6 +23,7 @@
   import { tracks$, selected$ } from '../stores/mixer'
   import { sequencer$ } from '../stores/euclid-sequencer'
   import { interacting } from '../stores/vr-controls'
+  import { theme } from '../stores/theme'
 
   import { rad } from '../lib/trig'
   import { regularPolygon } from '../lib/regular-polygon'
@@ -42,8 +43,8 @@
 
   // Create geometry
   const geo = new OctahedronGeometry(0.5)
-  const mat = new MeshBasicMaterial({ color: colors.gray2 })
-  const matActive = new MeshBasicMaterial({ color: colors.gray3 })
+  const mat = new MeshBasicMaterial({ color: colors.gray2, wireframe: true })
+  const matActive = new MeshBasicMaterial({ color: colors.white })
 
   /*
    * Get all polygon data
@@ -171,6 +172,15 @@
       scene.add(control)
     }
   }
+
+  theme.subscribe(mode => {
+    flows.forEach(flow =>
+      flow.object3D.material.color.setHex(mode === 'light' ? 0x111111 : 0xcccccc),
+    )
+
+    matActive.color.setHex(mode === 'light' ? 0x000000 : 0xffffff)
+    mat.color.setHex(mode === 'light' ? 0x444444 : 0x111111)
+  })
 
   const onPointerDown = () => (action = true)
   const onMouseMove = ({ offsetX: x, offsetY: y }) => updateMousePosition({ x, y })
