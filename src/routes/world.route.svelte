@@ -80,7 +80,7 @@
   const nextRemoveTrack = () => {
     const removed = $tracks$.filter(track => !menu.isClosed(track))
     const remaining = arrDiff($tracks$, removed)
-    if (removed[0].id === $selected$) selected$.next(-1)
+    selected$.next(-1)
     latestRemovedTrack$.next(arrFirst(removed))
     tracks$.next(remaining.map(indexTrack))
   }
