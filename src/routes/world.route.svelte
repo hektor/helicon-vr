@@ -1,13 +1,19 @@
 <script>
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
-  import { onMount, onDestroy } from 'svelte'
+  import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
 
-  import { diff } from '../lib/array'
+  import { first as arrFirst, diff as arrDiff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
-  import { master$, tracks$, selected$ } from '../stores/mixer'
+  import {
+    master$,
+    tracks$,
+    selected$,
+    latestRemoved$ as latestRemovedTrack$,
+    latestAdded$ as latestAddedTrack$,
+  } from '../stores/mixer'
   import { defaultSettings as defaultSynthSettings, synths$ } from '../stores/synths'
   import { sequencer$ } from '../stores/euclid-sequencer'
 
@@ -35,7 +41,7 @@
     close: () => (menuTrackId = null),
     setTrackId: id => (menuTrackId = id),
     setPosition: coordinates => (position = coordinates),
-    isClosed: ({ id }) => id !== menuTrackId
+    isClosed: ({ id }) => id !== menuTrackId,
   }
 
   /*
@@ -51,23 +57,34 @@
       id: $tracks$.length + 1,
       label: `Tracks ${$tracks$.length + 1}`,
       volume: 0,
-      muted: false
+      muted: false,
     },
     synth: {
       id: $synths$.length + 1,
       envelope,
       oscillator,
-      portamento
-    }
+      portamento,
+    },
   }
 
   const indexTrack = (track, id) => ({ ...track, id: id + 1, label: `Track ${id + 1}` })
   const indexSynth = (synth, id) => ({ ...synth, id: id + 1 })
 
-  const nextTrack = track => tracks$.next([...$tracks$, track])
+  const nextTrack = track => {
+    latestAddedTrack$.next(track)
+    tracks$.next([...$tracks$, track])
+  }
+
   const nextSynth = synth => synths$.next([...$synths$, synth])
-  const nextRemoveTrack = () => tracks$.next($tracks$.filter(menu.isClosed).map(indexTrack))
-  const nextRemoveSynth = () => synths$.next($synths$.filter(menu.isClosed).map(indexSynth))
+
+  const nextRemoveTrack = () => {
+    const removed = $tracks$.filter(track => !menu.isClosed(track))
+    const remaining = arrDiff($tracks$, removed)
+    latestRemovedTrack$.next(arrFirst(removed))
+    tracks$.next(remaining.map(indexTrack))
+  }
+
+  latestRemovedTrack$.subscribe(() => synths$.next($synths$.filter(menu.isClosed).map(indexSynth)))
 
   const addChannel = channel => (channels = [...channels, channel])
   const addSynth = synth => (synths = [...synths, synth])
@@ -93,8 +110,8 @@
   const trackIds = () => $tracks$.map(({ id }) => id)
   const channelIds = () => channels.map(({ name }) => name)
   const synthIds = () => synths.map(({ name }) => name)
-  const removedChannelId = () => diff(channelIds(), trackIds())
-  const removedSynthId = () => diff(synthIds(), trackIds())
+  const removedChannelId = () => arrDiff(channelIds(), trackIds())
+  const removedSynthId = () => arrDiff(synthIds(), trackIds())
   const removedChannel = () => channels.filter(({ name }) => removedChannelId().includes(name))
   const removedSynth = () => synths.filter(({ name }) => removedSynthId().includes(name))
   const disposeRemovedTrackChannel = () => removedChannel().forEach(channel => channel.dispose())
@@ -150,7 +167,7 @@
     ['G4', 'A4', 'A4', 'C5'],
     ['G4', 'A4', 'A4', 'C5'],
     ['G4', 'A4', 'A4', 'C5'],
-    ['G4', 'A4', 'E4', 'E5']
+    ['G4', 'A4', 'E4', 'E5'],
   ]
 
   let indeces = new Array($tracks$.length).fill(0)
@@ -174,7 +191,6 @@
   }
 
   const handleRemove = () => {
-    nextRemoveSynth()
     nextRemoveTrack()
     menu.close()
   }
