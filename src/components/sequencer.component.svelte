@@ -1,4 +1,6 @@
 <script>
+  import { distinct, pairwise, partition, map, tap } from 'rxjs/operators'
+  import { diff as arrDiff, first as arrFirst } from '../lib/array'
   import { tweened } from 'svelte/motion'
   import { cubicOut } from 'svelte/easing'
   import * as THREE from 'three'
@@ -8,7 +10,6 @@
     OctahedronGeometry,
     BufferGeometry,
     CatmullRomCurve3,
-    Color,
     Mesh,
     MeshBasicMaterial,
     LineBasicMaterial,
@@ -69,7 +70,7 @@
     ),
   )
 
-  const curveGroups = data.map((curveGroup, i) =>
+  const curveGroups = data.map(curveGroup =>
     curveGroup.map(curvePoints => {
       const handleGroup = new THREE.Group()
       const curve = new CatmullRomCurve3(
@@ -98,15 +99,15 @@
     }),
   )
 
-  export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, mat))
+  export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, matActive))
 
   const offset = tweened(20, {
     duration: 150,
     easing: cubicOut,
   })
   $: offset.set($selected$ === -1 ? 1 : $selected$)
-  $: curveGroups.forEach(group =>
-    group.forEach(({ line, handleGroup }) => {
+  $: curveGroups.forEach(group => {
+    group.forEach(({ curve, line, handleGroup }) => {
       line.position.x = -$tracks$.length * 20 + 20 * $offset
       handleGroup.position.x = -$tracks$.length * 20 + 20 * $offset
     })
@@ -212,7 +213,7 @@
     for (let j = 0; j < curveGroups[i].length; j++) {
       flows[i].setCurve(j, j % curveGroups[i].length)
       flows[i].moveIndividualAlongCurve(j, 0)
-      flows[i].object3D.setColorAt(j, new Color(0xff0000))
+      // flows[i].object3D.setColorAt(j, new Color(0xffffff))
     }
   }
 
@@ -220,6 +221,7 @@
   control.showX = false
   control.showZ = false
   control.translationSnap = 1
+  control.rotationSnap = false
   // Translation constraints
   control.addEventListener('change', () => {
     control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
