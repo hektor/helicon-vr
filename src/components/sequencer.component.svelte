@@ -20,7 +20,12 @@
   import { getContext } from 'svelte'
   const { scene, renderer, camera } = getContext('scene')
 
-  import { tracks$, selected$ } from '../stores/mixer'
+  import {
+    tracks$,
+    latestAdded$ as latestAddedTrack$,
+    latestRemoved$ as latestRemovedTrack$,
+    selected$,
+  } from '../stores/mixer'
   import { sequencer$ } from '../stores/euclid-sequencer'
   import { interacting } from '../stores/vr-controls'
   import { theme } from '../stores/theme'
@@ -104,8 +109,97 @@
     group.forEach(({ line, handleGroup }) => {
       line.position.x = -$tracks$.length * 20 + 20 * $offset
       handleGroup.position.x = -$tracks$.length * 20 + 20 * $offset
-    }),
+    })
+  })
+
+  const reId = (obj, id) => ({ ...obj, id: id + 1 })
+
+  $: next = {
+    id: $sequencer$.length + 1,
+    cycles: [
+      {
+        steps: 16,
+        pulses: 3,
+      },
+      {
+        steps: 16,
+        pulses: 2,
+      },
+      {
+        steps: 16,
+        pulses: 5,
+      },
+    ],
+  }
+
+  const addSequence = () => sequencer$.next([...$sequencer$, next])
+  const removeSequence = ({ id }) =>
+    sequencer$.next($sequencer$.filter(sequencer => sequencer.id !== id).map(reId))
+
+  latestAddedTrack$.subscribe(track => track && addSequence(track))
+  latestRemovedTrack$.subscribe(track => track && removeSequence(track))
+
+  const [added, removed] = sequencer$.pipe(
+    distinct(),
+    pairwise(),
+    partition(([a, b]) => a < b),
   )
+
+  added
+    .pipe(
+      map(([a, b]) => arrDiff(b, a)),
+      map(arrFirst),
+    )
+    .subscribe(({ cycles }) => {
+      const data = cycles.map(({ steps }, j) =>
+        regularPolygon(steps, 8, rad(-90)).map(point => ({
+          x: point[0] + $sequencer$.length * 20,
+          y: j * 8 + 2,
+          z: point[1],
+        })),
+      )
+
+      data.map(curvePoints => {
+        const handleGroup = new THREE.Group()
+        const curve = new CatmullRomCurve3(
+          curvePoints.map(position => {
+            const handle = new Mesh(geo, mat)
+            handle.position.copy(position)
+            handles.push(handle)
+            handleGroup.add(handle)
+            return handle.position
+          }),
+        )
+
+        curve.tension = 0
+        curve.curveType = 'catmullrom'
+        curve.closed = true
+
+        const line = new LineLoop(
+          new BufferGeometry().setFromPoints(curve.getPoints(32)),
+          new LineBasicMaterial({ color: colors.gray1 }),
+        )
+
+        scene.add(line)
+        scene.add(handleGroup)
+
+        line.position.x = -$tracks$.length * 20 + 20 * $offset
+        handleGroup.position.x = -$tracks$.length * 20 + 20 * $offset
+
+        return { curve, line, handleGroup }
+      })
+    })
+
+  removed
+    .pipe(
+      map(([a, b]) => arrDiff(a, b)),
+      map(arrFirst),
+    )
+    .subscribe(removed => console.log('Removed', removed))
+
+  // TODO: Create one flow in center position
+  // TODO: Link flow to currently active using updateCurve
+  $: flows.forEach(flow => {})
 
   for (let i = 0; i < curveGroups.length; i++) {
     curveGroups[i].forEach(({ curve }, j) => {
