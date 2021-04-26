@@ -80,6 +80,7 @@
   const nextRemoveTrack = () => {
     const removed = $tracks$.filter(track => !menu.isClosed(track))
     const remaining = arrDiff($tracks$, removed)
+    if (removed[0].id === $selected$) selected$.next(-1)
     latestRemovedTrack$.next(arrFirst(removed))
     tracks$.next(remaining.map(indexTrack))
   }
@@ -128,26 +129,25 @@
    */
 
   // Detect state changes
-  $: shouldAddTrack = $tracks$.length > channels.length
-  $: shouldRemoveTrack = $tracks$.length < channels.length
-  $: shouldAddSynth = $synths$.length > synths.length
-  $: shouldRemoveSynth = $synths$.length < synths.length
+  const shouldAddTrack = () => $tracks$.length > channels.length
+  const shouldRemoveTrack = () => $tracks$.length < channels.length
+  const shouldAddSynth = () => $synths$.length > synths.length
+  const shouldRemoveSynth = () => $synths$.length < synths.length
   // Handle state changes
   $: {
     // Master channel
     master.set({ volume: $master$.volume, mute: $master$.muted })
     // Track channels
-    if (shouldAddTrack) addChannel(new Channel().set({ name: $tracks$.length }).connect(master))
-    if (shouldRemoveTrack) {
+    if (shouldAddTrack()) addChannel(new Channel().set({ name: $tracks$.length }).connect(master))
+    if (shouldRemoveTrack()) {
       disposeRemovedTrackChannel()
       removeRemovedTrackChannel()
     }
 
     const newSynth = new Synth(defaultSynthSettings).set({ name: $synths$.length })
-
     if ($tracks$.length > 0) newSynth.connect(channels[$tracks$.length - 1])
-    if (shouldAddSynth) addSynth(newSynth)
-    if (shouldRemoveSynth) {
+    if (shouldAddSynth()) addSynth(newSynth)
+    if (shouldRemoveSynth()) {
       disposeRemovedTrackSynth()
       removeRemovedTrackSynth()
     }
@@ -170,8 +170,8 @@
     ['G4', 'A4', 'E4', 'E5'],
   ]
 
-  let indeces = new Array($tracks$.length).fill(0)
-  const loops = $tracks$.map((_, i) => time => {
+  let indeces = new Array($sequencer$.length).fill(0)
+  const loops = $sequencer$.map((_, i) => time => {
     let step = indeces[i] % cycles[i].length
     let input = cycles[i][step]
     input && synths[i].triggerAttackRelease(cycles[i][step], '32n', time)
@@ -197,6 +197,7 @@
   const handleAddTrack = () => {
     nextTrack(next.track)
     nextSynth(next.synth)
+    selected$.next($tracks$.length)
   }
 
   /*
@@ -286,7 +287,7 @@
             bind:muted
             selected={$selected$ === id}
             on:contextmenu={e => handleContextMenu(e, id)}
-            on:click={selected$.set(id)}
+            on:click={() => selected$.set(id)}
             type="track"
           />
         {/each}

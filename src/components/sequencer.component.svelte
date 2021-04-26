@@ -1,6 +1,4 @@
 <script>
-  import { distinct, pairwise, partition, map, tap } from 'rxjs/operators'
-  import { diff as arrDiff, first as arrFirst } from '../lib/array'
   import { tweened } from 'svelte/motion'
   import { cubicOut } from 'svelte/easing'
   import * as THREE from 'three'
@@ -22,7 +20,6 @@
   const { scene, renderer, camera } = getContext('scene')
 
   import {
-    tracks$,
     latestAdded$ as latestAddedTrack$,
     latestRemoved$ as latestRemovedTrack$,
     selected$,
@@ -60,18 +57,19 @@
    * Space cycles on y-axis
    */
 
-  const data = $sequencer$.map((sequencer, i) =>
-    sequencer.cycles.map(({ steps }, j) =>
+  const data = $sequencer$.map(({ cycles, id }, i) => ({
+    id,
+    geo: cycles.map(({ steps }, j) =>
       regularPolygon(steps, 8, rad(-90)).map(point => ({
-        x: point[0] + i * 20,
+        x: point[0] - i * 20,
         y: j * 8 + 2,
         z: point[1],
       })),
     ),
-  )
+  }))
 
-  const curveGroups = data.map(curveGroup =>
-    curveGroup.map(curvePoints => {
+  let curveGroups = data.map(curveGroup =>
+    curveGroup.geo.map(curvePoints => {
       const handleGroup = new THREE.Group()
       const curve = new CatmullRomCurve3(
         curvePoints.map(position => {
@@ -92,8 +90,9 @@
         new LineBasicMaterial({ color: colors.gray1 }),
       )
 
-      scene.add(line)
-      scene.add(handleGroup)
+      line.name = curveGroup.id
+      curve.name = curveGroup.id
+      handleGroup.name = curveGroup.id
 
       return { curve, line, handleGroup }
     }),
@@ -104,13 +103,6 @@
   const offset = tweened(20, {
     duration: 150,
     easing: cubicOut,
-  })
-  $: offset.set($selected$ === -1 ? 1 : $selected$)
-  $: curveGroups.forEach(group => {
-    group.forEach(({ curve, line, handleGroup }) => {
-      line.position.x = -$tracks$.length * 20 + 20 * $offset
-      handleGroup.position.x = -$tracks$.length * 20 + 20 * $offset
-    })
   })
 
   const reId = (obj, id) => ({ ...obj, id: id + 1 })
@@ -137,29 +129,16 @@
   const removeSequence = ({ id }) =>
     sequencer$.next($sequencer$.filter(sequencer => sequencer.id !== id).map(reId))
 
-  latestAddedTrack$.subscribe(track => track && addSequence(track))
-  latestRemovedTrack$.subscribe(track => track && removeSequence(track))
-
-  const [added, removed] = sequencer$.pipe(
-    distinct(),
-    pairwise(),
-    partition(([a, b]) => a < b),
-  )
-
-  added
-    .pipe(
-      map(([a, b]) => arrDiff(b, a)),
-      map(arrFirst),
+  const addSequenceToScene = sequencer => {
+    const data = sequencer.cycles.map(({ steps }, j) =>
+      regularPolygon(steps, 8, rad(-90)).map(point => ({
+        x: point[0] - ($sequencer$.length - 1) * 20,
+        y: j * 8 + 2,
+        z: point[1],
+      })),
     )
-    .subscribe(({ cycles }) => {
-      const data = cycles.map(({ steps }, j) =>
-        regularPolygon(steps, 8, rad(-90)).map(point => ({
-          x: point[0] + $sequencer$.length * 20,
-          y: j * 8 + 2,
-          z: point[1],
-        })),
-      )
-
+    curveGroups = [
+      ...curveGroups,
       data.map(curvePoints => {
         const handleGroup = new THREE.Group()
         const curve = new CatmullRomCurve3(
@@ -178,29 +157,61 @@
 
         const line = new LineLoop(
           new BufferGeometry().setFromPoints(curve.getPoints(32)),
-          new LineBasicMaterial({ color: colors.gray1 }),
+          new LineBasicMaterial({ color: 0xff0000 }),
         )
 
-        scene.add(line)
-        scene.add(handleGroup)
-
-        line.position.x = -$tracks$.length * 20 + 20 * $offset
-        handleGroup.position.x = -$tracks$.length * 20 + 20 * $offset
+        curve.name = $sequencer$.length
+        line.name = $sequencer$.length
+        handleGroup.name = $sequencer$.length
 
         return { curve, line, handleGroup }
-      })
-    })
+      }),
+    ]
+  }
 
-  removed
-    .pipe(
-      map(([a, b]) => arrDiff(a, b)),
-      map(arrFirst),
-    )
-    .subscribe(removed => console.log('Removed', removed))
+  const removeSequenceFromScene = ({ id }) => {
+    /* Remove references */
+    curveGroups = curveGroups.filter((_, i) => i !== id - 1)
+    /* Remove from scene */
+    sequencerGroup.children.filter(({ name }) => name === id).forEach(child => child.remove())
+    /* Remove from group */
+    sequencerGroup.children = sequencerGroup.children.filter(({ name }) => name !== id)
+    /* Close the gap */
+    sequencerGroup.children.filter(({ name }) => name > id).forEach(child => child.translateX(20))
+  }
 
-  // TODO: Create one flow in center position
-  // TODO: Link flow to currently active using updateCurve
-  $: flows.forEach(flow => {})
+  latestAddedTrack$.subscribe(track => {
+    if (track) {
+      addSequence(track)
+      addSequenceToScene($sequencer$[$sequencer$.length - 1])
+    }
+  })
+  latestRemovedTrack$.subscribe(track => {
+    if (track) {
+      removeSequence(track)
+      removeSequenceFromScene(track)
+    }
+  })
+
+  $: curveGroups.forEach(group =>
+    group.forEach(({ line, handleGroup }) => {
+      sequencerGroup.add(line)
+      sequencerGroup.add(handleGroup)
+    }),
+  )
+
+  const sequencerGroup = new THREE.Group()
+
+  selected$.subscribe(selected => {
+    if (selected === -1) {
+      offset.set(0)
+    } else {
+      offset.set(($selected$ - 1) * 20)
+    }
+  })
+  scene.add(sequencerGroup)
+
+  $: sequencerGroup.position.x = $offset
 
   for (let i = 0; i < curveGroups.length; i++) {
     curveGroups[i].forEach(({ curve }, j) => {
