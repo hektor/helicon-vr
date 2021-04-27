@@ -100,7 +100,7 @@
 
   export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, matActive))
 
-  const offset = tweened(20, {
+  const offset = tweened(0, {
     duration: 150,
     easing: cubicOut,
   })
