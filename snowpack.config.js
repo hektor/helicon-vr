@@ -6,7 +6,10 @@ module.exports = {
   },
   plugins: ['@snowpack/plugin-svelte'],
   routes: [{ match: 'routes', src: '.*', dest: '/index.html' }],
-  optimize: {},
+  optimize: {
+    bundle: true,
+    minify: true,
+  },
   devOptions: {},
   buildOptions: {},
   packageOptions: {},
