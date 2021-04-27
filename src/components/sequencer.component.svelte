@@ -237,10 +237,6 @@
   control.showZ = false
   control.translationSnap = 1
   control.rotationSnap = false
-  // Translation constraints
-  control.addEventListener('change', () => {
-    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
-  })
 
   const renderActive = target => {
     if (target) {
@@ -248,7 +244,6 @@
       target.scale.set(1.5, 1.5, 1.5)
     }
   }
-
   const renderInactive = target => {
     if (target) {
       target.material = mat
@@ -284,14 +279,20 @@
     }
   }
 
-  theme.subscribe(mode => {
-    flows.forEach(flow =>
-      flow.object3D.material.color.setHex(mode === 'light' ? 0x111111 : 0xcccccc),
-    )
+  /*
+   * Theme handling
+   */
 
+  theme.subscribe(mode => {
+    const getFlowColor = () => (mode === 'light' ? 0x111111 : 0xcccccc)
+    flows.forEach(flow => flow.object3D.material.color.setHex(getFlowColor(mode)))
     matActive.color.setHex(mode === 'light' ? 0x000000 : 0xffffff)
     mat.color.setHex(mode === 'light' ? 0x444444 : 0x111111)
   })
+
+  /*
+   * Event handling
+   */
 
   const onPointerDown = () => (action = true)
   const onMouseMove = ({ offsetX: x, offsetY: y }) => updateMousePosition({ x, y })
@@ -315,5 +316,10 @@
         })
       }
     }
+  })
+
+  // Translation constraints
+  control.addEventListener('change', () => {
+    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
   })
 </script>
