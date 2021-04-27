@@ -12,9 +12,14 @@
 <div class="transport-controls">
   <div class="field tooltip key">
     <label for="bpm">BPM</label>
-    <input type="number" bind:value={$bpm$} step="0.1" min="1" max="10000" />
+    <input id="bpm" type="number" bind:value={$bpm$} step="0.1" min="1" max="10000" />
   </div>
-  <button on:click={() => playing$.next(!$playing$)} class="tooltip key" class:playing={$playing$}>
+  <button
+    id="play"
+    on:click={() => playing$.next(!$playing$)}
+    class="tooltip key"
+    class:playing={$playing$}
+  >
     {#if $playing$}
       <Pause32 />
       <small>Pauze</small>
@@ -23,7 +28,7 @@
       <small>Play</small>
     {/if}
   </button>
-  <button class="tooltip key" disabled={!$playing$} on:click={() => playing$.next(false)}>
+  <button id="stop" class="tooltip key" disabled={!$playing$} on:click={() => playing$.next(false)}>
     <Stop32 />
     <small>Stop</small>
   </button>
@@ -57,7 +62,6 @@
   }
 
   .transport-controls {
-    flex: 1;
     display: flex;
     border-bottom: 1px solid var(--color-1);
   }

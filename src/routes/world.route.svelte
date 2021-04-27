@@ -4,21 +4,30 @@
   import * as Tone from 'tone'
   import { Transport, Channel, Synth } from 'tone'
 
-  import { diff } from '../lib/array'
+  import { first as arrFirst, diff as arrDiff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
-  import { master$, tracks$, selected$ } from '../stores/mixer'
-  import { synths$ } from '../stores/synths'
+  import {
+    master$,
+    tracks$,
+    selected$,
+    latestRemoved$ as latestRemovedTrack$,
+    latestAdded$ as latestAddedTrack$,
+  } from '../stores/mixer'
+  import { defaultSettings as defaultSynthSettings, synths$ } from '../stores/synths'
+  import { sequencer$ } from '../stores/euclid-sequencer'
 
   import Collapsible from '../components/collapsible.component.svelte'
   import Scene from '../components/scene.component.svelte'
   import SynthModules from '../components/synth-modules.component.svelte'
+  import SequencerSettings from '../components/sequencer-settings.component.svelte'
   import Header from '../components/header.component.svelte'
   import TransportControls from '../components/transport-controls.svelte'
   import MIDIDevices from '../components/midi-devices.component.svelte'
   import ChannelStrip from '../components/channel-strip.component.svelte'
   import AddTrack from '../components/add-track.component.svelte'
   import Piano from '../components/piano.component.svelte'
+  import Tour from '../components/tour.component.svelte'
 
   // Menu
 
@@ -39,28 +48,61 @@
    * Tone settings
    */
 
-  const context = new Tone.Context({ latencyHint: 'interactive' })
-  Tone.setContext(context)
+  Tone.setContext(new Tone.Context({ latencyHint: 'interactive' }))
 
-  // New track creation
-  const nextTrackId = () => $tracks$.length + 1
-  const nextTrackLabel = () => `Tracks ${nextTrackId()}`
-  const nextTrack = rest => ({ id: nextTrackId(), label: nextTrackLabel(), ...rest })
+  const { envelope, oscillator, portamento } = defaultSynthSettings
+
+  $: next = {
+    track: {
+      id: $tracks$.length + 1,
+      label: `Tracks ${$tracks$.length + 1}`,
+      volume: 0,
+      muted: false,
+    },
+    synth: {
+      id: $synths$.length + 1,
+      envelope,
+      oscillator,
+      portamento,
+    },
+  }
+
+  const indexTrack = (track, id) => ({ ...track, id: id + 1, label: `Track ${id + 1}` })
+  const indexSynth = (synth, id) => ({ ...synth, id: id + 1 })
+
+  const nextTrack = track => {
+    latestAddedTrack$.next(track)
+    tracks$.next([...$tracks$, track])
+  }
+
+  const nextSynth = synth => synths$.next([...$synths$, synth])
+
+  const nextRemoveTrack = () => {
+    const removed = $tracks$.filter(track => !menu.isClosed(track))
+    const remaining = arrDiff($tracks$, removed)
+    selected$.next(-1)
+    latestRemovedTrack$.next(arrFirst(removed))
+    tracks$.next(remaining.map(indexTrack))
+  }
+
+  latestRemovedTrack$.subscribe(() => synths$.next($synths$.filter(menu.isClosed).map(indexSynth)))
+
+  const addChannel = channel => (channels = [...channels, channel])
+  const addSynth = synth => (synths = [...synths, synth])
+
+  const removeChannel = ({ name: a }) => (channels = channels.filter(({ name: b }) => a !== b))
+  const removeSynth = ({ name: a }) => (synths = synths.filter(({ name: b }) => a !== b))
 
   const newChannel = ({ muted: mute, ...rest }) => new Channel({ mute, ...rest })
   const setChannel = (channel, { muted: mute, volume }) => channel.set({ volume, mute })
-
-  const addChannel = channel => (channels = [...channels, channel])
   const indexChannel = (channel, id) => channel.set({ name: id })
-  const removeChannel = ({ name: a }) => (channels = channels.filter(({ name: b }) => a !== b))
 
-  const addTrack = track => tracks$.next([...$tracks$, track])
-  const indexTrack = (track, id) => ({ ...track, id: id + 1, label: `Track ${id + 1}` })
-  const removeTrack = () => tracks$.next($tracks$.filter(menu.isClosed).map(indexTrack))
+  const newSynth = ({ id, ...rest }) => new Synth({ ...rest }).set({ name: id })
 
   // Create from state
   const master = newChannel($master$).toDestination()
   let channels = $tracks$.map(track => newChannel(track).connect(master))
+  let synths = $synths$.map((settings, i) => newSynth(settings).connect(channels[i]))
 
   // Index all channels (master and track channels)
   indexChannel(master, -1)
@@ -68,52 +110,69 @@
 
   const trackIds = () => $tracks$.map(({ id }) => id)
   const channelIds = () => channels.map(({ name }) => name)
-  const removedTrackId = () => diff(channelIds(), trackIds())
-  const removedTrack = () => channels.filter(({ name }) => removedTrackId().includes(name))
-  const disposeRemovedTrack = () => removedTrack().forEach(channel => channel.dispose())
-  const removeRemovedTrack = () => removedTrack().forEach(channel => removeChannel(channel))
+  const synthIds = () => synths.map(({ name }) => name)
+  const removedChannelId = () => arrDiff(channelIds(), trackIds())
+  const removedSynthId = () => arrDiff(synthIds(), trackIds())
+  const removedChannel = () => channels.filter(({ name }) => removedChannelId().includes(name))
+  const removedSynth = () => synths.filter(({ name }) => removedSynthId().includes(name))
+  const disposeRemovedTrackChannel = () => removedChannel().forEach(channel => channel.dispose())
+  const removeRemovedTrackChannel = () =>
+    removedChannel().forEach(channel => removeChannel(channel))
+  const disposeRemovedTrackSynth = () => removedSynth().forEach(synth => synth.dispose())
+  const removeRemovedTrackSynth = () => removedSynth().forEach(synth => removeSynth(synth))
 
   const updateChannels = () => channels.forEach((channel, i) => setChannel(channel, $tracks$[i]))
-
-  const shouldAddTrack = () => $tracks$.length > channels.length
-  const shouldRemoveTrack = () => $tracks$.length < channels.length
+  const updateSynths = () => synths.forEach((synth, i) => synth.set($synths$[i]))
 
   /*
    * Handle state updates
    */
 
+  // Detect state changes
+  const shouldAddTrack = () => $tracks$.length > channels.length
+  const shouldRemoveTrack = () => $tracks$.length < channels.length
+  const shouldAddSynth = () => $synths$.length > synths.length
+  const shouldRemoveSynth = () => $synths$.length < synths.length
+  // Handle state changes
   $: {
     // Master channel
     master.set({ volume: $master$.volume, mute: $master$.muted })
     // Track channels
     if (shouldAddTrack()) addChannel(new Channel().set({ name: $tracks$.length }).connect(master))
-    if (shouldRemoveTrack()) disposeRemovedTrack()
-    if (shouldRemoveTrack()) removeRemovedTrack()
+    if (shouldRemoveTrack()) {
+      disposeRemovedTrackChannel()
+      removeRemovedTrackChannel()
+    }
+
+    const newSynth = new Synth(defaultSynthSettings).set({ name: $synths$.length })
+    if ($tracks$.length > 0) newSynth.connect(channels[$tracks$.length - 1])
+    if (shouldAddSynth()) addSynth(newSynth)
+    if (shouldRemoveSynth()) {
+      disposeRemovedTrackSynth()
+      removeRemovedTrackSynth()
+    }
+
     updateChannels()
+    updateSynths()
+
     // Playback (calling Tone.start() prevents suspended AudioContext)
     $playing$ ? Tone.start() && Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
   }
-
-  /*
-   * Add synths
-   */
-
-  const synths = $synths$.map(settings => new Synth(settings))
-  synths.forEach((synth, i) => synth.connect(channels[i]))
-  synths$.subscribe(settings => settings.forEach((setting, i) => synths[i].set(setting)))
 
   const cycles = [
     ['C4', null, 'D4', null],
     ['E4', 'F4', 'F4', 'G4', 'E4'],
     ['G4', 'A4', 'A4'],
     ['G4', 'A4', 'A4', 'C5'],
+    ['G4', 'A4', 'A4', 'C5'],
+    ['G4', 'A4', 'A4', 'C5'],
+    ['G4', 'A4', 'E4', 'E5'],
   ]
 
-  let indeces = [0, 0, 0, 0]
-  const loops = $tracks$.map((_, i) => time => {
+  let indeces = new Array($sequencer$.length).fill(0)
+  const loops = $sequencer$.map((_, i) => time => {
     let step = indeces[i] % cycles[i].length
-    console.log(cycles[i].length)
     let input = cycles[i][step]
     input && synths[i].triggerAttackRelease(cycles[i][step], '32n', time)
     indeces[i]++
@@ -131,17 +190,30 @@
     menu.setPosition({ x, y })
   }
 
-  const handleRemove = () => removeTrack() && menu.close()
-  const handleAddTrack = () => addTrack(nextTrack({ volume: 0, muted: false }))
+  const handleRemove = () => {
+    nextRemoveTrack()
+    menu.close()
+  }
+  const handleAddTrack = () => {
+    nextTrack(next.track)
+    nextSynth(next.synth)
+    selected$.next($tracks$.length)
+  }
 
   /*
    * Piano
    */
 
   let pianoSynth = null
-  selected$.subscribe(selected =>
-    selected !== -1 ? (pianoSynth = synths[selected - 1]) : (pianoSynth = null),
-  )
+
+  selected$.subscribe(selected => {
+    if (selected !== -1) {
+      pianoSynth = synths[selected - 1]
+    } else {
+      pianoSynth = null
+    }
+  })
+
   const midiMessageToNoteName = msg => Tone.Frequency(msg[1], 'midi')
   const handleNoteOn = ({ detail }) => pianoSynth.triggerAttack(midiMessageToNoteName(detail))
   const handleNoteOff = () => pianoSynth.triggerRelease()
@@ -157,19 +229,55 @@
 <div class="container">
   <Header>
     <TransportControls />
-    <MIDIDevices />
+    <div class="actions">
+      <MIDIDevices />
+    </div>
   </Header>
   <Scene />
-  <Collapsible title="Instruments">
-    <div class="module-groups">
-      {#each $synths$ as synth}
+  {#if $selected$ > 0}
+    <Collapsible title={`Instrument (track ${$selected$})`}>
+      <div class="module-groups">
         <div class="module-group">
-          <SynthModules bind:synth />
+          <SynthModules bind:synth={$synths$[$selected$ - 1]} />
         </div>
-      {/each}
-    </div>
-  </Collapsible>
-  <Collapsible title="Mixer">
+      </div>
+    </Collapsible>
+  {:else}
+    <Collapsible title="Instruments (all tracks)">
+      <div class="module-groups">
+        {#each $synths$ as synth}
+          <div class="module-group">
+            <SynthModules bind:synth />
+          </div>
+        {/each}
+      </div>
+    </Collapsible>
+  {/if}
+  {#if $selected$ > 0}
+    <Collapsible title={`Euclidean sequencer (track ${$selected$})`}>
+      <div class="module-groups">
+        <div class="module-group">
+          <SequencerSettings bind:cycles={$sequencer$[$selected$ - 1].cycles} />
+        </div>
+      </div>
+    </Collapsible>
+  {:else}
+    <Collapsible title="Euclidean sequencer (all tracks)">
+      <div class="module-groups">
+        {#each $sequencer$ as { cycles }}
+          <div class="module-group">
+            <SequencerSettings bind:cycles />
+          </div>
+        {/each}
+      </div>
+    </Collapsible>
+  {/if}
+  {#if pianoSynth}
+    <Collapsible title={`Piano (track ${$selected$})`}>
+      <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
+    </Collapsible>
+  {/if}
+  <Collapsible title={`Mixer${$selected$ !== -1 ? ' (track ' + $selected$ + ')' : ''}`}>
     <div class="channel-strips">
       <div class="tracks">
         {#each $tracks$ as { id, label, volume, muted }}
@@ -179,7 +287,7 @@
             bind:muted
             selected={$selected$ === id}
             on:contextmenu={e => handleContextMenu(e, id)}
-            on:click={selected$.set(id)}
+            on:click={() => selected$.set(id)}
             type="track"
           />
         {/each}
@@ -195,11 +303,6 @@
       />
     </div>
   </Collapsible>
-  {#if pianoSynth}
-    <Collapsible title={`Piano (track ${$selected$})`}>
-      <Piano on:noteon={handleNoteOn} on:noteoff={handleNoteOff} />
-    </Collapsible>
-  {/if}
 </div>
 
 {#if menuTrackId}
@@ -216,6 +319,7 @@
   </div>
 {/if}
 <svelte:body on:click={menu.hide} on:contextmenu|preventDefault />
+<Tour />
 
 <style>
   .container {
@@ -224,6 +328,10 @@
     flex-direction: column;
     overflow: hidden;
     max-height: 100vh;
+  }
+
+  .actions {
+    margin-left: auto;
   }
 
   .channel-strips {
@@ -242,7 +350,6 @@
   }
 
   .module-group {
-    flex: 1;
     display: flex;
     margin-top: 0.8rem;
     margin-bottom: 0.8rem;

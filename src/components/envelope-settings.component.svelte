@@ -10,27 +10,27 @@
   <h2>Envelope</h2>
   <ADSR bind:envelope />
   <div class="action-group">
-    <fieldset>
+    <div class="control-knob-container">
       <ControlKnob id="attack" min={0} max={2} step={0.02} bind:value={envelope.attack} />
       <label for="attack">Attack</label>
-    </fieldset>
-    <fieldset>
+    </div>
+    <div class="control-knob-container">
       <ControlKnob id="decay" min={0} max={2} step={0.02} bind:value={envelope.decay} />
       <label for="decay">Decay</label>
-    </fieldset>
-    <fieldset>
+    </div>
+    <div class="control-knob-container">
       <ControlKnob id="sustain" min={0} max={1} step={0.01} bind:value={envelope.sustain} />
       <label for="sustain">Sustain</label>
-    </fieldset>
-    <fieldset>
+    </div>
+    <div class="control-knob-container">
       <ControlKnob id="release" min={0} max={5} step={0.05} bind:value={envelope.release} />
       <label for="release">Release</label>
-    </fieldset>
+    </div>
     <hr />
-    <fieldset>
+    <div class="control-knob-container">
       <ControlKnob id="portamento" min={0} max={5} step={0.05} bind:value={portamento} />
       <label for="portamento">Portamento</label>
-    </fieldset>
+    </div>
   </div>
 </div>
 
@@ -52,12 +52,12 @@
     padding: 1.6rem;
   }
 
-  fieldset {
+  .control-knob-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: none;
+    padding: 0.8rem;
   }
 
   label {

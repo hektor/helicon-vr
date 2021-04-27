@@ -14,7 +14,7 @@
   $: if (value > max) value = max
   $: if (value < min) value = min
 
-  const handleChange = ({ target }) => (value = target.valueAsNumber)
+  const handleChange = ({ target }) => (value = target.valueAsNumber || 0)
 </script>
 
 <div>
@@ -31,7 +31,16 @@
       stroke-width={strokeWidth}
     />
     <foreignObject width="100" height="100">
-      <input {id} {min} {max} {step} type="number" on:change={handleChange} {value} />
+      <input
+        {id}
+        {min}
+        {max}
+        {step}
+        type="number"
+        pattern="\d+(\.\d{2})?"
+        on:change={handleChange}
+        {value}
+      />
     </foreignObject>
   </svg>
 </div>

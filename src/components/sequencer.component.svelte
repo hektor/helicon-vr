@@ -1,11 +1,13 @@
 <script>
+  import { tweened } from 'svelte/motion'
+  import { cubicOut } from 'svelte/easing'
+  import * as THREE from 'three'
   import { InstancedFlow } from 'three/examples/jsm/modifiers/CurveModifier'
   import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
   import {
     OctahedronGeometry,
     BufferGeometry,
     CatmullRomCurve3,
-    Color,
     Mesh,
     MeshBasicMaterial,
     LineBasicMaterial,
@@ -17,7 +19,14 @@
   import { getContext } from 'svelte'
   const { scene, renderer, camera } = getContext('scene')
 
+  import {
+    latestAdded$ as latestAddedTrack$,
+    latestRemoved$ as latestRemovedTrack$,
+    selected$,
+  } from '../stores/mixer'
+  import { sequencer$ } from '../stores/euclid-sequencer'
   import { interacting } from '../stores/vr-controls'
+  import { theme } from '../stores/theme'
 
   import { rad } from '../lib/trig'
   import { regularPolygon } from '../lib/regular-polygon'
@@ -30,68 +39,207 @@
     white: 0xffffff,
   }
 
-  const smallBoxDimensions = [0.5, 0.5, 0.5]
-
-  export let flow
-  let control, target, action, hover
-  const curveHandles = []
+  let control, target, action
+  const handles = []
   const mouse = new Vector2(0, 0)
   const raycaster = new Raycaster()
 
   // Create geometry
   const geo = new OctahedronGeometry(0.5)
-  const mat = new MeshBasicMaterial({ color: colors.gray2 })
-  const matActive = new MeshBasicMaterial({ color: colors.gray3 })
+  const mat = new MeshBasicMaterial({ color: colors.gray2, wireframe: true })
+  const matActive = new MeshBasicMaterial({ color: colors.white })
 
-  const curves = [
-    regularPolygon(3, 8, rad(-90)).map(point => ({ x: point[0], y: 2, z: point[1] })),
-    regularPolygon(4, 8, rad(-90)).map(point => ({ x: point[0], y: 10, z: point[1] })),
-    regularPolygon(5, 8, rad(-90)).map(point => ({ x: point[0], y: 18, z: point[1] })),
-    regularPolygon(16, 8, rad(-90)).map(point => ({ x: point[0], y: 26, z: point[1] })),
-  ].map(curvePoints => {
-    const curve = new CatmullRomCurve3(
-      curvePoints.map(position => {
-        const handle = new Mesh(geo, mat)
-        handle.position.copy(position)
-        curveHandles.push(handle)
-        scene.add(handle)
-        return handle.position
+  /*
+   * Get all polygon data
+   * Every point of every polygon of every cycle of every track
+   *
+   * Space points on xz-plane
+   * Space cycles on y-axis
+   */
+
+  const data = $sequencer$.map(({ cycles, id }, i) => ({
+    id,
+    geo: cycles.map(({ steps }, j) =>
+      regularPolygon(steps, 8, rad(-90)).map(point => ({
+        x: point[0] - i * 20,
+        y: j * 8 + 2,
+        z: point[1],
+      })),
+    ),
+  }))
+
+  let curveGroups = data.map(curveGroup =>
+    curveGroup.geo.map(curvePoints => {
+      const handleGroup = new THREE.Group()
+      const curve = new CatmullRomCurve3(
+        curvePoints.map(position => {
+          const handle = new Mesh(geo, mat)
+          handle.position.copy(position)
+          handles.push(handle)
+          handleGroup.add(handle)
+          return handle.position
+        }),
+      )
+
+      curve.tension = 0
+      curve.curveType = 'catmullrom'
+      curve.closed = true
+
+      const line = new LineLoop(
+        new BufferGeometry().setFromPoints(curve.getPoints(32)),
+        new LineBasicMaterial({ color: colors.gray1 }),
+      )
+
+      line.name = curveGroup.id
+      curve.name = curveGroup.id
+      handleGroup.name = curveGroup.id
+
+      return { curve, line, handleGroup }
+    }),
+  )
+
+  export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, matActive))
+
+  const offset = tweened(20, {
+    duration: 150,
+    easing: cubicOut,
+  })
+
+  const reId = (obj, id) => ({ ...obj, id: id + 1 })
+
+  $: next = {
+    id: $sequencer$.length + 1,
+    cycles: [
+      {
+        steps: 16,
+        pulses: 3,
+      },
+      {
+        steps: 16,
+        pulses: 2,
+      },
+      {
+        steps: 16,
+        pulses: 5,
+      },
+    ],
+  }
+
+  const addSequence = () => sequencer$.next([...$sequencer$, next])
+  const removeSequence = ({ id }) =>
+    sequencer$.next($sequencer$.filter(sequencer => sequencer.id !== id).map(reId))
+
+  const addSequenceToScene = sequencer => {
+    const data = sequencer.cycles.map(({ steps }, j) =>
+      regularPolygon(steps, 8, rad(-90)).map(point => ({
+        x: point[0] - ($sequencer$.length - 1) * 20,
+        y: j * 8 + 2,
+        z: point[1],
+      })),
+    )
+    curveGroups = [
+      ...curveGroups,
+      data.map(curvePoints => {
+        const handleGroup = new THREE.Group()
+        const curve = new CatmullRomCurve3(
+          curvePoints.map(position => {
+            const handle = new Mesh(geo, mat)
+            handle.position.copy(position)
+            handles.push(handle)
+            handleGroup.add(handle)
+            return handle.position
+          }),
+        )
+
+        curve.tension = 0
+        curve.curveType = 'catmullrom'
+        curve.closed = true
+
+        const line = new LineLoop(
+          new BufferGeometry().setFromPoints(curve.getPoints(32)),
+          new LineBasicMaterial({ color: 0xff0000 }),
+        )
+
+        curve.name = $sequencer$.length
+        line.name = $sequencer$.length
+        handleGroup.name = $sequencer$.length
+
+        return { curve, line, handleGroup }
       }),
-    )
-    curve.tension = 0
-    curve.curveType = 'catmullrom'
-    curve.closed = true
+    ]
+  }
 
-    const line = new LineLoop(
-      new BufferGeometry().setFromPoints(curve.getPoints(32)),
-      new LineBasicMaterial({ color: colors.gray1 }),
-    )
+  const removeSequenceFromScene = ({ id }) => {
+    /* Remove references */
+    curveGroups = curveGroups.filter((_, i) => i !== id - 1)
+    /* Remove from scene */
+    sequencerGroup.children.filter(({ name }) => name === id).forEach(child => child.remove())
+    /* Close the gap */
+    sequencerGroup.children.filter(({ name }) => name > id).forEach(child => child.translateX(20))
+    /* Remove from group */
+    sequencerGroup.children = sequencerGroup.children.filter(({ name }) => name !== id)
+    /* Close ID gaps */
+    sequencerGroup.children
+      .filter(({ name }) => name > id)
+      .forEach(child => (child.name = child.name - 1))
+  }
 
-    scene.add(line)
-
-    return { curve, line }
+  latestAddedTrack$.subscribe(track => {
+    if (track) {
+      addSequence(track)
+      addSequenceToScene($sequencer$[$sequencer$.length - 1])
+    }
+  })
+  latestRemovedTrack$.subscribe(track => {
+    if (track) {
+      removeSequence(track)
+      removeSequenceFromScene(track)
+    }
   })
 
-  flow = new InstancedFlow(curves.length, curves.length, geo, mat)
+  $: curveGroups.forEach(group =>
+    group.forEach(({ line, handleGroup }) => {
+      sequencerGroup.add(line)
+      sequencerGroup.add(handleGroup)
+    }),
+  )
 
-  curves.forEach(({ curve }, i) => {
-    flow.updateCurve(i, curve)
-    scene.add(flow.object3D)
+  const sequencerGroup = new THREE.Group()
+
+  selected$.subscribe(selected => {
+    if (selected === -1) {
+      offset.set(0)
+    } else {
+      offset.set(($selected$ - 1) * 20)
+    }
   })
+  scene.add(sequencerGroup)
 
-  for (let i = 0; i < curves.length; i++) {
-    flow.setCurve(i, i % curves.length)
-    flow.moveIndividualAlongCurve(i, i)
-    flow.object3D.setColorAt(i, new Color(colors.white))
+  $: sequencerGroup.position.x = $offset
+
+  for (let i = 0; i < curveGroups.length; i++) {
+    curveGroups[i].forEach(({ curve }, j) => {
+      flows[i].updateCurve(j, curve)
+      scene.add(flows[i].object3D)
+    })
+  }
+
+  for (let i = 0; i < curveGroups.length; i++) {
+    for (let j = 0; j < curveGroups[i].length; j++) {
+      flows[i].setCurve(j, j % curveGroups[i].length)
+      flows[i].moveIndividualAlongCurve(j, 0)
+      // flows[i].object3D.setColorAt(j, new Color(0xffffff))
+    }
   }
 
   control = new TransformControls(camera, renderer.domElement)
   control.showX = false
   control.showZ = false
   control.translationSnap = 1
+  control.rotationSnap = false
   // Translation constraints
   control.addEventListener('change', () => {
-    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 10, 100))
+    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
   })
 
   const renderActive = target => {
@@ -112,7 +260,7 @@
 
   $: {
     raycaster.setFromCamera(mouse, camera)
-    const intersects = raycaster.intersectObjects(curveHandles)
+    const intersects = raycaster.intersectObjects(handles)
     if (intersects.length) {
       if (target !== intersects[0].object) {
         renderInactive(target)
@@ -129,12 +277,21 @@
   $: if (action) {
     action = false
     raycaster.setFromCamera(mouse, camera)
-    const intersects = raycaster.intersectObjects(curveHandles)
+    const intersects = raycaster.intersectObjects(handles)
     if (intersects.length) {
       control.attach(target)
       scene.add(control)
     }
   }
+
+  theme.subscribe(mode => {
+    flows.forEach(flow =>
+      flow.object3D.material.color.setHex(mode === 'light' ? 0x111111 : 0xcccccc),
+    )
+
+    matActive.color.setHex(mode === 'light' ? 0x000000 : 0xffffff)
+    mat.color.setHex(mode === 'light' ? 0x444444 : 0x111111)
+  })
 
   const onPointerDown = () => (action = true)
   const onMouseMove = ({ offsetX: x, offsetY: y }) => updateMousePosition({ x, y })
@@ -150,10 +307,13 @@
   control.addEventListener('mouseDown', () => interacting.set(true))
   control.addEventListener('mouseUp', () => interacting.set(false))
   control.addEventListener('dragging-changed', ({ value }) => {
-    !value &&
-      curves.forEach(({ curve, line }, i) => {
-        line.geometry.setFromPoints(curve.getPoints(50))
-        flow.updateCurve(i, curve)
-      })
+    if (!value) {
+      for (let i = 0; i < curveGroups.length; i++) {
+        curveGroups[i].forEach(({ curve, line }, j) => {
+          line.geometry.setFromPoints(curve.getPoints(50))
+          flows[i].updateCurve(j, curve)
+        })
+      }
+    }
   })
 </script>

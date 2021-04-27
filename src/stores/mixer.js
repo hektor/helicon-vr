@@ -16,6 +16,8 @@ const defaults = {
 export const master$ = writable$(JSON.parse(localStorage.getItem('master')) || defaults.master)
 export const tracks$ = writable$(JSON.parse(localStorage.getItem('tracks')) || defaults.tracks)
 export const selected$ = writable$(defaults.selected)
+export const latestAdded$ = writable$(null)
+export const latestRemoved$ = writable$(null)
 
 /*
  * Persist all channel states
