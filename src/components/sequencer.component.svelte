@@ -98,7 +98,12 @@
     }),
   )
 
-  export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, matActive))
+  export let flows = new InstancedFlow(
+    curveGroups[0].length,
+    curveGroups[0].length,
+    geo,
+    new MeshBasicMaterial({ color: 0xff0000 }),
+  )
 
   const offset = tweened(0, {
     duration: 150,
@@ -213,24 +218,23 @@
       offset.set(($selected$ - 1) * 20)
     }
   })
+
   scene.add(sequencerGroup)
+  scene.add(flows.object3D)
 
   $: sequencerGroup.position.x = $offset
+  $: selected = $selected$ === -1 ? 0 : $selected$ - 1
 
-  for (let i = 0; i < curveGroups.length; i++) {
-    curveGroups[i].forEach(({ curve }, j) => {
-      flows[i].updateCurve(j, curve)
-      scene.add(flows[i].object3D)
-    })
+  const updateCurve = (j, curve) => {
+    const newCurve = curve.clone()
+    newCurve.points.map(point => (point.x += selected * 20))
+    flows.updateCurve(j, newCurve)
   }
 
-  for (let i = 0; i < curveGroups.length; i++) {
-    for (let j = 0; j < curveGroups[i].length; j++) {
-      flows[i].setCurve(j, j % curveGroups[i].length)
-      flows[i].moveIndividualAlongCurve(j, 0)
-      // flows[i].object3D.setColorAt(j, new Color(0xffffff))
-    }
-  }
+  $: curveGroups[selected].forEach(({ curve }, j) => {
+    flows.setCurve(j, j % curveGroups[selected].length)
+    updateCurve(j, curve)
+  })
 
   control = new TransformControls(camera, renderer.domElement)
   control.showX = false
@@ -285,7 +289,7 @@
 
   theme.subscribe(mode => {
     const getFlowColor = () => (mode === 'light' ? 0x111111 : 0xcccccc)
-    flows.forEach(flow => flow.object3D.material.color.setHex(getFlowColor(mode)))
+    flows.object3D.material.color.setHex(getFlowColor(mode))
     matActive.color.setHex(mode === 'light' ? 0x000000 : 0xffffff)
     mat.color.setHex(mode === 'light' ? 0x444444 : 0x111111)
   })
@@ -307,14 +311,16 @@
 
   control.addEventListener('mouseDown', () => interacting.set(true))
   control.addEventListener('mouseUp', () => interacting.set(false))
-  control.addEventListener('dragging-changed', ({ value }) => {
+  $: control.addEventListener('dragging-changed', ({ value }) => {
     if (!value) {
-      for (let i = 0; i < curveGroups.length; i++) {
-        curveGroups[i].forEach(({ curve, line }, j) => {
-          line.geometry.setFromPoints(curve.getPoints(50))
-          flows[i].updateCurve(j, curve)
-        })
-      }
+      /* FIXME: Increase speed with slope to prevent laggards
+       * curveGroups.forEach(g =>
+       *   g.forEach(({ curve, line }) => {
+       *     line.geometry.setFromPoints(curve.getPoints(50))
+       *   }),
+       * )
+       * curveGroups[selected].forEach(({ curve }, j) => updateCurve(j, curve))
+       */
     }
   })
 
@@ -323,3 +329,7 @@
     control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
   })
 </script>
+
+<pre>
+{JSON.stringify(selected, 0, 2)}
+</pre>
