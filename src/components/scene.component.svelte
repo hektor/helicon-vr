@@ -1,6 +1,14 @@
 <script>
   import { onMount, onDestroy, setContext } from 'svelte'
-  import { Color, Clock, Fog, Scene, PerspectiveCamera, WebGLRenderer, sRGBEncoding } from 'three'
+  import {
+    Color,
+    Clock,
+    FogExp2,
+    Scene,
+    PerspectiveCamera,
+    WebGLRenderer,
+    sRGBEncoding,
+  } from 'three'
   import * as THREE from 'three'
 
   import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -38,7 +46,7 @@
   let controller1, controller2, controllerGrip1, controllerGrip2, hand1, hand2
   let flows
 
-  const { fov, near, far } = $cameraSettings
+  const { fov, near, far, density } = $cameraSettings
 
   const rendererSettings = {
     antialias: true,
@@ -87,7 +95,7 @@
    * Add fog to scene (fade distant objects)
    */
 
-  scene.fog = new Fog(colors.fog, near, far)
+  scene.fog = new FogExp2(colors.fog, near, far, density)
   scene.background = new Color(colors.bg)
 
   /*
