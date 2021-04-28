@@ -15,8 +15,8 @@
     LineLoop,
     Raycaster,
     Vector2,
-    Vector3,
   } from 'three'
+
   import { getContext } from 'svelte'
   const { scene, renderer, camera } = getContext('scene')
 
@@ -27,7 +27,6 @@
   } from '../stores/mixer'
   import { sequencer$ } from '../stores/euclid-sequencer'
   import { rhythms$ } from '../stores/rhythms'
-  // import { interacting } from '../stores/vr-controls'
   import { theme } from '../stores/theme'
 
   import { rad } from '../lib/trig'
@@ -37,11 +36,11 @@
     white: 0xffffff,
     gray1: 0x333333,
     gray2: 0x555555,
-    gray3: 0xaaaaaa,
+    gray3: 0xcccccc,
     white: 0xffffff,
   }
 
-  let control, target, action
+  let target, action
   const handles = []
   const mouse = new Vector2(0, 0)
   const raycaster = new Raycaster()
@@ -49,7 +48,6 @@
   // Create geometry
   const geo = new OctahedronGeometry(0.5)
   const mat = new MeshBasicMaterial({ color: colors.gray2, wireframe: true })
-  const matActive = new MeshBasicMaterial({ color: colors.white })
 
   /*
    * Get all polygon data
@@ -100,12 +98,7 @@
     }),
   )
 
-  export let flows = new InstancedFlow(
-    curveGroups[0].length,
-    curveGroups[0].length,
-    geo,
-    new MeshBasicMaterial({ color: 0xff0000 }),
-  )
+  export let flows = new InstancedFlow(curveGroups[0].length, curveGroups[0].length, geo, mat)
 
   const offset = tweened(0, {
     duration: 150,
@@ -162,10 +155,7 @@
         curve.curveType = 'catmullrom'
         curve.closed = true
 
-        const line = new LineLoop(
-          new BufferGeometry().setFromPoints(curve.getPoints(32)),
-          new LineBasicMaterial({ color: 0xff0000 }),
-        )
+        const line = new LineLoop(new BufferGeometry().setFromPoints(curve.getPoints(32)), mat)
 
         curve.name = $sequencer$.length
         line.name = $sequencer$.length
@@ -248,13 +238,11 @@
 
   const renderActive = target => {
     if (target) {
-      target.material = matActive
       target.scale.set(1.5, 1.5, 1.5)
     }
   }
   const renderInactive = target => {
     if (target) {
-      target.material = mat
       target.scale.set(1, 1, 1)
     }
   }
@@ -289,7 +277,7 @@
   }
   */
 
-  const pulseMat = new MeshBasicMaterial({ color: 0x00ff00 })
+  const pulseMat = new MeshBasicMaterial({ color: colors.gray2 })
 
   rhythms$.pipe(delay(150)).subscribe(rhythms =>
     rhythms.forEach((rhythm, i) => {
@@ -306,10 +294,10 @@
    */
 
   theme.subscribe(mode => {
-    const getFlowColor = () => (mode === 'light' ? 0x111111 : 0xcccccc)
+    const getFlowColor = () => (mode === 'light' ? colors.gray1 : colors.gray2)
     flows.object3D.material.color.setHex(getFlowColor(mode))
-    matActive.color.setHex(mode === 'light' ? 0x000000 : 0xffffff)
-    mat.color.setHex(mode === 'light' ? 0x444444 : 0x111111)
+    mat.color.setHex(mode === 'light' ? colors.gray1 : colors.gray2)
+    pulseMat.color.setHex(mode === 'light' ? colors.gray1 : colors.gray3)
   })
 
   /*
