@@ -25,6 +25,7 @@
     selected$,
   } from '../stores/mixer'
   import { sequencer$ } from '../stores/euclid-sequencer'
+  import { rhythms$ } from '../stores/rhythms'
   // import { interacting } from '../stores/vr-controls'
   import { theme } from '../stores/theme'
 
@@ -286,6 +287,19 @@
     }
   }
   */
+
+  const pulseMat = new MeshBasicMaterial({ color: 0x00ff00 })
+
+  rhythms$.subscribe(rhythms =>
+    rhythms.forEach((rhythm, i) => {
+      rhythm.forEach((pattern, j) => {
+        curveGroups[i][j].handleGroup.children.forEach((child, x) => {
+          console.log(pattern[x])
+          pattern[x] !== null ? (child.material = pulseMat) : (child.material = mat)
+        })
+      })
+    }),
+  )
 
   /*
    * Theme handling
