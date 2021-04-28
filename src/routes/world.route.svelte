@@ -7,6 +7,8 @@
   import { first as arrFirst, diff as arrDiff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
+  import { rhythms$ } from '../stores/rhythms'
+
   import {
     master$,
     tracks$,
@@ -169,6 +171,8 @@
     ['G4', 'A4', 'A4', 'C5'],
     ['G4', 'A4', 'E4', 'E5'],
   ]
+
+  rhythms$.subscribe(console.log)
 
   let indeces = new Array($sequencer$.length).fill(0)
   const loops = $sequencer$.map((_, i) => time => {
