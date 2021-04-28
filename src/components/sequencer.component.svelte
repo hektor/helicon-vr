@@ -1,4 +1,5 @@
 <script>
+  import { delay } from 'rxjs/operators'
   import { tweened } from 'svelte/motion'
   import { cubicOut } from 'svelte/easing'
   import { Group } from 'three'
@@ -290,11 +291,10 @@
 
   const pulseMat = new MeshBasicMaterial({ color: 0x00ff00 })
 
-  rhythms$.subscribe(rhythms =>
+  rhythms$.pipe(delay(150)).subscribe(rhythms =>
     rhythms.forEach((rhythm, i) => {
       rhythm.forEach((pattern, j) => {
         curveGroups[i][j].handleGroup.children.forEach((child, x) => {
-          console.log(pattern[x])
           pattern[x] !== null ? (child.material = pulseMat) : (child.material = mat)
         })
       })
