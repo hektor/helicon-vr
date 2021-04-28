@@ -1,9 +1,9 @@
 <script>
   import { tweened } from 'svelte/motion'
   import { cubicOut } from 'svelte/easing'
-  import * as THREE from 'three'
+  import { Group } from 'three'
   import { InstancedFlow } from 'three/examples/jsm/modifiers/CurveModifier'
-  import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
+  // import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
   import {
     OctahedronGeometry,
     BufferGeometry,
@@ -25,7 +25,7 @@
     selected$,
   } from '../stores/mixer'
   import { sequencer$ } from '../stores/euclid-sequencer'
-  import { interacting } from '../stores/vr-controls'
+  // import { interacting } from '../stores/vr-controls'
   import { theme } from '../stores/theme'
 
   import { rad } from '../lib/trig'
@@ -70,7 +70,7 @@
 
   let curveGroups = data.map(curveGroup =>
     curveGroup.geo.map(curvePoints => {
-      const handleGroup = new THREE.Group()
+      const handleGroup = new Group()
       const curve = new CatmullRomCurve3(
         curvePoints.map(position => {
           const handle = new Mesh(geo, mat)
@@ -145,7 +145,7 @@
     curveGroups = [
       ...curveGroups,
       data.map(curvePoints => {
-        const handleGroup = new THREE.Group()
+        const handleGroup = new Group()
         const curve = new CatmullRomCurve3(
           curvePoints.map(position => {
             const handle = new Mesh(geo, mat)
@@ -209,7 +209,7 @@
     }),
   )
 
-  const sequencerGroup = new THREE.Group()
+  const sequencerGroup = new Group()
 
   selected$.subscribe(selected => {
     if (selected === -1) {
@@ -236,11 +236,13 @@
     updateCurve(j, curve)
   })
 
+  /*
   control = new TransformControls(camera, renderer.domElement)
   control.showX = false
   control.showZ = false
   control.translationSnap = 1
   control.rotationSnap = false
+  */
 
   const renderActive = target => {
     if (target) {
@@ -273,6 +275,7 @@
 
   $: renderActive(target)
 
+  /*
   $: if (action) {
     action = false
     raycaster.setFromCamera(mouse, camera)
@@ -282,6 +285,7 @@
       scene.add(control)
     }
   }
+  */
 
   /*
    * Theme handling
@@ -309,27 +313,26 @@
   renderer.domElement.addEventListener('pointerdown', onPointerDown)
   renderer.domElement.addEventListener('mousemove', onMouseMove)
 
+  /*
   control.addEventListener('mouseDown', () => interacting.set(true))
   control.addEventListener('mouseUp', () => interacting.set(false))
   $: control.addEventListener('dragging-changed', ({ value }) => {
     if (!value) {
-      /* FIXME: Increase speed with slope to prevent laggards
-       * curveGroups.forEach(g =>
-       *   g.forEach(({ curve, line }) => {
-       *     line.geometry.setFromPoints(curve.getPoints(50))
-       *   }),
-       * )
-       * curveGroups[selected].forEach(({ curve }, j) => updateCurve(j, curve))
-       */
+      FIXME: Increase speed with slope to prevent laggards
+      curveGroups.forEach(g =>
+        g.forEach(({ curve, line }) => {
+          line.geometry.setFromPoints(curve.getPoints(50))
+        }),
+      )
+      curveGroups[selected].forEach(({ curve }, j) => updateCurve(j, curve))
     }
   })
+  */
 
+  /*
   // Translation constraints
   control.addEventListener('change', () => {
     control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
   })
+  */
 </script>
-
-<pre>
-{JSON.stringify(selected, 0, 2)}
-</pre>
