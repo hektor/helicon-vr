@@ -9,7 +9,7 @@
     <div class="cycle">
       <span>Cycle {i + 1}</span>
       <div class="cycle-setting">
-        <ControlKnob bind:value={steps} min={0} max={16} />
+        <ControlKnob bind:value={steps} min={3} max={16} />
         <label for="steps">Steps</label>
       </div>
       <div class="cycle-setting">
