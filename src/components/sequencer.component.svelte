@@ -15,6 +15,7 @@
     LineLoop,
     Raycaster,
     Vector2,
+    Vector3,
   } from 'three'
 
   import { getContext } from 'svelte'
@@ -282,6 +283,62 @@
   rhythms$.pipe(delay(150)).subscribe(rhythms =>
     rhythms.forEach((rhythm, i) => {
       rhythm.forEach((pattern, j) => {
+        // Compare amount of steps with scene
+        // Update geometry if necessary
+        if (pattern.length !== curveGroups[i][j].handleGroup.children.length) {
+          // Create new points
+          const points = regularPolygon(pattern.length, 8, rad(-90))
+            .map(point => ({
+              x: point[0] - i * 20,
+              y: j * 8 + 2,
+              z: point[1],
+            }))
+            .map(({ x, y, z }) => [x, y, z])
+
+          const { curve, handleGroup, line } = curveGroups[i][j]
+
+          const updateLine = () => {
+            line.geometry.attributes.position.needsUpdate = true
+            line.geometry.setDrawRange(0, points.length)
+
+            const flatPoints = points.flat()
+            for (let i = 0; i < flatPoints.length; i++)
+              line.geometry.attributes.position.array[i] = flatPoints[i]
+          }
+
+          if (handleGroup.children.length < pattern.length) {
+            // Handles
+            const handle = new Mesh(geo, mat)
+            handleGroup.add(handle)
+            handleGroup.children.map((child, i) => child.position.set(...points[i]))
+
+            //Line
+            updateLine()
+
+            // Curve & flow
+            const vectorPoints = points.map(point => new Vector3(...point))
+            curve.points = vectorPoints
+            flows.setCurve(j, j % curveGroups[i].length)
+            updateCurve(j, curve)
+          }
+
+          if (handleGroup.children.length > pattern.length) {
+            // Handles
+            handleGroup.remove(handleGroup.children[0])
+            handleGroup.children.map((child, i) => child.position.set(...points[i]))
+
+            // Line
+            updateLine()
+
+            // Curve & flow
+            const vectorPoints = points.map(point => new Vector3(...point))
+            curve.points = vectorPoints
+            flows.setCurve(j, j % curveGroups[i].length)
+            updateCurve(j, curve)
+          }
+        }
+
+        // Update materials
         curveGroups[i][j].handleGroup.children.forEach((child, x) => {
           pattern[x] !== null ? (child.material = pulseMat) : (child.material = mat)
         })
