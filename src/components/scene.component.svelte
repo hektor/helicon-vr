@@ -53,9 +53,9 @@
     powerPreference: 'high-performance',
   }
 
-  const colors = {
-    fog: 0x111111,
-    bg: 0x0c0c0c,
+  $: colors = {
+    fog: $theme === 'light' ? 0xaaaaaa : 0x111111,
+    bg: $theme === 'light' ? 0xcccccc : 0x111111,
   }
 
   const initial = {
@@ -95,8 +95,8 @@
    * Add fog to scene (fade distant objects)
    */
 
-  scene.fog = new FogExp2(colors.fog, near, far, density)
-  scene.background = new Color(colors.bg)
+  $: scene.fog = new FogExp2(colors.fog, near, far, density)
+  $: scene.background = new Color(colors.bg)
 
   /*
    * Controllers
