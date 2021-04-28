@@ -17,3 +17,11 @@ export const diff = (a, b) => a.filter(x => !b.includes(x))
 
 export const first = arr => arr[0]
 
+/**
+ * Flatten array
+ *
+ * @param {Array} arr
+ * @returns {Array} flattened array
+ */
+
+export const flat = arr => arr.flat()
