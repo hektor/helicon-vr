@@ -1,4 +1,6 @@
 <script>
+  import { playing$ } from '../stores/playback'
+
   export let synth
 
   import EnvelopeSettings from '../components/envelope-settings.component.svelte'
@@ -7,7 +9,7 @@
 
 <div class="modules">
   <EnvelopeSettings bind:envelope={synth.envelope} bind:portamento={synth.portamento} />
-  <OscillatorSettings bind:oscillator={synth.oscillator} />
+  <OscillatorSettings bind:oscillator={synth.oscillator} disabled={$playing$} />
 </div>
 
 <style>

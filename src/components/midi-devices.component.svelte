@@ -1,15 +1,13 @@
 <script>
-  import { fromEvent } from 'rxjs'
-  import { inputs$, outputs$, inputNames$, outputNames$ } from '../stores/devices'
-
-  let modal
+  import { from, fromEvent } from 'rxjs'
+  import { catchError, partition, take } from 'rxjs/operators'
 
   import Close32 from 'carbon-icons-svelte/lib/Close32'
   import MidiPort from './icons/midi-port-icon.component.svelte'
 
-  import { from } from 'rxjs'
-  import { catchError, partition, take } from 'rxjs/operators'
+  import { inputs$, outputs$, inputNames$, outputNames$ } from '../stores/devices'
 
+  let modal
   let blocked
 
   const [access, denial] = from(navigator.requestMIDIAccess({ sysex: true })).pipe(

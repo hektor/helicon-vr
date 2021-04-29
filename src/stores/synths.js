@@ -1,5 +1,5 @@
 import { interval } from 'rxjs'
-import { debounce, skip } from 'rxjs/operators'
+import { debounce } from 'rxjs/operators'
 import { writable$ } from './utils/observable-store'
 import { tracks$ } from './mixer'
 
@@ -13,18 +13,22 @@ const defaults = tracks$.getValue().map((_, i) => ({
       decayCurve: 'exponential',
       release: 1,
       releaseCurve: 'exponential',
-      sustain: 0.5
+      sustain: 0.5,
     },
     oscillator: {
       type: 'sine',
-      volume: 0
+      volume: 0,
     },
-    portamento: 0
-  }
+    maxPolyphony: 16,
+  },
 }))
 
 export const defaultSettings = defaults[0]
-export const synths$ = writable$(defaults)
+export const synths$ = writable$(JSON.parse(localStorage.getItem('synths')) || defaults)
+
+/*
+ * Persist all synth states
+ */
 
 synths$
   .pipe(debounce(() => interval(100)))

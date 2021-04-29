@@ -6,17 +6,19 @@ const defaults = tracks$.getValue().map((_, i) => ({
   cycles: [
     {
       steps: 16,
-      pulses: 3
+      pulses: 3,
     },
     {
       steps: 16,
-      pulses: 2
+      pulses: 2,
     },
     {
       steps: 16,
-      pulses: 5
-    }
-  ]
+      pulses: 5,
+    },
+  ],
 }))
 
-export const sequencer$ = writable$(defaults)
+export const sequencer$ = writable$(JSON.parse(localStorage.getItem('sequencer')) || defaults)
+
+sequencer$.subscribe(sequencer => localStorage.setItem('sequencer', JSON.stringify(sequencer)))

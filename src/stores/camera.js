@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store'
 
 const defaults = {
-  settings: { fov: 45, near: 0.1, far: 512 },
+  settings: { fov: 45, near: 0.015, far: 512 },
   position: [0, 0, -48],
 }
 

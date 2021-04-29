@@ -1,29 +1,36 @@
 <script>
   export let oscillator
+  export let disabled = true
 
   import RangeSlider from './range-slider.component.svelte'
+
+  const oscillators = [
+    { name: 'Sine', value: 'sine' },
+    { name: 'Square', value: 'square' },
+    { name: 'Triangle', value: 'triangle' },
+    { name: 'Fatsine', value: 'fatsine' },
+    { name: 'Fatsquare', value: 'fatsquare' },
+    { name: 'Fattriangle', value: 'fattriangle' },
+    { name: 'Fatsawtooth', value: 'fatsawtooth' },
+    { name: 'Sawtooth', value: 'sawtooth' },
+    { name: 'AM Sine', value: 'amsine' },
+    { name: 'AM Square', value: 'amsquare' },
+    { name: 'AM Triangle', value: 'amtriangle' },
+    { name: 'AM Sawtooth', value: 'amsawtooth' },
+    { name: 'FM Sine', value: 'fmsine' },
+    { name: 'FM Square', value: 'fmsquare' },
+    { name: 'FM Triangle', value: 'fmtriangle' },
+    { name: 'FM Sawtooth', value: 'fmsawtooth' },
+  ]
 </script>
 
 <div class="oscillator">
   <h2>Oscillator</h2>
   <div class="action-group">
-    <select bind:value={oscillator.type}>
-      <option value="sine"> Sine</option>
-      <option value="square">Square</option>
-      <option value="triangle">Triangle</option>
-      <option value="fatsine">Fat sine</option>
-      <option value="fatsquare">Fat square</option>
-      <option value="fattriangle">Fat triangle</option>
-      <option value="fatsawtooth">Fat sawtooth</option>
-      <option value="sawtooth">Sawtooth</option>
-      <option value="amsine">AM Sine</option>
-      <option value="amsquare">AM Square</option>
-      <option value="amtriangle">AM Triangle</option>
-      <option value="amsawtooth">AM Sawtooth</option>
-      <option value="fmsine">FM Sine</option>
-      <option value="fmsquare">FM Square</option>
-      <option value="fmtriangle">FM Triangle</option>
-      <option value="fmsawtooth">FM Sawtooth</option>
+    <select {disabled} bind:value={oscillator.type}>
+      {#each oscillators as { value, name }}
+        <option {value}>{name}</option>
+      {/each}
     </select>
     <RangeSlider
       min={-60}
@@ -56,5 +63,10 @@
 
   select {
     flex: 1;
+  }
+
+  select:disabled {
+    color: var(--color-2);
+    background: var(--color-1);
   }
 </style>

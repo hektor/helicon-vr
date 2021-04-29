@@ -1,9 +1,10 @@
 <script>
+  import { delay } from 'rxjs/operators'
   import { tweened } from 'svelte/motion'
   import { cubicOut } from 'svelte/easing'
-  import * as THREE from 'three'
+  import { Group } from 'three'
   import { InstancedFlow } from 'three/examples/jsm/modifiers/CurveModifier'
-  import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
+  // import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
   import {
     OctahedronGeometry,
     BufferGeometry,
@@ -16,6 +17,7 @@
     Vector2,
     Vector3,
   } from 'three'
+
   import { getContext } from 'svelte'
   const { scene, renderer, camera } = getContext('scene')
 
@@ -25,7 +27,7 @@
     selected$,
   } from '../stores/mixer'
   import { sequencer$ } from '../stores/euclid-sequencer'
-  import { interacting } from '../stores/vr-controls'
+  import { rhythms$ } from '../stores/rhythms'
   import { theme } from '../stores/theme'
 
   import { rad } from '../lib/trig'
@@ -35,11 +37,11 @@
     white: 0xffffff,
     gray1: 0x333333,
     gray2: 0x555555,
-    gray3: 0xaaaaaa,
+    gray3: 0xcccccc,
     white: 0xffffff,
   }
 
-  let control, target, action
+  let target, action
   const handles = []
   const mouse = new Vector2(0, 0)
   const raycaster = new Raycaster()
@@ -47,7 +49,6 @@
   // Create geometry
   const geo = new OctahedronGeometry(0.5)
   const mat = new MeshBasicMaterial({ color: colors.gray2, wireframe: true })
-  const matActive = new MeshBasicMaterial({ color: colors.white })
 
   /*
    * Get all polygon data
@@ -70,7 +71,7 @@
 
   let curveGroups = data.map(curveGroup =>
     curveGroup.geo.map(curvePoints => {
-      const handleGroup = new THREE.Group()
+      const handleGroup = new Group()
       const curve = new CatmullRomCurve3(
         curvePoints.map(position => {
           const handle = new Mesh(geo, mat)
@@ -98,9 +99,9 @@
     }),
   )
 
-  export let flows = curveGroups.map(g => new InstancedFlow(g.length, g.length, geo, matActive))
+  export let flows = new InstancedFlow(curveGroups[0].length, curveGroups[0].length, geo, mat)
 
-  const offset = tweened(20, {
+  const offset = tweened(0, {
     duration: 150,
     easing: cubicOut,
   })
@@ -140,7 +141,7 @@
     curveGroups = [
       ...curveGroups,
       data.map(curvePoints => {
-        const handleGroup = new THREE.Group()
+        const handleGroup = new Group()
         const curve = new CatmullRomCurve3(
           curvePoints.map(position => {
             const handle = new Mesh(geo, mat)
@@ -157,7 +158,7 @@
 
         const line = new LineLoop(
           new BufferGeometry().setFromPoints(curve.getPoints(32)),
-          new LineBasicMaterial({ color: 0xff0000 }),
+          new LineBasicMaterial({ color: colors.gray1 }),
         )
 
         curve.name = $sequencer$.length
@@ -204,7 +205,7 @@
     }),
   )
 
-  const sequencerGroup = new THREE.Group()
+  const sequencerGroup = new Group()
 
   selected$.subscribe(selected => {
     if (selected === -1) {
@@ -213,45 +214,39 @@
       offset.set(($selected$ - 1) * 20)
     }
   })
+
   scene.add(sequencerGroup)
+  scene.add(flows.object3D)
 
   $: sequencerGroup.position.x = $offset
+  $: selected = $selected$ === -1 ? 0 : $selected$ - 1
 
-  for (let i = 0; i < curveGroups.length; i++) {
-    curveGroups[i].forEach(({ curve }, j) => {
-      flows[i].updateCurve(j, curve)
-      scene.add(flows[i].object3D)
-    })
+  const updateCurve = (j, curve) => {
+    const newCurve = curve.clone()
+    newCurve.points.map(point => (point.x += selected * 20))
+    flows.updateCurve(j, newCurve)
   }
 
-  for (let i = 0; i < curveGroups.length; i++) {
-    for (let j = 0; j < curveGroups[i].length; j++) {
-      flows[i].setCurve(j, j % curveGroups[i].length)
-      flows[i].moveIndividualAlongCurve(j, 0)
-      // flows[i].object3D.setColorAt(j, new Color(0xffffff))
-    }
-  }
+  $: curveGroups[selected].forEach(({ curve }, j) => {
+    flows.setCurve(j, j % curveGroups[selected].length)
+    updateCurve(j, curve)
+  })
 
+  /*
   control = new TransformControls(camera, renderer.domElement)
   control.showX = false
   control.showZ = false
   control.translationSnap = 1
   control.rotationSnap = false
-  // Translation constraints
-  control.addEventListener('change', () => {
-    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
-  })
+  */
 
   const renderActive = target => {
     if (target) {
-      target.material = matActive
       target.scale.set(1.5, 1.5, 1.5)
     }
   }
-
   const renderInactive = target => {
     if (target) {
-      target.material = mat
       target.scale.set(1, 1, 1)
     }
   }
@@ -274,6 +269,7 @@
 
   $: renderActive(target)
 
+  /*
   $: if (action) {
     action = false
     raycaster.setFromCamera(mouse, camera)
@@ -283,15 +279,90 @@
       scene.add(control)
     }
   }
+  */
+
+  const pulseMat = new MeshBasicMaterial({ color: colors.gray2 })
+
+  rhythms$.pipe(delay(150)).subscribe(rhythms =>
+    rhythms.forEach((rhythm, i) => {
+      rhythm.forEach((pattern, j) => {
+        // Compare amount of steps with scene
+        // Update geometry if necessary
+        if (pattern.length !== curveGroups[i][j].handleGroup.children.length) {
+          // Create new points
+          const points = regularPolygon(pattern.length, 8, rad(-90))
+            .map(point => ({
+              x: point[0] - i * 20,
+              y: j * 8 + 2,
+              z: point[1],
+            }))
+            .map(({ x, y, z }) => [x, y, z])
+
+          const { curve, handleGroup, line } = curveGroups[i][j]
+
+          const updateLine = () => {
+            line.geometry.attributes.position.needsUpdate = true
+            line.geometry.setDrawRange(0, points.length)
+
+            const flatPoints = points.flat()
+            for (let i = 0; i < flatPoints.length; i++)
+              line.geometry.attributes.position.array[i] = flatPoints[i]
+          }
+
+          if (handleGroup.children.length < pattern.length) {
+            // Handles
+            const handle = new Mesh(geo, mat)
+            handleGroup.add(handle)
+            handleGroup.children.map((child, i) => child.position.set(...points[i]))
+
+            //Line
+            updateLine()
+
+            // Curve & flow
+            const vectorPoints = points.map(point => new Vector3(...point))
+            curve.points = vectorPoints
+            flows.setCurve(j, j % curveGroups[i].length)
+            updateCurve(j, curve)
+          }
+
+          if (handleGroup.children.length > pattern.length) {
+            // Handles
+            handleGroup.remove(handleGroup.children[0])
+            handleGroup.children.map((child, i) => child.position.set(...points[i]))
+
+            // Line
+            updateLine()
+
+            // Curve & flow
+            const vectorPoints = points.map(point => new Vector3(...point))
+            curve.points = vectorPoints
+            flows.setCurve(j, j % curveGroups[i].length)
+            updateCurve(j, curve)
+          }
+        }
+
+        // Update materials
+        curveGroups[i][j].handleGroup.children.forEach((child, x) => {
+          pattern[x] ? (child.material = pulseMat) : (child.material = mat)
+        })
+      })
+    }),
+  )
+
+  /*
+   * Theme handling
+   */
 
   theme.subscribe(mode => {
-    flows.forEach(flow =>
-      flow.object3D.material.color.setHex(mode === 'light' ? 0x111111 : 0xcccccc),
-    )
-
-    matActive.color.setHex(mode === 'light' ? 0x000000 : 0xffffff)
-    mat.color.setHex(mode === 'light' ? 0x444444 : 0x111111)
+    const getFlowColor = () => (mode === 'light' ? colors.gray1 : colors.gray2)
+    flows.object3D.material.color.setHex(getFlowColor(mode))
+    mat.color.setHex(mode === 'light' ? colors.gray1 : colors.gray2)
+    pulseMat.color.setHex(mode === 'light' ? colors.gray1 : colors.gray3)
   })
+
+  /*
+   * Event handling
+   */
 
   const onPointerDown = () => (action = true)
   const onMouseMove = ({ offsetX: x, offsetY: y }) => updateMousePosition({ x, y })
@@ -304,16 +375,26 @@
   renderer.domElement.addEventListener('pointerdown', onPointerDown)
   renderer.domElement.addEventListener('mousemove', onMouseMove)
 
+  /*
   control.addEventListener('mouseDown', () => interacting.set(true))
   control.addEventListener('mouseUp', () => interacting.set(false))
-  control.addEventListener('dragging-changed', ({ value }) => {
+  $: control.addEventListener('dragging-changed', ({ value }) => {
     if (!value) {
-      for (let i = 0; i < curveGroups.length; i++) {
-        curveGroups[i].forEach(({ curve, line }, j) => {
+      FIXME: Increase speed with slope to prevent laggards
+      curveGroups.forEach(g =>
+        g.forEach(({ curve, line }) => {
           line.geometry.setFromPoints(curve.getPoints(50))
-          flows[i].updateCurve(j, curve)
-        })
-      }
+        }),
+      )
+      curveGroups[selected].forEach(({ curve }, j) => updateCurve(j, curve))
     }
   })
+  */
+
+  /*
+  // Translation constraints
+  control.addEventListener('change', () => {
+    control.object.position.clamp(new Vector3(-100, 1, -100), new Vector3(100, 24, 100))
+  })
+  */
 </script>
