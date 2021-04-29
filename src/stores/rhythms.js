@@ -1,9 +1,8 @@
-import { distinctUntilChanged } from 'rxjs/operators'
+import { distinctUntilChanged, map } from 'rxjs/operators'
 import { sequencer$ } from '../stores/euclid-sequencer'
 import { bjorklund } from '../lib/bjorklund'
+import { mapBinary } from '../lib/array'
 import { writable$ } from './utils/observable-store'
-
-const notes = ['C3', 'E3', 'G3', 'C4', 'G4']
 
 // Hacky object comparison
 // Comparing JSON probably not way to go,
@@ -14,10 +13,18 @@ export const rhythms$ = writable$().pipe(distinctUntilChanged(objEqual))
 
 sequencer$.subscribe(sequencer => {
   rhythms$.next(
-    sequencer.map(({ cycles }) =>
-      cycles.map(({ steps, pulses }, i) =>
-        bjorklund(pulses, steps).map(position => (position === 1 ? notes[i] : null)),
-      ),
-    ),
+    sequencer.map(({ cycles }) => cycles.map(({ steps, pulses }) => bjorklund(pulses, steps))),
   )
 })
+
+export const notes$ = writable$()
+const chord = ['C3', 'C4', 'G3']
+
+rhythms$
+  .pipe(
+    map(rhythms => {
+      console.log(rhythms)
+      return rhythms.map(poly => poly.map((single, i) => mapBinary(single, [chord[i], null])))
+    }),
+  )
+  .subscribe(notes => notes$.next(notes))
