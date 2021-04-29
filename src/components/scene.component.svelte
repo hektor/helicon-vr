@@ -275,25 +275,24 @@
 
   renderer.setAnimationLoop(() => {
     // Monitor performance of enclosed code (begin to end)
-    stats.begin()
-    {
-      // Render scene
-      composer.render(scene, camera)
-      // XR controller intersections
-      if (renderer.xr.isPresenting) {
-        handleController(controller1)
-        handleController(controller2)
-        cleanIntersected()
-        intersectObjects(controller1, 1)
-        intersectObjects(controller2, 2)
-      } else {
-        // Control damping is enabled
-        if (selectedControls === 'orbit') controls.update()
-      }
-      // Sequencer
-      if (flows) flows.forEach(flow => flow.moveAlongCurve(0.001))
+    // stats.begin()
+    // {
+    // Render scene
+    composer.render(scene, camera)
+    // XR controller intersections
+    if (renderer.xr.isPresenting) {
+      handleController(controller1)
+      handleController(controller2)
+      cleanIntersected()
+      intersectObjects(controller1, 1)
+      intersectObjects(controller2, 2)
+    } else {
+      // Control damping is enabled
+      if (selectedControls === 'orbit') controls.update()
     }
-    stats.end()
+    // Sequencer
+    // }
+    // stats.end()
   })
 
   onMount(() => {
@@ -303,7 +302,7 @@
     // Attach elements to DOM
     target && target.appendChild(renderer.domElement)
     target && target.appendChild(VRButton.createButton(renderer))
-    target && target.appendChild(stats.dom)
+    /* target && target.appendChild(stats.dom) */
   })
 
   //Expose scene objects
