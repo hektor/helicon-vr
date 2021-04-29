@@ -44,7 +44,7 @@
 
   // VR controls & hands
   let controller1, controller2, controllerGrip1, controllerGrip2, hand1, hand2
-  let flows
+  export let flows
 
   const { fov, near, far, density } = $cameraSettings
 
