@@ -19,7 +19,7 @@ const defaults = tracks$.getValue().map((_, i) => ({
       type: 'sine',
       volume: 0,
     },
-    portamento: 0,
+    maxPolyphony: 16,
   },
 }))
 
