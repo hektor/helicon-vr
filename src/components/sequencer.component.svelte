@@ -343,7 +343,7 @@
 
         // Update materials
         curveGroups[i][j].handleGroup.children.forEach((child, x) => {
-          pattern[x] !== null ? (child.material = pulseMat) : (child.material = mat)
+          pattern[x] ? (child.material = pulseMat) : (child.material = mat)
         })
       })
     }),
