@@ -1,13 +1,14 @@
 <script>
+  import { onMount } from 'svelte'
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
-  import { Transport, Channel, Synth } from 'tone'
+  import { Transport, Channel, PolySynth, Synth } from 'tone'
 
   import { first as arrFirst, diff as arrDiff } from '../lib/array'
 
   import { playing$, bpm$ } from '../stores/playback'
-  import { rhythms$ } from '../stores/rhythms'
+  import { notes$ } from '../stores/rhythms'
 
   import {
     master$,
@@ -99,7 +100,7 @@
   const setChannel = (channel, { muted: mute, volume }) => channel.set({ volume, mute })
   const indexChannel = (channel, id) => channel.set({ name: id })
 
-  const newSynth = ({ id, ...rest }) => new Synth({ ...rest }).set({ name: id })
+  const newSynth = ({ id, ...rest }) => new PolySynth({ ...rest }).set({ name: id })
 
   // Create from state
   const master = newChannel($master$).toDestination()
@@ -146,7 +147,7 @@
       removeRemovedTrackChannel()
     }
 
-    const newSynth = new Synth(defaultSynthSettings).set({ name: $synths$.length })
+    const newSynth = new PolySynth(defaultSynthSettings).set({ name: $synths$.length })
     if ($tracks$.length > 0) newSynth.connect(channels[$tracks$.length - 1])
     if (shouldAddSynth()) addSynth(newSynth)
     if (shouldRemoveSynth()) {
@@ -162,27 +163,30 @@
     Transport.bpm.value = $bpm$
   }
 
-  const cycles = [
-    ['C4', null, 'D4', null],
-    ['E4', 'F4', 'F4', 'G4', 'E4'],
-    ['G4', 'A4', 'A4'],
-    ['G4', 'A4', 'A4', 'C5'],
-    ['G4', 'A4', 'A4', 'C5'],
-    ['G4', 'A4', 'A4', 'C5'],
-    ['G4', 'A4', 'E4', 'E5'],
-  ]
+  /*
+   *
+   */
 
-  rhythms$.subscribe(console.log)
+  let flows
 
-  let indeces = new Array($sequencer$.length).fill(0)
-  const loops = $sequencer$.map((_, i) => time => {
+  const cycles = $notes$[0]
+  let indeces = new Array(cycles.length).fill(0)
+
+  const loops = cycles.map((_, i) => time => {
     let step = indeces[i] % cycles[i].length
-    let input = cycles[i][step]
-    input && synths[i].triggerAttackRelease(cycles[i][step], '32n', time)
+    let input = cycles.map(cycle => cycle[step])
+    /* console.log(input) */
+    /* console.log(`${indeces[i] % cycles[i].length} of ${cycles[i].length}`) */
+    input && synths[0].triggerAttackRelease(cycles[i][step], '8n', time)
+    flows.moveIndividualAlongCurve(i, 1 / cycles[i].length)
     indeces[i]++
   })
 
-  loops.forEach(loop => Transport.scheduleRepeat(loop, '4n'))
+  onMount(() => {
+    for (let i = 0; i < flows.curveArray.length; i++) flows.moveIndividualAlongCurve(i, -0.38)
+  })
+
+  loops.forEach(loop => Transport.scheduleRepeat(loop, '8n'))
 
   /*
    * Handle DOM events
@@ -238,7 +242,7 @@
       <MIDIDevices />
     </div>
   </Header>
-  <Scene />
+  <Scene bind:flows />
   {#if $selected$ > 0}
     <Collapsible title={`Instrument (track ${$selected$})`}>
       <div class="module-groups">
