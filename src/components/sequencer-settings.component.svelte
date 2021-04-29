@@ -13,7 +13,7 @@
         <label for="steps">Steps</label>
       </div>
       <div class="cycle-setting">
-        <ControlKnob bind:value={pulses} min={0} max={16} />
+        <ControlKnob bind:value={pulses} min={0} max={steps} />
         <label for="pulses">Pulses</label>
       </div>
     </div>
