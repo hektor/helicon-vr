@@ -156,7 +156,10 @@
         curve.curveType = 'catmullrom'
         curve.closed = true
 
-        const line = new LineLoop(new BufferGeometry().setFromPoints(curve.getPoints(32)), mat)
+        const line = new LineLoop(
+          new BufferGeometry().setFromPoints(curve.getPoints(32)),
+          new LineBasicMaterial({ color: colors.gray1 }),
+        )
 
         curve.name = $sequencer$.length
         line.name = $sequencer$.length
