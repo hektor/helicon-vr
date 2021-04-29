@@ -195,6 +195,7 @@
   }
 
   const handleRemove = () => {
+    if ($tracks$.length <= 1) return
     nextRemoveTrack()
     menu.close()
   }
@@ -309,7 +310,7 @@
   </Collapsible>
 </div>
 
-{#if menuTrackId}
+{#if menuTrackId && $tracks$.length > 1}
   <div
     id="context"
     style="--display: {shown ? 'block' : 'none'}; --top: {position.y}px; --left: {position.x}px"
