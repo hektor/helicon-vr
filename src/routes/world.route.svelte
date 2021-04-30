@@ -158,8 +158,7 @@
     updateChannels()
     updateSynths()
 
-    // Playback (calling Tone.start() prevents suspended AudioContext)
-    $playing$ ? Tone.start() && Transport.start() : Transport.stop()
+    $playing$ ? Transport.start() : Transport.stop()
     Transport.bpm.value = $bpm$
   }
 
