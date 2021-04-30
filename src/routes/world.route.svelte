@@ -3,7 +3,7 @@
   import TrashCan24 from 'carbon-icons-svelte/lib/TrashCan24'
   import { onDestroy } from 'svelte'
   import * as Tone from 'tone'
-  import { Transport, Channel, PolySynth, Synth } from 'tone'
+  import { Transport, Channel, PolySynth } from 'tone'
 
   import { first as arrFirst, diff as arrDiff } from '../lib/array'
 
@@ -236,7 +236,7 @@
 </svelte:head>
 <div class="container">
   <Header>
-    <TransportControls />
+    <TransportControls on:click={console.log} />
     <div class="actions">
       <MIDIDevices />
     </div>
@@ -322,7 +322,12 @@
       <li>
         <span>Track {menuTrackId}</span>
       </li>
-      <li class="option" on:click={handleRemove}><TrashCan24 />Remove</li>
+      <li class="option" class:disabled={$playing$}>
+        <button disabled={$playing$} on:click={handleRemove}>
+          <TrashCan24 />
+          Remove
+        </button>
+      </li>
     </ul>
   </div>
 {/if}
@@ -407,5 +412,19 @@
     cursor: pointer;
     color: var(--color-1);
     background: var(--color-4);
+  }
+
+  #context .option.disabled {
+    color: var(--color-3);
+    background: var(--color-1);
+  }
+
+  #context .option {
+    padding: 1.6rem 1.6rem 1.6rem 0;
+  }
+
+  #context .option button {
+    display: flex;
+    align-items: center;
   }
 </style>
