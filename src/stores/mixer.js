@@ -6,10 +6,10 @@ const defaults = {
   selected: -1,
   master: { label: 'Master', volume: 0, muted: false },
   tracks: [
-    { id: 1, label: 'Track 1', volume: 0, muted: false },
-    { id: 2, label: 'Track 2', volume: 0, muted: false },
-    { id: 3, label: 'Track 3', volume: 0, muted: false },
-    { id: 4, label: 'Track 4', volume: 0, muted: false },
+    { id: 1, label: 'Track 1', volume: -6, muted: false },
+    { id: 2, label: 'Track 2', volume: -6, muted: false },
+    { id: 3, label: 'Track 3', volume: -6, muted: true },
+    { id: 4, label: 'Track 4', volume: -6, muted: true },
   ],
 }
 
