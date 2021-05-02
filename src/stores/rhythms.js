@@ -13,18 +13,14 @@ export const rhythms$ = writable$().pipe(distinctUntilChanged(objEqual))
 
 sequencer$.subscribe(sequencer => {
   rhythms$.next(
-    sequencer.map(({ cycles }) => cycles.map(({ steps, pulses }) => bjorklund(pulses, steps))),
+    sequencer.map(({ cycles }) =>
+      cycles.map(({ steps, pulses, note }) => {
+        return bjorklund(pulses, steps).map(position => (position === 1 ? note : 0))
+      }),
+    ),
   )
 })
 
 export const notes$ = writable$()
-const chord = ['C3', 'C4', 'G3']
 
-rhythms$
-  .pipe(
-    map(rhythms => {
-      console.log(rhythms)
-      return rhythms.map(poly => poly.map((single, i) => mapBinary(single, [chord[i], null])))
-    }),
-  )
-  .subscribe(notes => notes$.next(notes))
+rhythms$.subscribe(notes => notes$.next(notes))

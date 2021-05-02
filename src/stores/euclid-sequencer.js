@@ -7,14 +7,17 @@ const defaults = tracks$.getValue().map((_, i) => ({
     {
       steps: 16,
       pulses: 3,
+      note: 57 + i * 12,
     },
     {
       steps: 16,
       pulses: 2,
+      note: 59 + i * 12,
     },
     {
       steps: 16,
       pulses: 5,
+      note: 62 + i * 12,
     },
   ],
 }))
