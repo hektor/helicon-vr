@@ -1,20 +1,28 @@
 <script>
   import ControlKnob from './control-knob.component.svelte'
 
+  import * as Tone from 'tone'
+
+  const getNote = num => Tone.Frequency(num, 'midi').toNote()
+
   export let cycles = []
 </script>
 
 <div class="sequencer">
-  {#each cycles as { steps, pulses }, i}
+  {#each cycles as { steps, pulses, note }, i}
     <div class="cycle">
       <span>Cycle {i + 1}</span>
       <div class="cycle-setting">
         <ControlKnob bind:value={steps} min={3} max={16} />
-        <label for="steps">Steps</label>
+        <label for="steps">Positions</label>
       </div>
       <div class="cycle-setting">
         <ControlKnob bind:value={pulses} min={0} max={steps} />
         <label for="pulses">Pulses</label>
+      </div>
+      <div class="cycle-setting">
+        <ControlKnob bind:value={note} min={0} max={127} />
+        <label for="note">{getNote(note)}</label>
       </div>
     </div>
   {/each}

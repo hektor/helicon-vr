@@ -3,6 +3,8 @@ import { debounce } from 'rxjs/operators'
 import { writable$ } from './utils/observable-store'
 import { tracks$ } from './mixer'
 
+const defaultOscillatorTypes = ['sine', 'triangle', 'square', 'sawtooth']
+
 const defaults = tracks$.getValue().map((_, i) => ({
   id: i + 1,
   ...{
@@ -16,10 +18,10 @@ const defaults = tracks$.getValue().map((_, i) => ({
       sustain: 0.5,
     },
     oscillator: {
-      type: 'sine',
+      type: defaultOscillatorTypes[i],
       volume: 0,
     },
-    maxPolyphony: 16,
+    maxPolyphony: 32,
   },
 }))
 

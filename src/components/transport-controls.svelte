@@ -1,12 +1,14 @@
 <script>
+  import * as Tone from 'tone'
+
   import Play32 from 'carbon-icons-svelte/lib/Play32'
   import Pause32 from 'carbon-icons-svelte/lib/Pause32'
   import Stop32 from 'carbon-icons-svelte/lib/Stop32'
   import { playing$, bpm$ } from '../stores/playback'
 
-  /*
-   * Render transport controls and handle state updates
-   */
+  const play = async () => {
+    await Tone.context.resume().then(() => playing$.next(!$playing$))
+  }
 </script>
 
 <div class="transport-controls">
@@ -14,12 +16,7 @@
     <label for="bpm">BPM</label>
     <input id="bpm" type="number" bind:value={$bpm$} step="0.1" min="1" max="10000" />
   </div>
-  <button
-    id="play"
-    on:click={() => playing$.next(!$playing$)}
-    class="tooltip key"
-    class:playing={$playing$}
-  >
+  <button id="play" on:click={play} class="tooltip key" class:playing={$playing$}>
     {#if $playing$}
       <Pause32 />
       <small>Pauze</small>

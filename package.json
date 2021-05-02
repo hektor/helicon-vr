@@ -22,6 +22,6 @@
     "svelte": "^3.32.1",
     "svelte-spa-router": "^3.1.0",
     "three": "^0.128.0",
-    "tone": "^14.7.77"
+    "tone": "latest"
   }
 }
