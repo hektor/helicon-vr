@@ -51,7 +51,8 @@
    * Tone settings
    */
 
-  Tone.setContext(new Tone.Context({ latencyHint: 'interactive' }))
+  /* Tone.setContext(new Tone.Context({ latencyHint: 'interactive' })) */
+  /* Tone.context.lookAhead = 0 */
 
   const { envelope, oscillator, portamento } = defaultSynthSettings
 
@@ -168,24 +169,53 @@
 
   let flows
 
-  const cycles = $notes$[0]
-  let indeces = new Array(cycles.length).fill(0)
+  const decodeNotes = notes =>
+    notes.map(num => (num > 0 ? Tone.Frequency(num, 'midi').toNote() : null))
 
-  const loops = cycles.map((_, i) => time => {
-    let step = indeces[i] % cycles[i].length
-    let input = cycles.map(cycle => cycle[step])
-    /* console.log(input) */
-    /* console.log(`${indeces[i] % cycles[i].length} of ${cycles[i].length}`) */
-    input && synths[0].triggerAttackRelease(cycles[i][step], '8n', time)
-    flows.moveIndividualAlongCurve(i, 1 / cycles[i].length)
-    indeces[i]++
+  // TODO: Pass track index to cycles, create indeces for each track
+  let cycles = () => $notes$[0].map(decodeNotes)
+  let indeces = new Array(cycles().length).fill(0)
+
+  let loops = (time, trackIndex) => {
+    let step0 = indeces[0] % cycles()[0].length
+    let step1 = indeces[1] % cycles()[1].length
+    let step2 = indeces[2] % cycles()[2].length
+
+    const chord = [cycles()[0][step0], cycles()[1][step1], cycles()[2][step2]]
+
+    if (chord)
+      synths[trackIndex].triggerAttackRelease(
+        chord,
+        chord.map(() => '4n'),
+      )
+
+    Tone.Draw.schedule(() => {
+      if (flows) flows.moveIndividualAlongCurve(0, 1 / cycles()[0].length)
+      if (flows) flows.moveIndividualAlongCurve(1, 1 / cycles()[1].length)
+      if (flows) flows.moveIndividualAlongCurve(2, 1 / cycles()[2].length)
+    }, time)
+
+    indeces[0]++
+    indeces[1]++
+    indeces[2]++
+  }
+
+  $tracks$.forEach((_, i) => {
+    Tone.Transport.scheduleRepeat(time => loops(time, i), `${8 - 2 * i}n`)
   })
+
+  // FIXME: Not playing new added tracks
+  /* latestAddedTrack$.subscribe(() => { */
+  /*   Tone.Transport.scheduleRepeat( */
+  /*     time => loops(time, $tracks$.length - 1), */
+  /*     `${8 - 2 * $tracks$.length - 1}n`, */
+  /*   ) */
+  /* }) */
 
   onMount(() => {
-    for (let i = 0; i < flows.curveArray.length; i++) flows.moveIndividualAlongCurve(i, -0.38)
+    if (flows)
+      for (let i = 0; i < flows.curveArray.length; i++) flows.moveIndividualAlongCurve(i, -0.29)
   })
-
-  loops.forEach(loop => Transport.scheduleRepeat(loop, '8n'))
 
   /*
    * Handle DOM events
@@ -224,7 +254,10 @@
 
   const midiMessageToNoteName = msg => Tone.Frequency(msg[1], 'midi')
   const handleNoteOn = ({ detail }) => pianoSynth.triggerAttack(midiMessageToNoteName(detail))
-  const handleNoteOff = () => pianoSynth.triggerRelease()
+  const handleNoteOff = () => {
+    pianoSynth.triggerRelease()
+    pianoSynth.releaseAll()
+  }
 
   onDestroy(() => {
     playing$.next(false)
