@@ -23,7 +23,8 @@
       <label for="sustain">Sustain</label>
     </div>
     <div class="control-knob-container">
-      <ControlKnob id="release" min={0} max={5} step={0.05} bind:value={envelope.release} />
+      <!--release capped 1 instead of the maximum of 5-->
+      <ControlKnob id="release" min={0} max={1} step={0.05} bind:value={envelope.release} />
       <label for="release">Release</label>
     </div>
     <hr />
