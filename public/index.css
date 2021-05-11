@@ -99,8 +99,8 @@ button {
   color: inherit;
 }
 
-a[href^="https://"]::after
-{
+a[href^="https://"]::after,
+a[href^="mailto:"]::after {
   content: '↗';
 }
 
