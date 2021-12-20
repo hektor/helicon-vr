@@ -16,6 +16,7 @@
     "snowpack": "^3.0.1"
   },
   "dependencies": {
+    "@hektormisplon/numbers": "1.0.1",
     "carbon-icons-svelte": "^10.23.0",
     "rxjs": "^6.6.6",
     "sirv-cli": "1.0.11",
