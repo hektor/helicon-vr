@@ -1,5 +1,5 @@
 <script>
-  import { isNumber } from '../lib/number'
+  import { isNumber } from '@hektormisplon/numbers'
 
   export let envelope
 
